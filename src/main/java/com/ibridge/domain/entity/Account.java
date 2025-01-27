@@ -1,13 +1,14 @@
 package com.ibridge.domain.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Fetch;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -15,4 +16,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class Account {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToMany(mappedBy = "id")
+    private List<Parent> parentList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "id")
+    private List<Child> childList = new ArrayList<>();
 }
