@@ -25,4 +25,8 @@ public class Account {
 
     @OneToMany(mappedBy = "id")
     private List<Child> childList = new ArrayList<>();
+
+    public String toString() {
+        return id.toString();
+    }
 }
