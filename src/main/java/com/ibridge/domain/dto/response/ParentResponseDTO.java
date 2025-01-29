@@ -37,4 +37,22 @@ public class ParentResponseDTO {
     public static class EditInfo {
         Long parentId;
     }
+
+    @Builder
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ParentHome{
+        public String today;
+        public List<QuestionResponse> questions;
+    }
+    @Builder
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class QuestionResponse{
+        public Long questionId;
+        public String question;
+        public boolean isAnswer;
+    }
 }

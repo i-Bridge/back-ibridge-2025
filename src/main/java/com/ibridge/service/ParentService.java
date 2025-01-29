@@ -9,11 +9,13 @@ import com.ibridge.repository.AccountRepository;
 import com.ibridge.repository.ChildRepository;
 import com.ibridge.repository.ParentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -58,5 +60,10 @@ public class ParentService {
 
         return ParentResponseDTO.EditInfo.builder()
                 .parentId(parent.getId()).build();
+    }
+
+    public ParentResponseDTO.ParentHome getParentHomeData(Long parentId) {
+        List<ParentResponseDTO.QuestionResponse> questions = parentRepository.findQuestionsByParentId(parentId);
+        return new ParentResponseDTO.ParentHome(LocalDate.now().toString(), questions);
     }
 }
