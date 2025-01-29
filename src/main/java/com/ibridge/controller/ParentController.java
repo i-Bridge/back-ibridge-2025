@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/parent")
@@ -25,5 +28,11 @@ public class ParentController {
     public ApiResponse<ParentResponseDTO.EditInfo> EditInfo(@PathVariable("parentId") Long parentId, @RequestBody ParentRequestDTO.EditInfo editInfo) throws ParseException {
         ParentResponseDTO.EditInfo editInfoDTO = parentService.editInfo(parentId, editInfo);
         return ApiResponse.onSuccess(editInfoDTO);
+    }
+
+    @GetMapping("/{parentId}/home")
+    public ApiResponse<ParentResponseDTO.ParentHome> getParentHome(@PathVariable("parentId") Long parentId) {
+        ParentResponseDTO.ParentHome data = parentService.getParentHomeData(parentId);
+        return ApiResponse.onSuccess(data);
     }
 }
