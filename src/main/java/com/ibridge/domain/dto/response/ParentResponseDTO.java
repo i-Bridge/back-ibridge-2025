@@ -29,4 +29,12 @@ public class ParentResponseDTO {
         String name;
         String birth;
     }
+
+    @Builder
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class EditInfo {
+        Long parentId;
+    }
 }
