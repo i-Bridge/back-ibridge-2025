@@ -1,16 +1,15 @@
 package com.ibridge.service;
 
 import com.ibridge.domain.dto.request.ParentRequestDTO;
+import com.ibridge.domain.dto.request.QuestionRequestDTO;
 import com.ibridge.domain.dto.response.ParentResponseDTO;
 import com.ibridge.domain.dto.response.QuestionAnalysisDTO;
+import com.ibridge.domain.dto.response.QuestionResponseDTO;
 import com.ibridge.domain.entity.Account;
 import com.ibridge.domain.entity.Child;
 import com.ibridge.domain.entity.Gender;
 import com.ibridge.domain.entity.Parent;
-import com.ibridge.repository.AccountRepository;
-import com.ibridge.repository.AnalysisRepository;
-import com.ibridge.repository.ChildRepository;
-import com.ibridge.repository.ParentRepository;
+import com.ibridge.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +30,7 @@ public class ParentService {
     private final ChildRepository childRepository;
     private final AccountRepository accountRepository;
     private final AnalysisRepository analysisRepository;
+    private final QuestionRepository questionRepository;
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
 
@@ -106,5 +106,10 @@ public class ParentService {
 
     public QuestionAnalysisDTO getQuestionAnalysis(Long parentId, Long questionId){
         return analysisRepository.findAnalysisByQuestionId(parentId, questionId);
+    }
+
+    public QuestionResponseDTO addTempQuestion(Long parentId, QuestionRequestDTO request){
+        Long questionId = questionRepository.saveQuestion(parentId, request.getQuestion());
+        return new QuestionResponseDTO(questionId);
     }
 }

@@ -1,8 +1,11 @@
 package com.ibridge.controller;
 
 import com.ibridge.domain.dto.request.ParentRequestDTO;
+import com.ibridge.domain.dto.request.QuestionRequestDTO;
 import com.ibridge.domain.dto.response.ParentResponseDTO;
 import com.ibridge.domain.dto.response.QuestionAnalysisDTO;
+import com.ibridge.domain.dto.response.QuestionResponseDTO;
+import com.ibridge.domain.entity.Question;
 import com.ibridge.service.ParentService;
 import com.ibridge.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +53,12 @@ public class ParentController {
     @GetMapping("/{parentId}/{questionId}")
     public ApiResponse<QuestionAnalysisDTO> getQuestionAnalysis(@PathVariable("parentId") Long parentId, @PathVariable("questionId") Long questionId) {
         QuestionAnalysisDTO data = parentService.getQuestionAnalysis(parentId, questionId);
+        return ApiResponse.onSuccess(data);
+    }
+
+    @PostMapping("/{parentId}/add-temp")
+    public ApiResponse<QuestionResponseDTO> addTempQuestion(@PathVariable("parentId") Long parentId, @RequestBody QuestionRequestDTO request){
+        QuestionResponseDTO data = parentService.addTempQuestion(parentId, request);
         return ApiResponse.onSuccess(data);
     }
 }
