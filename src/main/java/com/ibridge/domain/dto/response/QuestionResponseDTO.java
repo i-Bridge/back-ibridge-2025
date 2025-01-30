@@ -7,12 +7,13 @@ import java.util.List;
 
 @Getter
 public class QuestionResponseDTO {
-    private Long QuestionId;
+    private Long questionId;
 
     @Builder
-    public QuestionResponseDTO(Long QuestionId) {
-        this.QuestionId = QuestionId;
+    public QuestionResponseDTO(Long questionId) {
+        this.questionId = questionId;
     }
+
 
     @Builder
     @Data
@@ -22,5 +23,17 @@ public class QuestionResponseDTO {
         public Long questionId;
         public String question;
         public boolean isAnswer;
+    }
+
+    @Builder
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class DeletedQuestionResponse {
+        @JsonProperty("questionId")
+        private Long questionId;
+
+        @JsonProperty("deletedAt")
+        private String deletedAt;
     }
 }
