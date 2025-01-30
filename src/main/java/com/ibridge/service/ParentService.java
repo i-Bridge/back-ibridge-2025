@@ -20,12 +20,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static java.time.LocalDate.now;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class ParentService {
     private final ParentRepository parentRepository;
     private final ChildRepository childRepository;
+    private final AccountRepository accountRepository;
 
     public ParentResponseDTO.getMyPageDTO getMyPage(Long parentId) {
         Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
@@ -63,7 +66,24 @@ public class ParentService {
     }
 
     public ParentResponseDTO.ParentHome getParentHomeData(Long parentId) {
-        List<ParentResponseDTO.QuestionResponse> questions = parentRepository.findQuestionsByParentId(parentId);
-        return new ParentResponseDTO.ParentHome(LocalDate.now().toString(), questions);
+        List<ParentResponseDTO.QuestionResponse> questions = parentRepository.findQuestionsById(parentId);
+        return new ParentResponseDTO.ParentHome(now().toString(), questions);
+    }
+
+    public ParentResponseDTO.deleteDTO deleteAccount(Long parentId) {
+        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
+
+        Account account = parent.getAccount();
+        for(Child child : childRepository.findByAccount(account)) {
+            childRepository.delete(child);
+        }
+        for(Parent parents : parentRepository.findByAccount(account)) {
+            parentRepository.delete(parents);
+        }
+        accountRepository.delete(account);
+
+        return ParentResponseDTO.deleteDTO.builder()
+                .deletedAt(new Date())
+                .account(account.toString()).build();
     }
 }

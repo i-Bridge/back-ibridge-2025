@@ -35,4 +35,10 @@ public class ParentController {
         ParentResponseDTO.ParentHome data = parentService.getParentHomeData(parentId);
         return ApiResponse.onSuccess(data);
     }
+
+    @DeleteMapping("/{parentId}/mypage/delete")
+    public ApiResponse<ParentResponseDTO.deleteDTO> deleteParentHome(@PathVariable("parentId") Long parentId) {
+        ParentResponseDTO.deleteDTO data = parentService.deleteAccount(parentId);
+        return ApiResponse.onSuccess(data);
+    }
 }

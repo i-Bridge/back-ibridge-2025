@@ -3,6 +3,7 @@ package com.ibridge.domain.dto.response;
 import com.ibridge.domain.entity.Relation;
 import lombok.*;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -55,4 +56,14 @@ public class ParentResponseDTO {
         public String question;
         public boolean isAnswer;
     }
+
+    @Builder
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class deleteDTO {
+        Date deletedAt;
+        String account;
+    }
+
 }
