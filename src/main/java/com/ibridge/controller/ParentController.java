@@ -4,9 +4,12 @@ import com.ibridge.domain.dto.request.ParentRequestDTO;
 import com.ibridge.domain.dto.request.QuestionRequestDTO;
 import com.ibridge.domain.dto.response.ParentResponseDTO;
 import com.ibridge.domain.dto.response.QuestionAnalysisDTO;
+import com.ibridge.domain.dto.response.QuestionBoardResponseDTO;
 import com.ibridge.domain.dto.response.QuestionResponseDTO;
 import com.ibridge.domain.entity.Question;
+import com.ibridge.repository.QuestionRepository;
 import com.ibridge.service.ParentService;
+import com.ibridge.service.QuestionBoardService;
 import com.ibridge.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.parameters.P;
@@ -19,6 +22,7 @@ import java.text.ParseException;
 @RequiredArgsConstructor
 public class ParentController {
     private final ParentService parentService;
+    private final QuestionBoardService questionBoardService;
 
     @GetMapping("/{parentId}/mypage")
     public ApiResponse<ParentResponseDTO.getMyPageDTO> getMyPage(@PathVariable("parentId") Long parentId) {
@@ -59,6 +63,14 @@ public class ParentController {
     @PostMapping("/{parentId}/add-temp")
     public ApiResponse<QuestionResponseDTO> addTempQuestion(@PathVariable("parentId") Long parentId, @RequestBody QuestionRequestDTO request){
         QuestionResponseDTO data = parentService.addTempQuestion(parentId, request);
+        return ApiResponse.onSuccess(data);
+    }
+
+    @GetMapping("/{parentId}/questions/board")
+    public ApiResponse<QuestionBoardResponseDTO> getQuestionBoard(
+            @PathVariable("parentId") Long parentId,
+            @RequestParam(defaultValue = "1") int page) {
+        QuestionBoardResponseDTO data = questionBoardService.getQuestionBoard(parentId, page);
         return ApiResponse.onSuccess(data);
     }
 }
