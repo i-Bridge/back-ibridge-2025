@@ -2,10 +2,7 @@ package com.ibridge.controller;
 
 import com.ibridge.domain.dto.request.ParentRequestDTO;
 import com.ibridge.domain.dto.request.QuestionRequestDTO;
-import com.ibridge.domain.dto.response.ParentResponseDTO;
-import com.ibridge.domain.dto.response.QuestionAnalysisDTO;
-import com.ibridge.domain.dto.response.QuestionBoardResponseDTO;
-import com.ibridge.domain.dto.response.QuestionResponseDTO;
+import com.ibridge.domain.dto.response.*;
 import com.ibridge.domain.entity.Question;
 import com.ibridge.repository.QuestionRepository;
 import com.ibridge.service.ParentService;
@@ -83,5 +80,13 @@ public class ParentController {
             @RequestBody QuestionRequestDTO.QuestionUpdateRequestDTO request) {
         questionService.updateQuestion(parentId, questionId, request);
         return ApiResponse.onSuccess(null);
+    }
+
+    @PostMapping("/{parentId}/questions")
+    public ApiResponse<QuestionListResponseDTO> createQuestion(
+            @PathVariable("parentId") Long parentId,
+            @RequestBody QuestionRequestDTO.QuestionUpdateRequestDTO request) {
+        QuestionListResponseDTO data = questionService.createQuestion(parentId, request);
+        return ApiResponse.onSuccess(data);
     }
 }
