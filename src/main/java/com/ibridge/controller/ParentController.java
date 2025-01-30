@@ -2,6 +2,7 @@ package com.ibridge.controller;
 
 import com.ibridge.domain.dto.request.ParentRequestDTO;
 import com.ibridge.domain.dto.response.ParentResponseDTO;
+import com.ibridge.domain.dto.response.QuestionAnalysisDTO;
 import com.ibridge.service.ParentService;
 import com.ibridge.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,12 @@ public class ParentController {
     @PostMapping("/{parentId}/mypage/child/add")
     public ApiResponse<ParentResponseDTO.AddChildDTO> addChild(@PathVariable("parentId") Long parentId, @RequestBody ParentRequestDTO.AddChildDTO addChildDTO) throws ParseException {
         ParentResponseDTO.AddChildDTO data = parentService.addChild(parentId, addChildDTO);
+        return ApiResponse.onSuccess(data);
+    }
+
+    @GetMapping("/{parentId}/{questionId}")
+    public ApiResponse<QuestionAnalysisDTO> getQuestionAnalysis(@PathVariable("parentId") Long parentId, @PathVariable("questionId") Long questionId) {
+        QuestionAnalysisDTO data = parentService.getQuestionAnalysis(parentId, questionId);
         return ApiResponse.onSuccess(data);
     }
 }
