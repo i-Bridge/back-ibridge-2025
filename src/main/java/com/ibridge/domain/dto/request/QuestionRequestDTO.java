@@ -15,7 +15,7 @@ public class QuestionRequestDTO {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public class QuestionUpdateRequestDTO {
+    public static class QuestionUpdateRequestDTO {
         private String question;
     }
 }
