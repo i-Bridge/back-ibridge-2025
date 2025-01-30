@@ -89,4 +89,12 @@ public class ParentController {
         QuestionListResponseDTO data = questionService.createQuestion(parentId, request);
         return ApiResponse.onSuccess(data);
     }
+
+    @DeleteMapping("/{parentId}/questions/delete/{questionId}")
+    public ApiResponse<QuestionResponseDTO.DeletedQuestionResponse> deleteQuestion(
+            @PathVariable("parentId") Long parentId,
+            @PathVariable("questionId") Long questionId) {
+        QuestionResponseDTO.DeletedQuestionResponse data = questionService.deleteQuestion(parentId, questionId);
+        return ApiResponse.onSuccess(data);
+    }
 }

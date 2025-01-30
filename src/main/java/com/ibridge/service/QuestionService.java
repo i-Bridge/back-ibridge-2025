@@ -8,6 +8,7 @@ import com.ibridge.repository.QuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -27,5 +28,10 @@ public class QuestionService {
         questionRepository.saveQuestion(parentId, request.getQuestion());
         List<QuestionListResponseDTO.QuestionDTO> questions = questionRepository.findQuestionsByParentId(parentId);
         return new QuestionListResponseDTO(questions);
+    }
+
+    public QuestionResponseDTO.DeletedQuestionResponse deleteQuestion(Long parentId, Long questionId) {
+        questionRepository.deleteQuestion(parentId, questionId);
+        return new QuestionResponseDTO.DeletedQuestionResponse(questionId, LocalDate.now().toString());
     }
 }

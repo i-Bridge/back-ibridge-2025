@@ -11,4 +11,5 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     Long saveQuestion(Long parentId, String question);
     void updateQuestion(Long parentId, Long questionId, String question);
     List<QuestionListResponseDTO.QuestionDTO> findQuestionsByParentId(Long parentId);
+    void deleteQuestion(Long parentId, Long questionId);
 }
