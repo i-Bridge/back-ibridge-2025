@@ -10,6 +10,7 @@ import com.ibridge.domain.entity.Question;
 import com.ibridge.repository.QuestionRepository;
 import com.ibridge.service.ParentService;
 import com.ibridge.service.QuestionBoardService;
+import com.ibridge.service.QuestionService;
 import com.ibridge.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.parameters.P;
@@ -23,6 +24,7 @@ import java.text.ParseException;
 public class ParentController {
     private final ParentService parentService;
     private final QuestionBoardService questionBoardService;
+    private final QuestionService questionService;
 
     @GetMapping("/{parentId}/mypage")
     public ApiResponse<ParentResponseDTO.getMyPageDTO> getMyPage(@PathVariable("parentId") Long parentId) {
@@ -72,5 +74,14 @@ public class ParentController {
             @RequestParam(defaultValue = "1") int page) {
         QuestionBoardResponseDTO data = questionBoardService.getQuestionBoard(parentId, page);
         return ApiResponse.onSuccess(data);
+    }
+
+    @PutMapping("/{parentId}/questions/{questionId}")
+    public ApiResponse<Void> updateQuestion(
+            @PathVariable("parentId") Long parentId,
+            @PathVariable("questionId") Long questionId,
+            @RequestBody QuestionRequestDTO.QuestionUpdateRequestDTO request) {
+        questionService.updateQuestion(parentId, questionId, request);
+        return ApiResponse.onSuccess(null);
     }
 }
