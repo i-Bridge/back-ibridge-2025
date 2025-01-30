@@ -44,16 +44,7 @@ public class ParentResponseDTO {
     @NoArgsConstructor
     public static class ParentHome{
         public String today;
-        public List<QuestionResponse> questions;
-    }
-    @Builder
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class QuestionResponse{
-        public Long questionId;
-        public String question;
-        public boolean isAnswer;
+        public List<QuestionResponseDTO.QuestionResponse> questions;
     }
 
     @Builder

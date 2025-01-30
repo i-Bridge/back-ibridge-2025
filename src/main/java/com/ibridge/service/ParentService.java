@@ -69,7 +69,7 @@ public class ParentService {
     }
 
     public ParentResponseDTO.ParentHome getParentHomeData(Long parentId) {
-        List<ParentResponseDTO.QuestionResponse> questions = parentRepository.findQuestionsById(parentId);
+        List<QuestionResponseDTO.QuestionResponse> questions = parentRepository.findQuestionsById(parentId);
         return new ParentResponseDTO.ParentHome(now().toString(), questions);
     }
 

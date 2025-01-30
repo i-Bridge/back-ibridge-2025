@@ -1,7 +1,6 @@
 package com.ibridge.domain.dto.request;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
 public class QuestionRequestDTO {
@@ -10,5 +9,13 @@ public class QuestionRequestDTO {
     @Builder
     public QuestionRequestDTO(String question) {
         this.question = question;
+    }
+
+    @Builder
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public class QuestionUpdateRequestDTO {
+        private String question;
     }
 }

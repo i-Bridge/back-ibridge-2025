@@ -1,7 +1,6 @@
 package com.ibridge.domain.dto.response;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
 public class QuestionResponseDTO {
@@ -10,5 +9,15 @@ public class QuestionResponseDTO {
     @Builder
     public QuestionResponseDTO(Long QuestionId) {
         this.QuestionId = QuestionId;
+    }
+
+    @Builder
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class QuestionResponse{
+        public Long questionId;
+        public String question;
+        public boolean isAnswer;
     }
 }
