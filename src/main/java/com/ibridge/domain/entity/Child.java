@@ -25,6 +25,9 @@ public class Child {
     @Column(nullable = false)
     private Date birth;
 
+    @Column(nullable = false)
+    private Gender gender;
+
     @ManyToOne
     @JoinColumn(name = "account")
     private Account account;

@@ -5,12 +5,10 @@ import com.ibridge.domain.dto.response.ParentResponseDTO;
 import com.ibridge.service.ParentService;
 import com.ibridge.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("/parent")
@@ -37,8 +35,14 @@ public class ParentController {
     }
 
     @DeleteMapping("/{parentId}/mypage/delete")
-    public ApiResponse<ParentResponseDTO.deleteDTO> deleteParentHome(@PathVariable("parentId") Long parentId) {
-        ParentResponseDTO.deleteDTO data = parentService.deleteAccount(parentId);
+    public ApiResponse<ParentResponseDTO.DeleteDTO> deleteParentHome(@PathVariable("parentId") Long parentId) {
+        ParentResponseDTO.DeleteDTO data = parentService.deleteAccount(parentId);
+        return ApiResponse.onSuccess(data);
+    }
+
+    @PostMapping("/{parentId}/mypage/child/add")
+    public ApiResponse<ParentResponseDTO.AddChildDTO> addChild(@PathVariable("parentId") Long parentId, @RequestBody ParentRequestDTO.AddChildDTO addChildDTO) throws ParseException {
+        ParentResponseDTO.AddChildDTO data = parentService.addChild(parentId, addChildDTO);
         return ApiResponse.onSuccess(data);
     }
 }

@@ -14,4 +14,14 @@ public class ParentRequestDTO {
         String name;
         String birthday;
     }
+
+    @Builder
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class AddChildDTO {
+        String name;
+        String birthday;
+        int gender;
+    }
 }

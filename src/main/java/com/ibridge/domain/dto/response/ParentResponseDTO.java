@@ -1,6 +1,5 @@
 package com.ibridge.domain.dto.response;
 
-import com.ibridge.domain.entity.Relation;
 import lombok.*;
 
 import java.util.Date;
@@ -61,9 +60,16 @@ public class ParentResponseDTO {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class deleteDTO {
+    public static class DeleteDTO {
         Date deletedAt;
         String account;
     }
 
+    @Builder
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class AddChildDTO {
+        Long childId;
+    }
 }

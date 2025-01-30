@@ -4,18 +4,17 @@ import com.ibridge.domain.dto.request.ParentRequestDTO;
 import com.ibridge.domain.dto.response.ParentResponseDTO;
 import com.ibridge.domain.entity.Account;
 import com.ibridge.domain.entity.Child;
+import com.ibridge.domain.entity.Gender;
 import com.ibridge.domain.entity.Parent;
 import com.ibridge.repository.AccountRepository;
 import com.ibridge.repository.ChildRepository;
 import com.ibridge.repository.ParentRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,6 +28,8 @@ public class ParentService {
     private final ParentRepository parentRepository;
     private final ChildRepository childRepository;
     private final AccountRepository accountRepository;
+    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
 
     public ParentResponseDTO.getMyPageDTO getMyPage(Long parentId) {
         Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
@@ -56,7 +57,6 @@ public class ParentService {
         Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
 
         parent.setName(request.getName());
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date newBirth = sdf.parse(request.getBirthday());
         parent.setBirth(newBirth);
         parentRepository.save(parent);
@@ -70,7 +70,7 @@ public class ParentService {
         return new ParentResponseDTO.ParentHome(now().toString(), questions);
     }
 
-    public ParentResponseDTO.deleteDTO deleteAccount(Long parentId) {
+    public ParentResponseDTO.DeleteDTO deleteAccount(Long parentId) {
         Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
 
         Account account = parent.getAccount();
@@ -82,8 +82,22 @@ public class ParentService {
         }
         accountRepository.delete(account);
 
-        return ParentResponseDTO.deleteDTO.builder()
+        return ParentResponseDTO.DeleteDTO.builder()
                 .deletedAt(new Date())
                 .account(account.toString()).build();
+    }
+
+    public ParentResponseDTO.AddChildDTO addChild(Long parentId, ParentRequestDTO.AddChildDTO request) throws ParseException {
+        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
+        Account account = parent.getAccount();
+
+        Child child = Child.builder()
+                .account(account)
+                .name(request.getName())
+                .birth(sdf.parse(request.getBirthday()))
+                .gender(Gender.values()[request.getGender()]).build();
+
+        return ParentResponseDTO.AddChildDTO.builder()
+                .childId(childRepository.save(child).getId()).build();
     }
 }
