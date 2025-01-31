@@ -36,4 +36,12 @@ public class ParentRequestDTO {
         String birthday;
         int gender;
     }
+
+    @Builder
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class DeleteChildDTO {
+        Long childId;
+    }
 }

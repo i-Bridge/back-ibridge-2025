@@ -126,4 +126,12 @@ public class ParentService {
         return ParentResponseDTO.PatchChildDTO.builder()
                 .childId(child.getId()).build();
     }
+
+    public void deleteChild(Long parentId, ParentRequestDTO.DeleteChildDTO request) {
+        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
+        Child child = childRepository.findById(request.getChildId()).orElseThrow(() -> new RuntimeException("Child not found"));
+
+        childRepository.delete(child);
+        return;
+    }
 }
