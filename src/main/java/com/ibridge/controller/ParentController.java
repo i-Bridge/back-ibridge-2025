@@ -105,4 +105,10 @@ public class ParentController {
         ParentResponseDTO.PatchChildDTO data = parentService.patchChild(parentId, request);
         return ApiResponse.onSuccess(data);
     }
+
+    @DeleteMapping("/{parentId}/mypage/child/delete")
+    public ApiResponse deleteChild(@PathVariable("parentId") Long parentId, @RequestBody ParentRequestDTO.DeleteChildDTO request) {
+        parentService.deleteChild(parentId, request);
+        return ApiResponse.onSuccess(null);
+    }
 }
