@@ -63,4 +63,12 @@ public class ParentResponseDTO {
     public static class AddChildDTO {
         Long childId;
     }
+
+    @Builder
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class PatchChildDTO {
+        Long childId;
+    }
 }

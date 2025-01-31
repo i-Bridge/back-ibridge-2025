@@ -97,4 +97,12 @@ public class ParentController {
         QuestionResponseDTO.DeletedQuestionResponse data = questionService.deleteQuestion(parentId, questionId);
         return ApiResponse.onSuccess(data);
     }
+
+    @PatchMapping("/{parentId}/mypage/child/edit")
+    public ApiResponse<ParentResponseDTO.PatchChildDTO> patchChild(
+            @PathVariable("parentId") Long parentId,
+            @RequestBody ParentRequestDTO.EditChildDTO request) throws ParseException {
+        ParentResponseDTO.PatchChildDTO data = parentService.patchChild(parentId, request);
+        return ApiResponse.onSuccess(data);
+    }
 }

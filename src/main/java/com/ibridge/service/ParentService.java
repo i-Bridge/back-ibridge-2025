@@ -112,4 +112,18 @@ public class ParentService {
         Long questionId = questionRepository.saveQuestion(parentId, request.getQuestion());
         return new QuestionResponseDTO(questionId);
     }
+
+    public ParentResponseDTO.PatchChildDTO patchChild(Long parentId, ParentRequestDTO.EditChildDTO request) throws ParseException {
+        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
+        Account account = parent.getAccount();
+
+        Child child = childRepository.findById(request.getChildId()).orElseThrow(() -> new RuntimeException("Child not found"));
+        child.setName(request.getName());
+        child.setBirth(sdf.parse(request.getBirthday()));
+        child.setGender(Gender.values()[request.getGender()]);
+        childRepository.save(child);
+
+        return ParentResponseDTO.PatchChildDTO.builder()
+                .childId(child.getId()).build();
+    }
 }
