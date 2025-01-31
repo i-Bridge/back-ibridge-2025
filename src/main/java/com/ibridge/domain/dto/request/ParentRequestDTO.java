@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Service;
 
 public class ParentRequestDTO {
     @Builder
@@ -20,6 +21,17 @@ public class ParentRequestDTO {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class AddChildDTO {
+        String name;
+        String birthday;
+        int gender;
+    }
+
+    @Builder
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class EditChildDTO {
+        Long childId;
         String name;
         String birthday;
         int gender;
