@@ -29,9 +29,9 @@ public class Child {
     private Gender gender;
 
     @ManyToOne
-    @JoinColumn(name = "account")
-    private Account account;
+    @JoinColumn(name = "family")
+    private Family family;
 
     @OneToMany(mappedBy = "id")
-    private List<Analysis> analysisList;
+    private List<Question> questions;
 }

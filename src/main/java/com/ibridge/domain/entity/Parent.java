@@ -23,15 +23,12 @@ public class Parent {
     private String name;
 
     @Column
-    private Date birth;
-
-    @Column
-    private Relation relation;
+    private String email;
 
     @ManyToOne
-    @JoinColumn(name = "account")
-    private Account account;
+    @JoinColumn(name = "family")
+    private Family family;
 
-    @OneToMany(mappedBy = "parent")
-    private List<Question> questionList;
+    @ManyToMany
+    List<Notice> notices;
 }
