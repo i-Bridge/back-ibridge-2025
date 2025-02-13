@@ -25,10 +25,6 @@ public class Question {
     private Timestamp time;
 
     @ManyToOne
-    @JoinColumn(name = "parent")
-    private Parent parent;
-
-    @ManyToOne
     @JoinColumn(name = "child")
     private Child child;
 
