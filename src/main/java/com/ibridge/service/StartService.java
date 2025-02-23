@@ -3,8 +3,6 @@ package com.ibridge.service;
 import com.ibridge.domain.dto.response.UserSelectionResponseDTO;
 import com.ibridge.domain.entity.Account;
 import com.ibridge.domain.entity.User;
-import com.ibridge.repository.AccountRepository;
-import com.ibridge.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

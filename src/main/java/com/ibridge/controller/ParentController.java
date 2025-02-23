@@ -23,8 +23,10 @@ public class ParentController {
     private final QuestionBoardService questionBoardService;
     private final QuestionService questionService;
 
-    @GetMapping("/{parentId}/mypage")
-    public ApiResponse<ParentResponseDTO.getMyPageDTO> getMyPage(@PathVariable("parentId") Long parentId) {
+    @GetMapping("/mypage")
+    public ApiResponse<ParentResponseDTO.getMyPageDTO> getMyPage() {
+        Long parentId = 0L;
+
         ParentResponseDTO.getMyPageDTO parentResponseDTO = parentService.getMyPage(parentId);
         return ApiResponse.onSuccess(parentResponseDTO);
     }

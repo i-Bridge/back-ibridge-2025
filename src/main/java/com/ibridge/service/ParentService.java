@@ -7,6 +7,7 @@ import com.ibridge.domain.dto.response.QuestionAnalysisDTO;
 import com.ibridge.domain.dto.response.QuestionResponseDTO;
 import com.ibridge.domain.entity.Account;
 import com.ibridge.domain.entity.Child;
+import com.ibridge.domain.entity.Family;
 import com.ibridge.domain.entity.Gender;
 import com.ibridge.domain.entity.Parent;
 import com.ibridge.repository.*;
@@ -28,18 +29,17 @@ import static java.time.LocalDate.now;
 public class ParentService {
     private final ParentRepository parentRepository;
     private final ChildRepository childRepository;
-    private final AccountRepository accountRepository;
     private final AnalysisRepository analysisRepository;
     private final QuestionRepository questionRepository;
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
 
     public ParentResponseDTO.getMyPageDTO getMyPage(Long parentId) {
-        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
+        Family family = parentRepository.getFamilyById(parentId);
+        Parent parent = parentRepository.findById(parentId).get();
 
-        Account account = parent.getAccount();
-        List<Child> children = childRepository.findByAccount(account);
         List<ParentResponseDTO.childDTO> childDTOList = new ArrayList<>();
+        List<Child> children = childRepository.findByFamily(family);
         for(Child child : children) {
             ParentResponseDTO.childDTO childDTO = ParentResponseDTO.childDTO.builder()
                     .childId(child.getId())
@@ -50,9 +50,7 @@ public class ParentService {
 
         return ParentResponseDTO.getMyPageDTO.builder()
                 .name(parent.getName())
-                .account(account.toString())
-                .birth(parent.getBirth().toString())
-                .relation(parent.getRelation().toString())
+                .account(parent.getEmail())
                 .children(childDTOList).build();
     }
 
@@ -61,7 +59,6 @@ public class ParentService {
 
         parent.setName(request.getName());
         Date newBirth = sdf.parse(request.getBirthday());
-        parent.setBirth(newBirth);
         parentRepository.save(parent);
 
         return ParentResponseDTO.EditInfo.builder()
