@@ -28,6 +28,6 @@ public class Question {
     @JoinColumn(name = "child")
     private Child child;
 
-    @OneToOne
+    @OneToOne(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private Analysis analysis;
 }

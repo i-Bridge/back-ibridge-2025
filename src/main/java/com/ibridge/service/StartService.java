@@ -1,34 +1,28 @@
 package com.ibridge.service;
 
+<<<<<<< HEAD
 import com.ibridge.domain.dto.response.UserSelectionResponseDTO;
 import com.ibridge.domain.entity.Account;
 import com.ibridge.domain.entity.User;
+=======
+import com.ibridge.util.CustomOAuth2User;
+import com.ibridge.domain.dto.response.StartResponseDTO;
+import com.ibridge.repository.ParentRepository;
+>>>>>>> ec0ae5e73a03075c71675037013c48112e6cc55d
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class StartService {
-    private final AccountRepository accountRepository;
+    private final ParentRepository parentRepository;
 
-    public UserSelectionResponseDTO getUserSelection(Long accountId){
-        Account account = accountRepository.findById(accountId).orElse(null);
-        List<User> parents = accountRepository.findParentsById(accountId);
-        List<User> children = accountRepository.findChildrenByAccountId(accountId);
+    public StartResponseDTO signIn(CustomOAuth2User oAuth2User) {
+        String email = oAuth2User.getEmail();
+        boolean isFirst = !parentRepository.existsByEmail(email);
 
-        List<UserSelectionResponseDTO.ParentInfo> parentDTOs = parents.stream()
-                .map(p -> new UserSelectionResponseDTO.ParentInfo(p.getId(), p.getName(), p.getRelation()))
-                .collect(Collectors.toList());
-
-        List<UserSelectionResponseDTO.ChildInfo> childDTOs = children.stream()
-                .map(c -> new UserSelectionResponseDTO.ChildInfo(c.getId(), c.getName(), c.getBirth(), c.getGender()))
-                .collect(Collectors.toList());
-
-        return new UserSelectionResponseDTO(parentDTOs, childDTOs);
+        return new StartResponseDTO(isFirst);
     }
 }

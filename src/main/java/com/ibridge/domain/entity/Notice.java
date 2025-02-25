@@ -22,5 +22,10 @@ public class Notice {
     @Column(nullable = false)
     String sender;
     @ManyToMany
-    List<Parent> receivers;
+    @JoinTable(
+            name = "notice_parent",
+            joinColumns = @JoinColumn(name = "notice_id"),
+            inverseJoinColumns = @JoinColumn(name = "parent_id")
+    )
+    private List<Parent> receivers;
 }
