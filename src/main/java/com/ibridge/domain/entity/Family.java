@@ -19,8 +19,9 @@ public class Family {
     Long id;
     @Column(nullable = false)
     String name;
-    @OneToMany
-    List<Parent> parents;
-    @OneToMany
-    List<Child> children;
+    @OneToMany(mappedBy = "family", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Parent> parents;
+
+    @OneToMany(mappedBy = "family", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Child> children;
 }
