@@ -15,8 +15,6 @@ public class ParentResponseDTO {
     public static class getMyPageDTO {
         String name;
         String account;
-        String birth;
-        String relation;
         List<childDTO> children;
     }
 

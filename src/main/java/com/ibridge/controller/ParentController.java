@@ -23,14 +23,18 @@ public class ParentController {
     private final QuestionBoardService questionBoardService;
     private final QuestionService questionService;
 
-    @GetMapping("/{parentId}/mypage")
-    public ApiResponse<ParentResponseDTO.getMyPageDTO> getMyPage(@PathVariable("parentId") Long parentId) {
+    @GetMapping("/mypage")
+    public ApiResponse<ParentResponseDTO.getMyPageDTO> getMyPage() {
+        Long parentId = 0L;
+
         ParentResponseDTO.getMyPageDTO parentResponseDTO = parentService.getMyPage(parentId);
         return ApiResponse.onSuccess(parentResponseDTO);
     }
 
-    @PatchMapping("/{parentId}/mypage/edit")
-    public ApiResponse<ParentResponseDTO.EditInfo> EditInfo(@PathVariable("parentId") Long parentId, @RequestBody ParentRequestDTO.EditInfo editInfo) throws ParseException {
+    @PatchMapping("/mypage/edit")
+    public ApiResponse<ParentResponseDTO.EditInfo> EditInfo(@RequestBody ParentRequestDTO.EditInfo editInfo) throws ParseException {
+        Long parentId = 0L;
+
         ParentResponseDTO.EditInfo editInfoDTO = parentService.editInfo(parentId, editInfo);
         return ApiResponse.onSuccess(editInfoDTO);
     }
@@ -41,14 +45,18 @@ public class ParentController {
         return ApiResponse.onSuccess(data);
     }
 
-    @DeleteMapping("/{parentId}/mypage/delete")
-    public ApiResponse<ParentResponseDTO.DeleteDTO> deleteParentHome(@PathVariable("parentId") Long parentId) {
-        ParentResponseDTO.DeleteDTO data = parentService.deleteAccount(parentId);
-        return ApiResponse.onSuccess(data);
+    @DeleteMapping("/mypage/delete")
+    public ApiResponse<ParentResponseDTO.DeleteDTO> deleteParentHome() {
+        Long parentId = 0L;
+
+        parentService.deleteAccount(parentId);
+        return ApiResponse.onSuccess(null);
     }
 
-    @PostMapping("/{parentId}/mypage/child/add")
-    public ApiResponse<ParentResponseDTO.AddChildDTO> addChild(@PathVariable("parentId") Long parentId, @RequestBody ParentRequestDTO.AddChildDTO addChildDTO) throws ParseException {
+    @PostMapping("/mypage/child/add")
+    public ApiResponse<ParentResponseDTO.AddChildDTO> addChild(@RequestBody ParentRequestDTO.AddChildDTO addChildDTO) throws ParseException {
+        Long parentId = 0L;
+
         ParentResponseDTO.AddChildDTO data = parentService.addChild(parentId, addChildDTO);
         return ApiResponse.onSuccess(data);
     }
@@ -98,17 +106,17 @@ public class ParentController {
         return ApiResponse.onSuccess(data);
     }
 
-    @PatchMapping("/{parentId}/mypage/child/edit")
-    public ApiResponse<ParentResponseDTO.PatchChildDTO> patchChild(
-            @PathVariable("parentId") Long parentId,
-            @RequestBody ParentRequestDTO.EditChildDTO request) throws ParseException {
+    @PatchMapping("/mypage/child/edit")
+    public ApiResponse<ParentResponseDTO.PatchChildDTO> patchChild(@RequestBody ParentRequestDTO.EditChildDTO request) throws ParseException {
+        Long parentId = 0L;
+
         ParentResponseDTO.PatchChildDTO data = parentService.patchChild(parentId, request);
         return ApiResponse.onSuccess(data);
     }
 
-    @DeleteMapping("/{parentId}/mypage/child/delete")
-    public ApiResponse deleteChild(@PathVariable("parentId") Long parentId, @RequestBody ParentRequestDTO.DeleteChildDTO request) {
-        parentService.deleteChild(parentId, request);
+    @DeleteMapping("/mypage/child/delete")
+    public ApiResponse deleteChild(@RequestBody ParentRequestDTO.DeleteChildDTO request) {
+        parentService.deleteChild(request);
         return ApiResponse.onSuccess(null);
     }
 }

@@ -5,8 +5,8 @@ import com.ibridge.domain.dto.request.QuestionRequestDTO;
 import com.ibridge.domain.dto.response.ParentResponseDTO;
 import com.ibridge.domain.dto.response.QuestionAnalysisDTO;
 import com.ibridge.domain.dto.response.QuestionResponseDTO;
-import com.ibridge.domain.entity.Account;
 import com.ibridge.domain.entity.Child;
+import com.ibridge.domain.entity.Family;
 import com.ibridge.domain.entity.Gender;
 import com.ibridge.domain.entity.Parent;
 import com.ibridge.repository.*;
@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static java.time.LocalDate.now;
@@ -28,18 +27,18 @@ import static java.time.LocalDate.now;
 public class ParentService {
     private final ParentRepository parentRepository;
     private final ChildRepository childRepository;
-    private final AccountRepository accountRepository;
     private final AnalysisRepository analysisRepository;
     private final QuestionRepository questionRepository;
+    private final FamliyRepository famliyRepository;
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
 
     public ParentResponseDTO.getMyPageDTO getMyPage(Long parentId) {
-        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
+        Parent parent = parentRepository.findById(parentId).get();
+        Family family = parent.getFamily();
 
-        Account account = parent.getAccount();
-        List<Child> children = childRepository.findByAccount(account);
         List<ParentResponseDTO.childDTO> childDTOList = new ArrayList<>();
+        List<Child> children = childRepository.findByFamily(family);
         for(Child child : children) {
             ParentResponseDTO.childDTO childDTO = ParentResponseDTO.childDTO.builder()
                     .childId(child.getId())
@@ -50,9 +49,7 @@ public class ParentService {
 
         return ParentResponseDTO.getMyPageDTO.builder()
                 .name(parent.getName())
-                .account(account.toString())
-                .birth(parent.getBirth().toString())
-                .relation(parent.getRelation().toString())
+                .account(parent.getEmail())
                 .children(childDTOList).build();
     }
 
@@ -60,8 +57,6 @@ public class ParentService {
         Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
 
         parent.setName(request.getName());
-        Date newBirth = sdf.parse(request.getBirthday());
-        parent.setBirth(newBirth);
         parentRepository.save(parent);
 
         return ParentResponseDTO.EditInfo.builder()
@@ -73,29 +68,27 @@ public class ParentService {
         return new ParentResponseDTO.ParentHome(now().toString(), questions);
     }
 
-    public ParentResponseDTO.DeleteDTO deleteAccount(Long parentId) {
+    public void deleteAccount(Long parentId) {
         Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
+        Family family = parent.getFamily();
 
-        Account account = parent.getAccount();
-        for(Child child : childRepository.findByAccount(account)) {
+        if(parentRepository.getParentCount(family) > 1) {
+            parentRepository.deleteById(parentId);
+            return;
+        }
+
+        for(Child child : childRepository.findByFamily(family)) {
             childRepository.delete(child);
         }
-        for(Parent parents : parentRepository.findByAccount(account)) {
-            parentRepository.delete(parents);
-        }
-        accountRepository.delete(account);
-
-        return ParentResponseDTO.DeleteDTO.builder()
-                .deletedAt(new Date())
-                .account(account.toString()).build();
+        famliyRepository.delete(family);
     }
 
     public ParentResponseDTO.AddChildDTO addChild(Long parentId, ParentRequestDTO.AddChildDTO request) throws ParseException {
         Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
-        Account account = parent.getAccount();
+        Family family = parent.getFamily();
 
         Child child = Child.builder()
-                .account(account)
+                .family(family)
                 .name(request.getName())
                 .birth(sdf.parse(request.getBirthday()))
                 .gender(Gender.values()[request.getGender()]).build();
@@ -115,7 +108,7 @@ public class ParentService {
 
     public ParentResponseDTO.PatchChildDTO patchChild(Long parentId, ParentRequestDTO.EditChildDTO request) throws ParseException {
         Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
-        Account account = parent.getAccount();
+        Family family = parent.getFamily();
 
         Child child = childRepository.findById(request.getChildId()).orElseThrow(() -> new RuntimeException("Child not found"));
         child.setName(request.getName());
@@ -127,8 +120,7 @@ public class ParentService {
                 .childId(child.getId()).build();
     }
 
-    public void deleteChild(Long parentId, ParentRequestDTO.DeleteChildDTO request) {
-        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
+    public void deleteChild(ParentRequestDTO.DeleteChildDTO request) {
         Child child = childRepository.findById(request.getChildId()).orElseThrow(() -> new RuntimeException("Child not found"));
 
         childRepository.delete(child);

@@ -1,8 +1,14 @@
 package com.ibridge.service;
 
+<<<<<<< HEAD
+import com.ibridge.domain.dto.response.UserSelectionResponseDTO;
+import com.ibridge.domain.entity.Account;
+import com.ibridge.domain.entity.User;
+=======
 import com.ibridge.util.CustomOAuth2User;
 import com.ibridge.domain.dto.response.StartResponseDTO;
 import com.ibridge.repository.ParentRepository;
+>>>>>>> ec0ae5e73a03075c71675037013c48112e6cc55d
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
