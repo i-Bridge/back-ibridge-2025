@@ -14,6 +14,6 @@ import java.util.List;
 public interface ParentRepository extends JpaRepository<Parent, Long> {
     List<QuestionResponseDTO.QuestionResponse> findQuestionsById(Long parentId);
 
-    @Query("SELECT p.family FROM Parent p WHERE p.id = :parentId")
-    Family getFamilyById(@Param("parentId") Long parentId);
+    @Query("SELECT COUNT(p) FROM Parent p WHERE p.family = :family")
+    int getParentCount(@Param("family") Family family);
 }
