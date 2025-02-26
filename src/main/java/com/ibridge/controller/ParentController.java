@@ -119,4 +119,13 @@ public class ParentController {
         parentService.deleteChild(request);
         return ApiResponse.onSuccess(null);
     }
+
+    @GetMapping("/{childId}/home")
+    public ApiResponse<ParentHomeResponseDTO> getParentHome(
+            @PathVariable Long childId,
+            @RequestParam(required = false) String date) {
+
+        ParentHomeResponseDTO response = parentService.getParentHome(childId, date);
+        return ApiResponse.onSuccess(response);
+    }
 }
