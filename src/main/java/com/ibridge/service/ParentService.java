@@ -5,10 +5,7 @@ import com.ibridge.domain.dto.request.QuestionRequestDTO;
 import com.ibridge.domain.dto.response.ParentResponseDTO;
 import com.ibridge.domain.dto.response.QuestionAnalysisDTO;
 import com.ibridge.domain.dto.response.QuestionResponseDTO;
-import com.ibridge.domain.entity.Child;
-import com.ibridge.domain.entity.Family;
-import com.ibridge.domain.entity.Gender;
-import com.ibridge.domain.entity.Parent;
+import com.ibridge.domain.entity.*;
 import com.ibridge.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,6 +28,7 @@ public class ParentService {
     private final QuestionRepository questionRepository;
     private final FamliyRepository famliyRepository;
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    private final NoticeRepository noticeRepository;
 
 
     public ParentResponseDTO.getMyPageDTO getMyPage(Long parentId) {
@@ -125,5 +123,19 @@ public class ParentService {
 
         childRepository.delete(child);
         return;
+    }
+
+    public ParentResponseDTO.NoticeCheckDTO noticeCheck(Long parentId) {
+        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
+
+        List<ParentResponseDTO.NoticeDTO> noticeDTOList = new ArrayList<>();
+        List<Notice> notices = noticeRepository.findByReceiver(parent);
+        for(Notice notice : notices) {
+            ParentResponseDTO.NoticeDTO noticeDTO = new ParentResponseDTO.NoticeDTO();
+            //작성 필요
+            noticeDTOList.add(noticeDTO);
+        }
+        
+        return ParentResponseDTO.NoticeCheckDTO.builder().notices(noticeDTOList).build();
     }
 }

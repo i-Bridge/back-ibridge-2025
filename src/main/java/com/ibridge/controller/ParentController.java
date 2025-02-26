@@ -119,4 +119,12 @@ public class ParentController {
         parentService.deleteChild(request);
         return ApiResponse.onSuccess(null);
     }
+
+    @GetMapping("/{childId}/notice")
+    public ApiResponse<ParentResponseDTO.NoticeCheckDTO> noticeCheck() {
+        Long parentId = 0L;
+
+        ParentResponseDTO.NoticeCheckDTO data = parentService.noticeCheck(parentId);
+        return ApiResponse.onSuccess(data);
+    }
 }
