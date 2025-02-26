@@ -44,4 +44,12 @@ public class ParentRequestDTO {
     public static class DeleteChildDTO {
         Long childId;
     }
+
+    @Builder
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class getParentintoFamilyDTO{
+        Long parentId;
+    }
 }
