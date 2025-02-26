@@ -29,7 +29,7 @@ public class ParentService {
     private final ChildRepository childRepository;
     private final AnalysisRepository analysisRepository;
     private final QuestionRepository questionRepository;
-    private final FamliyRepository famliyRepository;
+    private final FamilyRepository famliyRepository;
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
 
