@@ -69,4 +69,24 @@ public class ParentResponseDTO {
     public static class PatchChildDTO {
         Long childId;
     }
+
+    @Builder
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class NoticeCheckDTO {
+        List<NoticeDTO> notices;
+    }
+
+    @Builder
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class NoticeDTO {
+        Long noticeId;
+        int type;
+        Long parentId;
+        String parentName;
+        boolean isAccept;
+    }
 }

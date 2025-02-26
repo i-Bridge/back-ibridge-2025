@@ -128,4 +128,12 @@ public class ParentController {
         ParentHomeResponseDTO response = parentService.getParentHome(childId, date);
         return ApiResponse.onSuccess(response);
     }
+
+    @GetMapping("/{childId}/notice")
+    public ApiResponse<ParentResponseDTO.NoticeCheckDTO> noticeCheck() {
+        Long parentId = 0L;
+
+        ParentResponseDTO.NoticeCheckDTO data = parentService.noticeCheck(parentId);
+        return ApiResponse.onSuccess(data);
+    }
 }
