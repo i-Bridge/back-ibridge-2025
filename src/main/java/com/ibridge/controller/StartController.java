@@ -2,6 +2,7 @@ package com.ibridge.controller;
 
 import com.ibridge.domain.dto.request.StartRequestDTO;
 import com.ibridge.domain.dto.request.StartSignupNewRequestDTO;
+import com.ibridge.domain.dto.response.StartUserSelectionResponseDTO;
 import com.ibridge.util.CustomOAuth2User;
 import com.ibridge.domain.dto.response.StartResponseDTO;
 import com.ibridge.service.StartService;
@@ -34,8 +35,14 @@ public class StartController {
     }
 
     @PostMapping("/signup/new")
-    public ResponseEntity<ApiResponse<StartResponseDTO>> registerNewFamily(@RequestBody StartSignupNewRequestDTO request) {
+    public ApiResponse<StartResponseDTO> registerNewFamily(@RequestBody StartSignupNewRequestDTO request) {
         StartResponseDTO response = startService.registerNewFamily(request);
-        return ResponseEntity.ok(ApiResponse.onSuccess(response));
+        return ApiResponse.onSuccess(response);
+    }
+
+    @GetMapping("/login")
+    public ApiResponse<StartUserSelectionResponseDTO> getUserSelection(@RequestParam Long parentId) {
+        StartUserSelectionResponseDTO response = startService.getUserSelection(parentId);
+        return ApiResponse.onSuccess(response);
     }
 }
