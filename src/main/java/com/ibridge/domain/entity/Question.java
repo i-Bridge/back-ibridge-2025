@@ -30,4 +30,10 @@ public class Question {
 
     @OneToOne(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private Analysis analysis;
+
+    @Column(nullable = false)
+    private boolean isAnswer;
+
+    @Column(nullable = false)
+    private int type;
 }
