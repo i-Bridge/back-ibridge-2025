@@ -92,6 +92,12 @@ public class ParentController {
             @PathVariable("childId") Long childId,
             @PathVariable("questionId") Long questionId) {
         QuestionAnalysisDTO data = analysisService.getQuestionAnalysis(childId, questionId);
+
+      @GetMapping("/{childId}/notice")
+    public ApiResponse<ParentResponseDTO.NoticeCheckDTO> noticeCheck() {
+        Long parentId = 0L;
+
+        ParentResponseDTO.NoticeCheckDTO data = parentService.noticeCheck(parentId);
         return ApiResponse.onSuccess(data);
     }
 }

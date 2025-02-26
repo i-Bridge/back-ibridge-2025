@@ -33,6 +33,7 @@ public class ParentService {
     private final QuestionRepository questionRepository;
     private final FamilyRepository famliyRepository;
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    private final NoticeRepository noticeRepository;
 
 
     public ParentResponseDTO.getMyPageDTO getMyPage(Long parentId) {
@@ -173,5 +174,19 @@ public class ParentService {
                 .answers(answerCountDTOs)
                 .questions(questionDTOs)
                 .build();
+    }
+
+    public ParentResponseDTO.NoticeCheckDTO noticeCheck(Long parentId) {
+        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
+
+        List<ParentResponseDTO.NoticeDTO> noticeDTOList = new ArrayList<>();
+        List<Notice> notices = noticeRepository.findByReceiver(parent);
+        for(Notice notice : notices) {
+            ParentResponseDTO.NoticeDTO noticeDTO = new ParentResponseDTO.NoticeDTO();
+            //작성 필요
+            noticeDTOList.add(noticeDTO);
+        }
+
+        return ParentResponseDTO.NoticeCheckDTO.builder().notices(noticeDTOList).build();
     }
 }
