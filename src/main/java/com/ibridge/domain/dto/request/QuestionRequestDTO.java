@@ -5,17 +5,5 @@ import lombok.*;
 @Getter
 public class QuestionRequestDTO {
     private String question;
-
-    @Builder
-    public QuestionRequestDTO(String question) {
-        this.question = question;
-    }
-
-    @Builder
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class QuestionUpdateRequestDTO {
-        private String question;
-    }
+    private String time;
 }
