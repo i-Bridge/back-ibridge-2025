@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,5 +28,5 @@ public class Notice {
             joinColumns = @JoinColumn(name = "notice_id"),
             inverseJoinColumns = @JoinColumn(name = "parent_id")
     )
-    private List<Parent> receivers;
+    private List<Parent> receivers = new ArrayList<>();
 }
