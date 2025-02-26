@@ -1,10 +1,14 @@
 package com.ibridge.service;
 
 import com.ibridge.domain.dto.request.QuestionRequestDTO;
+import com.ibridge.domain.dto.response.QuestionAnalysisDTO;
 import com.ibridge.domain.dto.response.QuestionListResponseDTO;
 import com.ibridge.domain.dto.response.QuestionResponseDTO;
+import com.ibridge.domain.entity.Analysis;
 import com.ibridge.domain.entity.Question;
+import com.ibridge.repository.AnalysisRepository;
 import com.ibridge.repository.QuestionRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +20,7 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
 
     @Autowired
-    public QuestionService(QuestionRepository questionRepository) {
+    public QuestionService(QuestionRepository questionRepository, AnalysisRepository analysisRepository) {
         this.questionRepository = questionRepository;
     }
 

@@ -4,7 +4,9 @@ import com.ibridge.domain.dto.request.ParentRequestDTO;
 import com.ibridge.domain.dto.request.QuestionRequestDTO;
 import com.ibridge.domain.dto.response.*;
 import com.ibridge.domain.entity.Question;
+import com.ibridge.repository.AnalysisRepository;
 import com.ibridge.repository.QuestionRepository;
+import com.ibridge.service.AnalysisService;
 import com.ibridge.service.ParentService;
 import com.ibridge.service.QuestionBoardService;
 import com.ibridge.service.QuestionService;
@@ -22,6 +24,7 @@ public class ParentController {
     private final ParentService parentService;
     private final QuestionBoardService questionBoardService;
     private final QuestionService questionService;
+    private final AnalysisService analysisService;
 
     @GetMapping("/mypage")
     public ApiResponse<ParentResponseDTO.getMyPageDTO> getMyPage() {
@@ -61,51 +64,6 @@ public class ParentController {
         return ApiResponse.onSuccess(data);
     }
 
-    @GetMapping("/{parentId}/{questionId}")
-    public ApiResponse<QuestionAnalysisDTO> getQuestionAnalysis(@PathVariable("parentId") Long parentId, @PathVariable("questionId") Long questionId) {
-        QuestionAnalysisDTO data = parentService.getQuestionAnalysis(parentId, questionId);
-        return ApiResponse.onSuccess(data);
-    }
-
-    @PostMapping("/{parentId}/add-temp")
-    public ApiResponse<QuestionResponseDTO> addTempQuestion(@PathVariable("parentId") Long parentId, @RequestBody QuestionRequestDTO request){
-        QuestionResponseDTO data = parentService.addTempQuestion(parentId, request);
-        return ApiResponse.onSuccess(data);
-    }
-
-    @GetMapping("/{parentId}/questions/board")
-    public ApiResponse<QuestionBoardResponseDTO> getQuestionBoard(
-            @PathVariable("parentId") Long parentId,
-            @RequestParam(defaultValue = "1") int page) {
-        QuestionBoardResponseDTO data = questionBoardService.getQuestionBoard(parentId, page);
-        return ApiResponse.onSuccess(data);
-    }
-
-    @PutMapping("/{parentId}/questions/{questionId}")
-    public ApiResponse<Void> updateQuestion(
-            @PathVariable("parentId") Long parentId,
-            @PathVariable("questionId") Long questionId,
-            @RequestBody QuestionRequestDTO.QuestionUpdateRequestDTO request) {
-        questionService.updateQuestion(parentId, questionId, request);
-        return ApiResponse.onSuccess(null);
-    }
-
-    @PostMapping("/{parentId}/questions")
-    public ApiResponse<QuestionListResponseDTO> createQuestion(
-            @PathVariable("parentId") Long parentId,
-            @RequestBody QuestionRequestDTO.QuestionUpdateRequestDTO request) {
-        QuestionListResponseDTO data = questionService.createQuestion(parentId, request);
-        return ApiResponse.onSuccess(data);
-    }
-
-    @DeleteMapping("/{parentId}/questions/delete/{questionId}")
-    public ApiResponse<QuestionResponseDTO.DeletedQuestionResponse> deleteQuestion(
-            @PathVariable("parentId") Long parentId,
-            @PathVariable("questionId") Long questionId) {
-        QuestionResponseDTO.DeletedQuestionResponse data = questionService.deleteQuestion(parentId, questionId);
-        return ApiResponse.onSuccess(data);
-    }
-
     @PatchMapping("/mypage/child/edit")
     public ApiResponse<ParentResponseDTO.PatchChildDTO> patchChild(@RequestBody ParentRequestDTO.EditChildDTO request) throws ParseException {
         Long parentId = 0L;
@@ -127,5 +85,13 @@ public class ParentController {
 
         ParentHomeResponseDTO response = parentService.getParentHome(childId, date);
         return ApiResponse.onSuccess(response);
+    }
+
+    @GetMapping("/{childId}/{questionId}")
+    public ApiResponse<QuestionAnalysisDTO> getAnalysis(
+            @PathVariable("childId") Long childId,
+            @PathVariable("questionId") Long questionId) {
+        QuestionAnalysisDTO data = analysisService.getQuestionAnalysis(childId, questionId);
+        return ApiResponse.onSuccess(data);
     }
 }
