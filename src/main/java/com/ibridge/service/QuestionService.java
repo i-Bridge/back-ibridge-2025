@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -57,5 +58,16 @@ public class QuestionService {
                 .type(question.getType())
                 .period(7)  // 임시 값 설정
                 .build();
+    }
+    @Transactional
+    public void updateQuestion(Long childId, Long questionId, QuestionUpdateRequestDTO requestDTO) {
+        Question question = questionRepository.findByIdAndChild_Id(questionId, childId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 질문을 찾을 수 없습니다."));
+
+        question.setText(requestDTO.getQuestion());
+        question.setType(requestDTO.getType());
+        question.setTime(Timestamp.valueOf(LocalDateTime.now())); // 임시로 현재 시간 저장
+
+        questionRepository.save(question);
     }
 }

@@ -112,4 +112,14 @@ public class ParentController {
         QuestionResponseDTO updatedQuestion = questionService.getQuestionForEdit(parentId, questionId);
         return ApiResponse.onSuccess(updatedQuestion);
     }
+
+    @PutMapping("/{childId}/questions/edit/{questionId}")
+    public ApiResponse<?> updateQuestion(
+            @PathVariable Long childId,
+            @PathVariable Long questionId,
+            @RequestBody QuestionUpdateRequestDTO requestDTO) {
+
+        questionService.updateQuestion(childId, questionId, requestDTO);
+        return ApiResponse.onSuccess(null);
+    }
 }
