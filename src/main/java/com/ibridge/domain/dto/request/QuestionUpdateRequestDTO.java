@@ -13,6 +13,7 @@ import java.sql.Timestamp;
 @Builder
 public class QuestionUpdateRequestDTO {
     private String question;
-    private Timestamp time;
     private int type;
+    private String time;
+    private int period;
 }

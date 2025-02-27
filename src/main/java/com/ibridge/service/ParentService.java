@@ -66,11 +66,6 @@ public class ParentService {
                 .parentId(parent.getId()).build();
     }
 
-    public ParentResponseDTO.ParentHome getParentHomeData(Long parentId) {
-        List<QuestionResponseDTO.QuestionResponse> questions = parentRepository.findQuestionsById(parentId);
-        return new ParentResponseDTO.ParentHome(now().toString(), questions);
-    }
-
     public void deleteAccount(Long parentId) {
         Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
         Family family = parent.getFamily();

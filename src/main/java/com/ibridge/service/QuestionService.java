@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -27,17 +28,6 @@ public class QuestionService {
     public QuestionService(QuestionRepository questionRepository, ChildRepository childRepository) {
         this.questionRepository = questionRepository;
         this.childRepository = childRepository;
-    }
-
-    public QuestionListResponseDTO createQuestion(Long parentId, QuestionUpdateRequestDTO request) {
-        questionRepository.saveQuestion(parentId, request.getQuestion());
-        List<QuestionListResponseDTO.QuestionDTO> questions = questionRepository.findQuestionsByParentId(parentId);
-        return new QuestionListResponseDTO(questions);
-    }
-
-    public QuestionResponseDTO.DeletedQuestionResponse deleteQuestion(Long parentId, Long questionId) {
-        questionRepository.deleteQuestion(parentId, questionId);
-        return new QuestionResponseDTO.DeletedQuestionResponse(questionId, LocalDate.now().toString());
     }
 
     @Transactional
@@ -55,22 +45,29 @@ public class QuestionService {
         return new QuestionResponseDTO(savedQuestion.getId());
     }
 
-    @Transactional
-    public QuestionEditResponseDTO updateQuestion(Long parentId, Long questionId, QuestionUpdateRequestDTO request) {
-        Question question = questionRepository.findByIdAndChild_ParentId(questionId, parentId)
+    @Transactional(readOnly = true)
+    public QuestionResponseDTO getQuestionForEdit(Long childId, Long questionId) {
+        Question question = questionRepository.findByIdAndChild_Id(questionId, childId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 질문을 찾을 수 없습니다."));
 
-        question.setText(request.getQuestion());
-        question.setTime(request.getTime());
-        question.setType(request.getType());
-
-        return QuestionEditResponseDTO.builder()
+        return QuestionResponseDTO.builder()
                 .questionId(question.getId())
                 .child(question.getChild().getId())
                 .text(question.getText())
-                .time(question.getTime().toString())
+                .time("오전")
                 .type(question.getType())
                 .period(7)  // 임시 값 설정
                 .build();
+    }
+    @Transactional
+    public void updateQuestion(Long childId, Long questionId, QuestionUpdateRequestDTO requestDTO) {
+        Question question = questionRepository.findByIdAndChild_Id(questionId, childId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 질문을 찾을 수 없습니다."));
+
+        question.setText(requestDTO.getQuestion());
+        question.setType(requestDTO.getType());
+        question.setTime(Timestamp.valueOf(LocalDateTime.now())); // 임시로 현재 시간 저장
+
+        questionRepository.save(question);
     }
 }

@@ -29,5 +29,5 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     @Query("SELECT q FROM Question q WHERE q.child = :child " +
             "AND DATE(q.time) = :date")
     List<Question> findByChildAndDate(Child child, LocalDate date);
-    Optional<Question> findByIdAndChild_ParentId(Long questionId, Long parentId);
+    Optional<Question> findByIdAndChild_Id(Long questionId, Long childId);
 }

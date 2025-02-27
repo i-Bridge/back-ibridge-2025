@@ -6,34 +6,19 @@ import lombok.*;
 import java.util.List;
 
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class QuestionResponseDTO {
     private Long questionId;
+    private Long child;
+    private String text;
+    private String time;
+    private int type;
+    private int period;
 
-    @Builder
-    public QuestionResponseDTO(Long questionId) {
-        this.questionId = questionId;
-    }
-
-
-    @Builder
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class QuestionResponse{
-        public Long questionId;
-        public String question;
-        public boolean isAnswer;
-    }
-
-    @Builder
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class DeletedQuestionResponse {
-        @JsonProperty("questionId")
-        private Long questionId;
-
-        @JsonProperty("deletedAt")
-        private String deletedAt;
+    public QuestionResponseDTO(Long id) {
+        this.questionId = id;
     }
 }
