@@ -43,12 +43,6 @@ public class ParentController {
         return ApiResponse.onSuccess(editInfoDTO);
     }
 
-    @GetMapping("/{parentId}/home")
-    public ApiResponse<ParentResponseDTO.ParentHome> getParentHome(@PathVariable("parentId") Long parentId) {
-        ParentResponseDTO.ParentHome data = parentService.getParentHomeData(parentId);
-        return ApiResponse.onSuccess(data);
-    }
-
     @DeleteMapping("/mypage/delete")
     public ApiResponse<ParentResponseDTO.DeleteDTO> deleteParentHome() {
         Long parentId = 0L;
@@ -111,12 +105,11 @@ public class ParentController {
         return ApiResponse.onSuccess(data);
     }
 
-    @PutMapping("/{parentId}/questions/edit/{questionId}")
-    public ApiResponse<QuestionEditResponseDTO> updateQuestion(
+    @GetMapping("/{parentId}/questions/edit/{questionId}")
+    public ApiResponse<QuestionResponseDTO> updateQuestion(
             @PathVariable("parentId") Long parentId,
-            @PathVariable("questionId") Long questionId,
-            @RequestBody QuestionUpdateRequestDTO request) {
-        QuestionEditResponseDTO updatedQuestion = questionService.updateQuestion(parentId, questionId, request);
+            @PathVariable("questionId") Long questionId) {
+        QuestionResponseDTO updatedQuestion = questionService.getQuestionForEdit(parentId, questionId);
         return ApiResponse.onSuccess(updatedQuestion);
     }
 }

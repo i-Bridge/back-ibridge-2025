@@ -12,7 +12,4 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @Builder
 public class QuestionUpdateRequestDTO {
-    private String question;
-    private Timestamp time;
-    private int type;
 }
