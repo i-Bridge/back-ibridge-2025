@@ -2,11 +2,11 @@ package com.ibridge.service;
 
 import com.ibridge.domain.dto.request.QuestionRequestDTO;
 import com.ibridge.domain.dto.request.QuestionUpdateRequestDTO;
+import com.ibridge.domain.dto.response.QuestionEditResponseDTO;
 import com.ibridge.domain.dto.response.QuestionListResponseDTO;
 import com.ibridge.domain.dto.response.QuestionResponseDTO;
 import com.ibridge.domain.entity.Child;
 import com.ibridge.domain.entity.Question;
-import com.ibridge.repository.AnalysisRepository;
 import com.ibridge.repository.ChildRepository;
 import com.ibridge.repository.QuestionRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -27,10 +27,6 @@ public class QuestionService {
     public QuestionService(QuestionRepository questionRepository, ChildRepository childRepository) {
         this.questionRepository = questionRepository;
         this.childRepository = childRepository;
-    }
-
-    public void updateQuestion(Long parentId, Long questionId, QuestionUpdateRequestDTO request) {
-        questionRepository.updateQuestion(parentId, questionId, request.getQuestion());
     }
 
     public QuestionListResponseDTO createQuestion(Long parentId, QuestionUpdateRequestDTO request) {
@@ -57,5 +53,24 @@ public class QuestionService {
 
         Question savedQuestion = questionRepository.save(question);
         return new QuestionResponseDTO(savedQuestion.getId());
+    }
+
+    @Transactional
+    public QuestionEditResponseDTO updateQuestion(Long parentId, Long questionId, QuestionUpdateRequestDTO request) {
+        Question question = questionRepository.findByIdAndChild_ParentId(questionId, parentId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 질문을 찾을 수 없습니다."));
+
+        question.setText(request.getQuestion());
+        question.setTime(request.getTime());
+        question.setType(request.getType());
+
+        return QuestionEditResponseDTO.builder()
+                .questionId(question.getId())
+                .child(question.getChild().getId())
+                .text(question.getText())
+                .time(question.getTime().toString())
+                .type(question.getType())
+                .period(7)  // 임시 값 설정
+                .build();
     }
 }
