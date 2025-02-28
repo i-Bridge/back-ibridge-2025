@@ -184,4 +184,12 @@ public class ParentService {
 
         return ParentResponseDTO.NoticeCheckDTO.builder().notices(noticeDTOList).build();
     }
+
+    public void getParentintoFamily(Long parentId, ParentRequestDTO.getParentintoFamilyDTO request) {
+        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
+        Family family = parent.getFamily();
+
+        Parent requester = parentRepository.findById(request.getParentId()).orElseThrow(() -> new RuntimeException("Sender not found"));
+        family.getParents().add(requester);
+    }
 }

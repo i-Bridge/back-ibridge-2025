@@ -89,12 +89,21 @@ public class ParentController {
         QuestionAnalysisDTO data = analysisService.getQuestionAnalysis(childId, questionId);
         return ApiResponse.onSuccess(data);
     }
+
     @GetMapping("/{childId}/notice")
-    public ApiResponse<ParentResponseDTO.NoticeCheckDTO> noticeCheck() {
+    public ApiResponse<ParentResponseDTO.NoticeCheckDTO> noticeCheck(@PathVariable Long childId) {
         Long parentId = 0L;
 
         ParentResponseDTO.NoticeCheckDTO data = parentService.noticeCheck(parentId);
         return ApiResponse.onSuccess(data);
+    }
+
+    @PostMapping("/{childId}/add")
+    public ApiResponse addFamily(@PathVariable Long childId, @RequestBody ParentRequestDTO.getParentintoFamilyDTO request) {
+        Long parentId = 0L;
+
+        parentService.getParentintoFamily(parentId, request);
+        return ApiResponse.onSuccess(null);
     }
 
     @PostMapping("/{childId}/add-temp")
