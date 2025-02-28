@@ -194,7 +194,7 @@ public class ParentService {
         Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
         Family family = parent.getFamily();
 
-        Parent requester = parentRepository.findById(request.getParentId()).orElseThrow(() -> new RuntimeException("Child not found"));
+        Parent requester = parentRepository.findById(request.getParentId()).orElseThrow(() -> new RuntimeException("Sender not found"));
         family.getParents().add(requester);
     }
 }
