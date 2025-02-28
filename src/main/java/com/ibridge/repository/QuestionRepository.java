@@ -5,10 +5,13 @@ import com.ibridge.domain.dto.response.QuestionResponseDTO;
 import com.ibridge.domain.entity.Child;
 import com.ibridge.domain.entity.Question;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface QuestionRepository extends JpaRepository<Question, Long> {
     Long saveQuestion(Long parentId, String question);
@@ -26,4 +29,5 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     @Query("SELECT q FROM Question q WHERE q.child = :child " +
             "AND DATE(q.time) = :date")
     List<Question> findByChildAndDate(Child child, LocalDate date);
+    Optional<Question> findByIdAndChild_Id(Long questionId, Long childId);
 }

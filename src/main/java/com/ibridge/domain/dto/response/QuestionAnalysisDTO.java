@@ -1,20 +1,23 @@
 package com.ibridge.domain.dto.response;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.ibridge.domain.entity.Analysis;
+import com.ibridge.domain.entity.Question;
+import lombok.*;
 
 @Getter
 @Setter
+@AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class QuestionAnalysisDTO {
     private String video;
     private String result;
-    @Builder
-    public QuestionAnalysisDTO(String video, String result) {
-        this.video = video;
-        this.result = result;
+
+    public static QuestionAnalysisDTO from(Analysis entity) {
+        return QuestionAnalysisDTO.builder()
+                .video(entity.getVideo())
+                .result(entity.getAnswer())
+                .build();
     }
 }
 

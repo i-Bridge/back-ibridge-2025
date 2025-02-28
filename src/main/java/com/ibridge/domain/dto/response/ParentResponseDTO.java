@@ -40,15 +40,6 @@ public class ParentResponseDTO {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class ParentHome{
-        public String today;
-        public List<QuestionResponseDTO.QuestionResponse> questions;
-    }
-
-    @Builder
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
     public static class DeleteDTO {
         Date deletedAt;
         String account;
