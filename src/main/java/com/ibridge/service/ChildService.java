@@ -41,4 +41,9 @@ public class ChildService {
         return ChildResponseDTO.getHomeDTO.builder().questions(questionList).build();
     }
 
+    public ChildResponseDTO.getQuestionDescriptionDTO getQuestion(Long childId, Long questionId) {
+        Question question = questionRepository.findById(questionId).get();
+        return ChildResponseDTO.getQuestionDescriptionDTO.builder()
+                .question(question.getText()).build();
+    }
 }

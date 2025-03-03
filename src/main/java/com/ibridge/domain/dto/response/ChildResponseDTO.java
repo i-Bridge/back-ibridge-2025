@@ -24,4 +24,11 @@ public class ChildResponseDTO {
         boolean isAnswer;
     }
 
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class getQuestionDescriptionDTO {
+        String question;
+    }
 }

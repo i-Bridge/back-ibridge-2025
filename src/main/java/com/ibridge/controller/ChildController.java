@@ -13,12 +13,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/child")
 @RequiredArgsConstructor
 public class ChildController {
-
     private final ChildService childService;
 
     @GetMapping("/{childId}/home")
     public ApiResponse<ChildResponseDTO.getHomeDTO> home(@PathVariable Long childId) {
         ChildResponseDTO.getHomeDTO data = childService.getHome(childId);
+        return ApiResponse.onSuccess(data);
+    }
+
+    @GetMapping("/{childId}/{questionId}")
+    public ApiResponse<ChildResponseDTO.getQuestionDescriptionDTO> getQuestion(@PathVariable Long childId, @PathVariable Long questionId) {
+        ChildResponseDTO.getQuestionDescriptionDTO data = childService.getQuestion(childId, questionId);
         return ApiResponse.onSuccess(data);
     }
 }
