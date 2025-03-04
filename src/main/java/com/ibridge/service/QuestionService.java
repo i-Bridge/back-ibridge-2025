@@ -2,7 +2,6 @@ package com.ibridge.service;
 
 import com.ibridge.domain.dto.request.QuestionRequestDTO;
 import com.ibridge.domain.dto.request.QuestionUpdateRequestDTO;
-import com.ibridge.domain.dto.response.QuestionEditResponseDTO;
 import com.ibridge.domain.dto.response.QuestionListResponseDTO;
 import com.ibridge.domain.dto.response.QuestionResponseDTO;
 import com.ibridge.domain.entity.Child;
@@ -18,6 +17,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class QuestionService {
@@ -69,5 +69,27 @@ public class QuestionService {
         question.setTime(Timestamp.valueOf(LocalDateTime.now())); // 임시로 현재 시간 저장
 
         questionRepository.save(question);
+    }
+
+    @Transactional
+    public List<QuestionResponseDTO> addRegularQuestion(Long childId, QuestionRequestDTO requestDTO) {
+        Child child = childRepository.findById(childId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 자녀를 찾을 수 없습니다."));
+
+        if (requestDTO != null && requestDTO.getQuestion() != null) {
+            Question question = Question.builder()
+                    .text(requestDTO.getQuestion())
+                    .time(new Timestamp(System.currentTimeMillis())) // 현재 시간 저장
+                    .child(child)
+                    .type(0) // 정기 질문 0
+                    .build();
+
+            questionRepository.save(question);
+        }
+
+        List<Question> questions = questionRepository.findByChild_IdAndType(childId, 1);
+        return questions.stream()
+                .map(q -> new QuestionResponseDTO(q.getId(), q.getText(), q.getTime().toString()))
+                .collect(Collectors.toList());
     }
 }
