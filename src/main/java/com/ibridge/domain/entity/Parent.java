@@ -29,6 +29,6 @@ public class Parent {
     @JoinColumn(name = "family")
     private Family family;
 
-    @ManyToMany
-    List<Notice> notices;
+    @OneToMany
+    List<ParentNotice> parentNotices;
 }

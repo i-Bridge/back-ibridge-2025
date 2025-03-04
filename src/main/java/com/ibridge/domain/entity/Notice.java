@@ -22,11 +22,6 @@ public class Notice {
     Integer type;
     @Column(nullable = false)
     String sender;
-    @ManyToMany
-    @JoinTable(
-            name = "notice_parent",
-            joinColumns = @JoinColumn(name = "notice_id"),
-            inverseJoinColumns = @JoinColumn(name = "parent_id")
-    )
-    private List<Parent> receivers = new ArrayList<>();
+    @OneToMany
+    List<ParentNotice> parentNotices;
 }
