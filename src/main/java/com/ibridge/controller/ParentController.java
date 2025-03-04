@@ -17,6 +17,7 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/parent")
@@ -120,6 +121,16 @@ public class ParentController {
             @RequestBody QuestionUpdateRequestDTO requestDTO) {
 
         questionService.updateQuestion(childId, questionId, requestDTO);
+        return ApiResponse.onSuccess(null);
+    }
+
+    @PostMapping("/{childId}/questions/regular")
+    public ApiResponse<?> addRegularQuestion(
+            @PathVariable Long childId,
+            @RequestBody(required = false) QuestionRequestDTO requestDTO) {
+
+        List<QuestionResponseDTO> questions = questionService.addRegularQuestion(childId, requestDTO);
+
         return ApiResponse.onSuccess(null);
     }
 }

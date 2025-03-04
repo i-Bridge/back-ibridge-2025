@@ -20,5 +20,12 @@ public class QuestionResponseDTO {
 
     public QuestionResponseDTO(Long id) {
         this.questionId = id;
+
+    }
+
+    public QuestionResponseDTO(Long id, String text, String string) {
+        this.questionId = id;
+        this.text = text;
+        this.time = string;
     }
 }
