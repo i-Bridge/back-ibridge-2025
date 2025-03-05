@@ -22,7 +22,10 @@ public class ParentNotice {
     boolean isAccept;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    Parent parent;
+    Parent receiver;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    Parent sender;
 
     @ManyToOne(fetch = FetchType.LAZY)
     Notice notice;

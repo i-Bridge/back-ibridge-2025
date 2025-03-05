@@ -9,6 +9,4 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
-    @Query("SELECT n FROM Notice n WHERE n.receivers = :receiver ORDER BY n.id asc")
-    List<Notice> findByReceiver(@Param("receiver")Parent receiver);
 }

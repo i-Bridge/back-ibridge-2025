@@ -34,6 +34,8 @@ public class ParentService {
     private final FamilyRepository famliyRepository;
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     private final NoticeRepository noticeRepository;
+    private final ParentNoticeRepository parentNoticeRepository;
+    private final FamilyRepository familyRepository;
 
 
     public ParentResponseDTO.getMyPageDTO getMyPage(Long parentId) {
@@ -175,11 +177,20 @@ public class ParentService {
         Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
 
         List<ParentResponseDTO.NoticeDTO> noticeDTOList = new ArrayList<>();
-        List<Notice> notices = noticeRepository.findByReceiver(parent);
-        for(Notice notice : notices) {
-            ParentResponseDTO.NoticeDTO noticeDTO = new ParentResponseDTO.NoticeDTO();
-            //작성 필요
-            noticeDTOList.add(noticeDTO);
+        List<ParentNotice> noticesForParent = parentNoticeRepository.findAllByParent(parent);
+        for(ParentNotice notice : noticesForParent) {
+            Notice specNotice = notice.getNotice();
+            Boolean isAccept = null;
+            if(specNotice.getType() == 1) {
+                isAccept = notice.isAccept();
+            }
+            ParentResponseDTO.NoticeDTO tempDTO = ParentResponseDTO.NoticeDTO.builder()
+                    .parentId(notice.getSender().getId())
+                    .type(specNotice.getType())
+                    .isAccept(isAccept)
+                    .parentName(notice.getSender().getName())
+                    .noticeId(specNotice.getId()).build();
+            noticeDTOList.add(tempDTO);
         }
 
         return ParentResponseDTO.NoticeCheckDTO.builder().notices(noticeDTOList).build();
@@ -188,8 +199,42 @@ public class ParentService {
     public void getParentintoFamily(Long parentId, ParentRequestDTO.getParentintoFamilyDTO request) {
         Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
         Family family = parent.getFamily();
-
         Parent requester = parentRepository.findById(request.getParentId()).orElseThrow(() -> new RuntimeException("Sender not found"));
+
+        ParentNotice requested = parentNoticeRepository.findByReceiverandSendertoJoinFamily(parent, requester);
+        requested.setAccept(true);
+        parentNoticeRepository.save(requested);
+
         family.getParents().add(requester);
+        familyRepository.save(family);
+    }
+
+    public void deleteNotice(Long parentId, ParentRequestDTO.DeleteNoticeDTO reqeust) {
+        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
+        Notice notice = noticeRepository.findById(reqeust.getNoticeId()).orElseThrow(() -> new RuntimeException("Notice not found"));
+        ParentNotice parentNotice = parentNoticeRepository.findByNoticeandReceiver(notice, parent);
+
+        List<ParentNotice> forOtherReceivers = parentNoticeRepository.findAllReceiverByNotice(notice);
+        boolean flag = false;
+        if(forOtherReceivers.size() > 1) {
+            flag = true;
+        }
+        parentNoticeRepository.delete(parentNotice);
+        if(flag) noticeRepository.delete(parentNotice.getNotice());
+    }
+
+    public void deleteNoticeAll(Long parentId) {
+        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
+        List<ParentNotice> parentNotices = parentNoticeRepository.findAllByParent(parent);
+        for(ParentNotice parentNotice : parentNotices) {
+            List<ParentNotice> forOtherReceivers = parentNoticeRepository.findAllReceiverByNotice(parentNotice.getNotice());
+            boolean flag = false;
+            if(forOtherReceivers.size() > 1) {
+                flag = true;
+            }
+            parentNoticeRepository.delete(parentNotice);
+            if(flag) noticeRepository.delete(parentNotice.getNotice());
+        }
+
     }
 }

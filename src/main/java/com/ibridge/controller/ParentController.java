@@ -131,4 +131,18 @@ public class ParentController {
         questionService.updateQuestion(childId, questionId, requestDTO);
         return ApiResponse.onSuccess(null);
     }
+
+    @DeleteMapping("/{childId}/notice/delete")
+    public ApiResponse deleteNotice(@PathVariable("childId") Long childId, ParentRequestDTO.DeleteNoticeDTO request) {
+        Long parentId = 0L;
+        parentService.deleteNotice(parentId, request);
+        return ApiResponse.onSuccess(null);
+    }
+
+    @DeleteMapping("/{childId}/notice/deleteAll")
+    public ApiResponse deleteNoticeAll(@PathVariable("childId") Long childId) {
+        Long parentId = 0L;
+        parentService.deleteNoticeAll(parentId);
+        return ApiResponse.onSuccess(null);
+    }
 }

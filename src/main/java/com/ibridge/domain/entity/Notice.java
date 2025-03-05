@@ -20,8 +20,6 @@ public class Notice {
     Long id;
     @Column(nullable = false)
     Integer type;
-    @Column(nullable = false)
-    String sender;
     @OneToMany
     List<ParentNotice> parentNotices;
 }
