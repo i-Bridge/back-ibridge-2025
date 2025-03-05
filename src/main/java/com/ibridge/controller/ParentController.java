@@ -6,7 +6,6 @@ import com.ibridge.domain.dto.request.QuestionUpdateRequestDTO;
 import com.ibridge.domain.dto.response.*;
 import com.ibridge.service.AnalysisService;
 import com.ibridge.service.ParentService;
-import com.ibridge.service.QuestionBoardService;
 import com.ibridge.service.QuestionService;
 import com.ibridge.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ParentController {
     private final ParentService parentService;
-    private final QuestionBoardService questionBoardService;
     private final QuestionService questionService;
     private final AnalysisService analysisService;
 
