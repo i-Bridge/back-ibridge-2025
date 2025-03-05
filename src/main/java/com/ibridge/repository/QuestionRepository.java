@@ -30,5 +30,5 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
             "AND DATE(q.time) = :date")
     List<Question> findByChildAndDate(Child child, LocalDate date);
     Optional<Question> findByIdAndChild_Id(Long questionId, Long childId);
-    List<Question> findByChild_IdAndType(Long childId, int type);
+    List<Question> findByChildId(Long childId);
 }

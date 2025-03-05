@@ -133,13 +133,19 @@ public class ParentController {
         return ApiResponse.onSuccess(null);
     }
 
-    @PostMapping("/{childId}/questions/regular")
+    @PostMapping("/{childId}/questions/add-regular")
     public ApiResponse<?> addRegularQuestion(
             @PathVariable Long childId,
             @RequestBody(required = false) QuestionRequestDTO requestDTO) {
-
-        List<QuestionResponseDTO> questions = questionService.addRegularQuestion(childId, requestDTO);
-
+        questionService.addRegularQuestion(childId, requestDTO);
         return ApiResponse.onSuccess(null);
+    }
+
+    @GetMapping("/{childId}/questions/regular")
+    public ApiResponse<List<QuestionResponseDTO>> getRegularQuestions(
+            @PathVariable Long childId) {
+
+        List<QuestionResponseDTO> questions = questionService.getRegularQuestions(childId);
+        return ApiResponse.onSuccess(questions);
     }
 }

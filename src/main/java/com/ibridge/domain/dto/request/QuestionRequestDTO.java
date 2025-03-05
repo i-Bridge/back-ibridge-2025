@@ -6,4 +6,5 @@ import lombok.*;
 public class QuestionRequestDTO {
     private String question;
     private String time;
+    private int period;
 }

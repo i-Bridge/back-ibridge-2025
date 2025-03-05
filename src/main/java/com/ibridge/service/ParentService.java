@@ -141,11 +141,10 @@ public class ParentService {
         Map<Integer, Long> dailyAnswerCountMap = monthlyQuestions.stream()
                 .filter(Question::isAnswer)
                 .collect(Collectors.groupingBy(
-                        q -> q.getTime().toLocalDateTime().getDayOfMonth(),
+                        q -> q.getDate().toLocalDateTime().getDayOfMonth(),
                         Collectors.counting()
                 ));
 
-        // 응답 데이터 생성
         List<ParentHomeResponseDTO.AnswerCountDTO> answerCountDTOs = new ArrayList<>();
         for (int i = 1; i <= date.lengthOfMonth(); i++) {
             answerCountDTOs.add(ParentHomeResponseDTO.AnswerCountDTO.builder()
@@ -160,8 +159,9 @@ public class ParentService {
                         .questionId(q.getId())
                         .question(q.getText())
                         .type(q.getType())
-                        .time(q.getTime().toString())
+                        .time(q.getTime())
                         .isAnswer(q.isAnswer())
+                        .date(q.getDate())
                         .build())
                 .collect(Collectors.toList());
 
