@@ -4,16 +4,12 @@ import com.ibridge.domain.dto.request.ParentRequestDTO;
 import com.ibridge.domain.dto.request.QuestionRequestDTO;
 import com.ibridge.domain.dto.request.QuestionUpdateRequestDTO;
 import com.ibridge.domain.dto.response.*;
-import com.ibridge.domain.entity.Question;
-import com.ibridge.repository.AnalysisRepository;
-import com.ibridge.repository.QuestionRepository;
 import com.ibridge.service.AnalysisService;
 import com.ibridge.service.ParentService;
 import com.ibridge.service.QuestionBoardService;
 import com.ibridge.service.QuestionService;
 import com.ibridge.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -170,5 +166,15 @@ public class ParentController {
 
         questionService.deleteQuestion(childId, questionId);
         return ApiResponse.onSuccess(null);
+    }
+
+    @GetMapping("/{childId}/questions/board")
+    public ApiResponse<QuestionBoardResponseDTO> getQuestionBoard(
+            @PathVariable Long childId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        QuestionBoardResponseDTO response = questionService.getQuestionBoard(childId, page, size);
+        return ApiResponse.onSuccess(response);
     }
 }

@@ -1,23 +1,18 @@
 package com.ibridge.repository;
 
-import com.ibridge.domain.dto.response.QuestionListResponseDTO;
-import com.ibridge.domain.dto.response.QuestionResponseDTO;
 import com.ibridge.domain.entity.Child;
 import com.ibridge.domain.entity.Question;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 public interface QuestionRepository extends JpaRepository<Question, Long> {
-    Long saveQuestion(Long parentId, String question);
-    void updateQuestion(Long parentId, Long questionId, String question);
-    List<QuestionListResponseDTO.QuestionDTO> findQuestionsByParentId(Long parentId);
-    void deleteQuestion(Long parentId, Long questionId);
 
     // 특정 자녀의 해당 월 모든 질문 조회
     @Query("SELECT q FROM Question q WHERE q.child = :child " +
@@ -31,4 +26,5 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<Question> findByChildAndDate(Child child, LocalDate date);
     Optional<Question> findByIdAndChild_Id(Long questionId, Long childId);
     List<Question> findByChildId(Long childId);
+    Page<Question> findAllByChildId(Long childId, Pageable pageable);
 }
