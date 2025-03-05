@@ -4,18 +4,17 @@ import com.ibridge.domain.dto.request.StartRequestDTO;
 import com.ibridge.domain.dto.request.StartSignupNewRequestDTO;
 import com.ibridge.domain.dto.response.StartUserSelectionResponseDTO;
 import com.ibridge.domain.entity.*;
-import com.ibridge.repository.ChildRepository;
-import com.ibridge.repository.FamilyRepository;
-import com.ibridge.repository.NoticeRepository;
+import com.ibridge.repository.*;
 import com.ibridge.util.ApiResponse;
 import com.ibridge.util.CustomOAuth2User;
 import com.ibridge.domain.dto.response.StartResponseDTO;
-import com.ibridge.repository.ParentRepository;
 import lombok.RequiredArgsConstructor;
+import org.antlr.v4.runtime.misc.LogManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,6 +27,7 @@ public class StartService {
     private final FamilyRepository familyRepository;
     private final NoticeRepository noticeRepository;
     private final ChildRepository childRepository;
+    private final ParentNoticeRepository parentNoticeRepository;
 
     public StartResponseDTO signIn(CustomOAuth2User oAuth2User) {
         String email = oAuth2User.getEmail();
@@ -42,15 +42,25 @@ public class StartService {
         if (familyOptional.isPresent()) {
             Family family = familyOptional.get();
 
-            // 부모들에게 초대 알림 생성
+            Notice notice = Notice.builder()
+                    .type(1) //초대 알림 임의로 1로 설정
+                    .parentNotices(new ArrayList<>())
+                    .build();
+            noticeRepository.save(notice);
+
             for (Parent parent : family.getParents()) {
-                Notice notice = Notice.builder()
-                        .type(1) // 초대 알림 유형 (임의로 1 설정)
-                        .sender("System") // 시스템에서 보낸 것으로 설정
+                ParentNotice parentNotice = ParentNotice.builder()
+                        .isAccept(false) // 기본값 미수락
+                        .receiver(parent)
+                        .sender(null) //임의로 null 설정
+                        .notice(notice)
                         .build();
-                notice.getReceivers().add(parent); // 부모 추가
-                noticeRepository.save(notice);
+
+                parentNoticeRepository.save(parentNotice);
+                notice.getParentNotices().add(parentNotice);
             }
+
+            noticeRepository.save(notice);
 
             return new StartResponseDTO(true);
         }
