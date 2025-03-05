@@ -37,4 +37,7 @@ public class Question {
 
     @Column(nullable = false)
     private Timestamp date;
+
+    @Column(nullable = true)
+    private int period;
 }

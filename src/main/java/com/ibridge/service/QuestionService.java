@@ -2,7 +2,7 @@ package com.ibridge.service;
 
 import com.ibridge.domain.dto.request.QuestionRequestDTO;
 import com.ibridge.domain.dto.request.QuestionUpdateRequestDTO;
-import com.ibridge.domain.dto.response.QuestionListResponseDTO;
+import com.ibridge.domain.dto.response.QuestionBoardResponseDTO;
 import com.ibridge.domain.dto.response.QuestionResponseDTO;
 import com.ibridge.domain.entity.Child;
 import com.ibridge.domain.entity.Question;
@@ -13,12 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class QuestionService {
@@ -118,5 +119,31 @@ public class QuestionService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 질문을 찾을 수 없습니다."));
 
         questionRepository.delete(question);
+    }
+
+    public QuestionBoardResponseDTO getQuestionBoard(Long childId, int page, int size) {
+        if (!childRepository.existsById(childId)) {
+            throw new EntityNotFoundException("해당 자녀를 찾을 수 없습니다.");
+        }
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        Page<Question> questionPage = questionRepository.findAllByChildId(childId, pageable);
+
+        List<QuestionResponseDTO> questionList = questionPage.getContent().stream()
+                .map(q -> QuestionResponseDTO.builder()
+                        .questionId(q.getId())
+                        .text(q.getText())
+                        .time(q.getTime())
+                        .type(q.getType())
+                        .period(q.getPeriod())
+                        .child(q.getChild().getId())
+                        .build())
+                .toList();
+
+        return QuestionBoardResponseDTO.builder()
+                .page(questionPage.getNumber() + 1)
+                .totalPages(questionPage.getTotalPages())
+                .questions(questionList)
+                .build();
     }
 }
