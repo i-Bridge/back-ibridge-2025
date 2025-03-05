@@ -106,4 +106,17 @@ public class QuestionService {
         }
         return data;
     }
+
+    @Transactional
+    public void deleteQuestion(Long childId, Long questionId) {
+        if (!childRepository.existsById(childId)) {
+            throw new EntityNotFoundException("해당 자녀를 찾을 수 없습니다.");
+        }
+
+        // 해당 questionId가 childId에 속하는지 확인 후 삭제
+        Question question = questionRepository.findByIdAndChild_Id(questionId, childId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 질문을 찾을 수 없습니다."));
+
+        questionRepository.delete(question);
+    }
 }

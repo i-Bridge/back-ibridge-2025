@@ -162,4 +162,13 @@ public class ParentController {
         parentService.deleteNoticeAll(parentId);
         return ApiResponse.onSuccess(null);
     }
+
+    @DeleteMapping("/{childId}/questions/delete/{questionId}")
+    public ApiResponse<Void> deleteQuestion(
+            @PathVariable Long childId,
+            @PathVariable Long questionId) {
+
+        questionService.deleteQuestion(childId, questionId);
+        return ApiResponse.onSuccess(null);
+    }
 }
