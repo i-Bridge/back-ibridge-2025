@@ -1,11 +1,8 @@
 package com.ibridge.service;
 
 import com.ibridge.domain.dto.request.ParentRequestDTO;
-import com.ibridge.domain.dto.request.QuestionRequestDTO;
 import com.ibridge.domain.dto.response.ParentHomeResponseDTO;
 import com.ibridge.domain.dto.response.ParentResponseDTO;
-import com.ibridge.domain.dto.response.QuestionAnalysisDTO;
-import com.ibridge.domain.dto.response.QuestionResponseDTO;
 import com.ibridge.domain.entity.*;
 import com.ibridge.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static java.time.LocalDate.now;
 
 @Service
 @RequiredArgsConstructor
@@ -93,15 +89,6 @@ public class ParentService {
 
         return ParentResponseDTO.AddChildDTO.builder()
                 .childId(childRepository.save(child).getId()).build();
-    }
-
-    public QuestionAnalysisDTO getQuestionAnalysis(Long parentId, Long questionId){
-        return analysisRepository.findAnalysisByQuestionId(parentId, questionId);
-    }
-
-    public QuestionResponseDTO addTempQuestion(Long parentId, QuestionRequestDTO request){
-        Long questionId = questionRepository.saveQuestion(parentId, request.getQuestion());
-        return new QuestionResponseDTO(questionId);
     }
 
     public ParentResponseDTO.PatchChildDTO patchChild(Long parentId, ParentRequestDTO.EditChildDTO request) throws ParseException {
