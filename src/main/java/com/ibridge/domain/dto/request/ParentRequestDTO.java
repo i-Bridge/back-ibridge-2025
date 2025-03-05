@@ -52,4 +52,12 @@ public class ParentRequestDTO {
     public static class getParentintoFamilyDTO{
         Long parentId;
     }
+
+    @Builder
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DeleteNoticeDTO {
+        Long noticeId;
+    }
 }
