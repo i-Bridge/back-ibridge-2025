@@ -20,7 +20,7 @@ public class Question {
     private String text;
 
     @Column(nullable = false)
-    private Timestamp time;
+    private String time;
 
     @ManyToOne
     @JoinColumn(name = "child")
@@ -34,4 +34,7 @@ public class Question {
 
     @Column(nullable = false)
     private int type;
+
+    @Column(nullable = false)
+    private Timestamp date;
 }

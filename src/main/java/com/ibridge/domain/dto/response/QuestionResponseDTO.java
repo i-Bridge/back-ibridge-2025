@@ -3,6 +3,7 @@ package com.ibridge.domain.dto.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Getter
@@ -17,15 +18,6 @@ public class QuestionResponseDTO {
     private String time;
     private int type;
     private int period;
+    private Timestamp date;
 
-    public QuestionResponseDTO(Long id) {
-        this.questionId = id;
-
-    }
-
-    public QuestionResponseDTO(Long id, String text, String string) {
-        this.questionId = id;
-        this.text = text;
-        this.time = string;
-    }
 }

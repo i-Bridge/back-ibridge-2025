@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,11 +39,11 @@ public class QuestionService {
         Question question = Question.builder()
                 .child(child)
                 .text(request.getQuestion())
-                .time(Timestamp.valueOf(request.getTime() + " 00:00:00"))
+                .time(request.getTime())
                 .build();
 
         Question savedQuestion = questionRepository.save(question);
-        return new QuestionResponseDTO(savedQuestion.getId());
+        return QuestionResponseDTO.builder().questionId(savedQuestion.getId()).build();
     }
 
     @Transactional(readOnly = true)
@@ -56,6 +57,7 @@ public class QuestionService {
                 .text(question.getText())
                 .time("오전")
                 .type(question.getType())
+                .date(question.getDate())
                 .period(7)  // 임시 값 설정
                 .build();
     }
@@ -66,30 +68,42 @@ public class QuestionService {
 
         question.setText(requestDTO.getQuestion());
         question.setType(requestDTO.getType());
-        question.setTime(Timestamp.valueOf(LocalDateTime.now())); // 임시로 현재 시간 저장
+        question.setTime(requestDTO.getTime());
 
         questionRepository.save(question);
     }
 
     @Transactional
-    public List<QuestionResponseDTO> addRegularQuestion(Long childId, QuestionRequestDTO requestDTO) {
+    public void addRegularQuestion(Long childId, QuestionRequestDTO requestDTO) {
         Child child = childRepository.findById(childId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 자녀를 찾을 수 없습니다."));
 
-        if (requestDTO != null && requestDTO.getQuestion() != null) {
-            Question question = Question.builder()
-                    .text(requestDTO.getQuestion())
-                    .time(new Timestamp(System.currentTimeMillis())) // 현재 시간 저장
-                    .child(child)
-                    .type(0) // 정기 질문 0
-                    .build();
+        Question question = Question.builder()
+                .text(requestDTO.getQuestion())
+                .time(requestDTO.getTime())
+                .child(child)
+                .date(new Timestamp(System.currentTimeMillis()))
+                .type(0) // 정기 질문 0
+                .build();
 
-            questionRepository.save(question);
+        questionRepository.save(question);
+    }
+
+    @Transactional(readOnly = true)
+    public List<QuestionResponseDTO> getRegularQuestions(Long childId) {
+        if (!childRepository.existsById(childId)) {
+            throw new EntityNotFoundException("해당 자녀를 찾을 수 없습니다.");
         }
-
-        List<Question> questions = questionRepository.findByChild_IdAndType(childId, 1);
-        return questions.stream()
-                .map(q -> new QuestionResponseDTO(q.getId(), q.getText(), q.getTime().toString()))
-                .collect(Collectors.toList());
+        List<Question> questions = questionRepository.findByChildId(childId);
+        List<QuestionResponseDTO> data = new ArrayList<>();
+        for(Question question : questions) {
+            QuestionResponseDTO temp = QuestionResponseDTO.builder()
+                    .questionId(question.getId())
+                    .text(question.getText())
+                    .time(question.getTime())
+                    .build();
+            data.add(temp);
+        }
+        return data;
     }
 }
