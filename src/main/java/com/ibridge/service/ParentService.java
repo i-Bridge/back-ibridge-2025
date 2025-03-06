@@ -191,6 +191,11 @@ public class ParentService {
         ParentNotice requested = parentNoticeRepository.findByReceiverandSendertoJoinFamily(parent, requester);
         requested.setAccept(true);
         parentNoticeRepository.save(requested);
+        List<ParentNotice> otherRequested = parentNoticeRepository.findAllReceiverByNotice(requested.getNotice());
+        for(ParentNotice otherRequest : otherRequested) {
+            otherRequest.setAccept(true);
+            parentNoticeRepository.save(otherRequest);
+        }
 
         family.getParents().add(requester);
         familyRepository.save(family);
