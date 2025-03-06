@@ -6,11 +6,8 @@ import com.ibridge.domain.dto.request.StartSignupNewRequestDTO;
 import com.ibridge.domain.dto.response.StartUserSelectionResponseDTO;
 import com.ibridge.domain.entity.*;
 import com.ibridge.repository.*;
-import com.ibridge.util.ApiResponse;
-import com.ibridge.util.CustomOAuth2User;
 import com.ibridge.domain.dto.response.StartResponseDTO;
 import lombok.RequiredArgsConstructor;
-import org.antlr.v4.runtime.misc.LogManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
