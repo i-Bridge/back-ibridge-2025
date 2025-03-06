@@ -1,6 +1,7 @@
 package com.ibridge.controller;
 
 import com.ibridge.domain.dto.request.StartRequestDTO;
+import com.ibridge.domain.dto.request.StartSigninRequestDTO;
 import com.ibridge.domain.dto.request.StartSignupNewRequestDTO;
 import com.ibridge.domain.dto.response.StartUserSelectionResponseDTO;
 import com.ibridge.util.CustomOAuth2User;
@@ -19,12 +20,12 @@ import org.springframework.web.bind.annotation.*;
 public class StartController {
     private final StartService startService;
 
-    @GetMapping("/signin")
-    public ApiResponse<StartResponseDTO> signIn(@AuthenticationPrincipal CustomOAuth2User oAuth2User) {
-        if (oAuth2User == null) {
+    @PostMapping("/signin")
+    public ApiResponse<StartResponseDTO> signIn(@RequestBody StartSigninRequestDTO startSigninRequestDTO) {
+        if (startSigninRequestDTO == null) {
             return ApiResponse.onFailure("401", "인증되지 않은 사용자입니다.");
         }
-        StartResponseDTO response = startService.signIn(oAuth2User);
+        StartResponseDTO response = startService.signIn(startSigninRequestDTO);
         return ApiResponse.onSuccess(response);
     }
 
