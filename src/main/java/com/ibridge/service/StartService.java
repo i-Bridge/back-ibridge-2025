@@ -1,15 +1,14 @@
 package com.ibridge.service;
 
 import com.ibridge.domain.dto.request.StartRequestDTO;
+import com.ibridge.domain.dto.request.StartSigninRequestDTO;
 import com.ibridge.domain.dto.request.StartSignupNewRequestDTO;
 import com.ibridge.domain.dto.response.StartUserSelectionResponseDTO;
 import com.ibridge.domain.entity.*;
 import com.ibridge.repository.*;
-import com.ibridge.util.ApiResponse;
 import com.ibridge.util.CustomOAuth2User;
 import com.ibridge.domain.dto.response.StartResponseDTO;
 import lombok.RequiredArgsConstructor;
-import org.antlr.v4.runtime.misc.LogManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,8 +28,8 @@ public class StartService {
     private final ChildRepository childRepository;
     private final ParentNoticeRepository parentNoticeRepository;
 
-    public StartResponseDTO signIn(CustomOAuth2User oAuth2User) {
-        String email = oAuth2User.getEmail();
+    public StartResponseDTO signIn(StartSigninRequestDTO startSigninRequestDTO) {
+        String email = startSigninRequestDTO.getEmail();
         boolean isFirst = !parentRepository.existsByEmail(email);
 
         return new StartResponseDTO(isFirst);
@@ -75,7 +74,7 @@ public class StartService {
         familyRepository.save(family);
 
         Parent parent = Parent.builder()
-                .name("부모님 이름") // 부모 이름이 없으므로 임시 값
+                .name("부모님 이름") // 임시 값
                 .family(family)
                 .build();
         parentRepository.save(parent);
