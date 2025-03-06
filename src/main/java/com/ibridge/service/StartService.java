@@ -1,20 +1,17 @@
 package com.ibridge.service;
 
 import com.ibridge.domain.dto.request.StartRequestDTO;
+import com.ibridge.domain.dto.request.StartSigninRequestDTO;
 import com.ibridge.domain.dto.request.StartSignupNewRequestDTO;
 import com.ibridge.domain.dto.response.StartUserSelectionResponseDTO;
 import com.ibridge.domain.entity.*;
 import com.ibridge.repository.*;
-import com.ibridge.util.ApiResponse;
-import com.ibridge.util.CustomOAuth2User;
 import com.ibridge.domain.dto.response.StartResponseDTO;
 import lombok.RequiredArgsConstructor;
-import org.antlr.v4.runtime.misc.LogManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,30 +26,36 @@ public class StartService {
     private final ChildRepository childRepository;
     private final ParentNoticeRepository parentNoticeRepository;
 
-    public StartResponseDTO signIn(CustomOAuth2User oAuth2User) {
-        String email = oAuth2User.getEmail();
+    public StartResponseDTO signIn(StartSigninRequestDTO startSigninRequestDTO) {
+        String email = startSigninRequestDTO.getEmail();
+        String name = startSigninRequestDTO.getName();
         boolean isFirst = !parentRepository.existsByEmail(email);
-
+        //isFirst가 true -> db에 저장
+        if(isFirst) {
+            Parent parent = Parent.builder()
+                    .email(email)
+                    .name(name)
+                    .build();
+            parentRepository.save(parent);
+        }
         return new StartResponseDTO(isFirst);
     }
 
-    public StartResponseDTO checkFamilyExistence(StartRequestDTO request) {
+    public StartResponseDTO checkFamilyExistence(StartRequestDTO request, Parent parent) {
         Optional<Family> familyOptional = familyRepository.findByName(request.getFamilyName());
 
         if (familyOptional.isPresent()) {
             Family family = familyOptional.get();
 
             Notice notice = Notice.builder()
-                    .type(1) //초대 알림 임의로 1로 설정
-                    .parentNotices(new ArrayList<>())
+                    .type(2) //초대 알림 타입 2
                     .build();
             noticeRepository.save(notice);
-
-            for (Parent parent : family.getParents()) {
+            for (Parent p : family.getParents()) {
                 ParentNotice parentNotice = ParentNotice.builder()
                         .isAccept(false) // 기본값 미수락
-                        .receiver(parent)
-                        .sender(null) //임의로 null 설정
+                        .receiver(p)
+                        .sender(parent) //임의로 null 설정
                         .notice(notice)
                         .build();
 
@@ -75,7 +78,7 @@ public class StartService {
         familyRepository.save(family);
 
         Parent parent = Parent.builder()
-                .name("부모님 이름") // 부모 이름이 없으므로 임시 값
+                .name("부모님 이름") // 임시 값
                 .family(family)
                 .build();
         parentRepository.save(parent);
