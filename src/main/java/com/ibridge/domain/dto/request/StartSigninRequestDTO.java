@@ -2,9 +2,10 @@ package com.ibridge.domain.dto.request;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
+@NoArgsConstructor
 public class StartSigninRequestDTO {
     private String email;
     private String name;
