@@ -7,6 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.sql.Timestamp;
+import java.util.Date;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -20,6 +23,13 @@ public class ParentNotice {
     @Column(nullable = false)
     @ColumnDefault("false")
     boolean isAccept;
+
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    boolean isRead;
+
+    @Column(nullable = false)
+    Timestamp send_at;
 
     @ManyToOne(fetch = FetchType.LAZY)
     Parent receiver;

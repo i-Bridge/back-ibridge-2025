@@ -25,13 +25,6 @@ public class Analysis {
     @Column
     private String video;
 
-    @Column
-    private Timestamp date;
-
-    @ManyToOne
-    @JoinColumn(name = "child")
-    private Child child;
-
     @OneToOne
     @JoinColumn(name = "question")
     private Question question;

@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
@@ -14,24 +14,24 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Child {
+public class Subject {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String title;
 
     @Column(nullable = false)
-    private Date birth;
+    private boolean isAnswer;
 
     @Column(nullable = false)
-    private Gender gender;
+    private Timestamp date;
 
     @ManyToOne
-    @JoinColumn(name = "family")
-    private Family family;
+    @JoinColumn(name = "child")
+    private Child child;
 
-    @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Subject> subjects;
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
+    private List<Question> questions;
 }

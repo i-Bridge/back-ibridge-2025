@@ -17,8 +17,10 @@ public class Family {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
     @Column(nullable = false)
     String name;
+
     @OneToMany(mappedBy = "family", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Parent> parents;
 

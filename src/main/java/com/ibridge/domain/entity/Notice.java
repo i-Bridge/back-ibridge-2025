@@ -18,8 +18,10 @@ public class Notice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
     @Column(nullable = false)
     Integer type;
+
     @OneToMany
     List<ParentNotice> parentNotices;
 }
