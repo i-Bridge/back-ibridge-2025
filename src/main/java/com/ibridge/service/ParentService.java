@@ -42,15 +42,13 @@ public class ParentService {
         List<Child> children = childRepository.findByFamily(family);
         for(Child child : children) {
             ParentResponseDTO.childDTO childDTO = ParentResponseDTO.childDTO.builder()
-                    .childId(child.getId())
-                    .name(child.getName())
-                    .birth(child.getBirth().toString()).build();
+                    .childId(child.getId()).build();
             childDTOList.add(childDTO);
         }
 
         return ParentResponseDTO.getMyPageDTO.builder()
                 .name(parent.getName())
-                .account(parent.getEmail())
+                .familyName(family.getName())
                 .children(childDTOList).build();
     }
 
