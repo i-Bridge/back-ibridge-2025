@@ -78,8 +78,8 @@ public class ParentResponseDTO {
     public static class NoticeDTO {
         Long noticeId;
         int type;
-        Long parentId;
-        String parentName;
+        Long senderId;
+        String senderName;
         boolean isAccept;
     }
 

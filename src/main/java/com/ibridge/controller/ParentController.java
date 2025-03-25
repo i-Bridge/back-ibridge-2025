@@ -145,9 +145,7 @@ public class ParentController {
 
     @PatchMapping("/mypage/edit/{childId}")
     public ApiResponse<ParentResponseDTO.ChildIdDTO> patchChild(@RequestBody ParentRequestDTO.EditChildDTO request) throws ParseException {
-        Long parentId = 0L;
-
-        ParentResponseDTO.ChildIdDTO data = parentService.patchChild(parentId, request);
+        ParentResponseDTO.ChildIdDTO data = parentService.patchChild(request);
         return ApiResponse.onSuccess(data);
     }
 
@@ -158,19 +156,19 @@ public class ParentController {
     }
 
     //알림
-    @GetMapping("/{childId}/notice")
-    public ApiResponse<ParentResponseDTO.NoticeCheckDTO> noticeCheck(@PathVariable Long childId) {
+    @GetMapping("/notice")
+    public ApiResponse<ParentResponseDTO.NoticeCheckDTO> getNotice() {
         Long parentId = 0L;
 
-        ParentResponseDTO.NoticeCheckDTO data = parentService.noticeCheck(parentId);
+        ParentResponseDTO.NoticeCheckDTO data = parentService.getNotice(parentId);
         return ApiResponse.onSuccess(data);
     }
 
-    @PostMapping("/{childId}/add")
-    public ApiResponse addFamily(@PathVariable Long childId, @RequestBody ParentRequestDTO.getParentintoFamilyDTO request) {
+    @PostMapping("/notice/accept")
+    public ApiResponse addParentintoFamily(@PathVariable Long childId, @RequestBody ParentRequestDTO.getParentintoFamilyDTO request) {
         Long parentId = 0L;
 
-        parentService.getParentintoFamily(parentId, request);
+        parentService.addParentintoFamily(parentId, request);
         return ApiResponse.onSuccess(null);
     }
 }

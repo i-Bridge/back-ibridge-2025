@@ -160,10 +160,7 @@ public class ParentService {
                 .childId(childRepository.save(child).getId()).build();
     }
 
-    public ParentResponseDTO.ChildIdDTO patchChild(Long parentId, ParentRequestDTO.EditChildDTO request) throws ParseException {
-        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
-        Family family = parent.getFamily();
-
+    public ParentResponseDTO.ChildIdDTO patchChild(ParentRequestDTO.EditChildDTO request) throws ParseException {
         Child child = childRepository.findById(request.getChildId()).orElseThrow(() -> new RuntimeException("Child not found"));
         child.setName(request.getName());
         child.setBirth(sdf.parse(request.getBirthday()));
@@ -184,30 +181,33 @@ public class ParentService {
 
 
     //알림
-    public ParentResponseDTO.NoticeCheckDTO noticeCheck(Long parentId) {
+    public ParentResponseDTO.NoticeCheckDTO getNotice(Long parentId) {
         Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
 
         List<ParentResponseDTO.NoticeDTO> noticeDTOList = new ArrayList<>();
         List<ParentNotice> noticesForParent = parentNoticeRepository.findAllByParent(parent);
-        for(ParentNotice notice : noticesForParent) {
-            Notice specNotice = notice.getNotice();
-            Boolean isAccept = null;
-            if(specNotice.getType() == 1) {
-                isAccept = notice.isAccept();
+        for(ParentNotice parentNotice : noticesForParent) {
+            Notice notice = parentNotice.getNotice();
+
+            if((notice.getType() == 1 || notice.getType() == 3) && parentNotice.isRead()) {
+                parentNoticeRepository.delete(parentNotice);
+                if(parentNoticeRepository.CountByNotice(notice) == 0) noticeRepository.delete(notice);
             }
-            ParentResponseDTO.NoticeDTO tempDTO = ParentResponseDTO.NoticeDTO.builder()
-                    .parentId(notice.getSender().getId())
-                    .type(specNotice.getType())
-                    .isAccept(isAccept)
-                    .parentName(notice.getSender().getName())
-                    .noticeId(specNotice.getId()).build();
-            noticeDTOList.add(tempDTO);
+            else {
+                ParentResponseDTO.NoticeDTO tempDTO = ParentResponseDTO.NoticeDTO.builder()
+                        .senderId(parentNotice.getSender().getId())
+                        .type(notice.getType())
+                        .isAccept(parentNotice.isAccept())
+                        .senderName(parentNotice.getSender().getName())
+                        .noticeId(notice.getId()).build();
+                noticeDTOList.add(tempDTO);
+            }
         }
 
         return ParentResponseDTO.NoticeCheckDTO.builder().notices(noticeDTOList).build();
     }
 
-    public void getParentintoFamily(Long parentId, ParentRequestDTO.getParentintoFamilyDTO request) {
+    public void addParentintoFamily(Long parentId, ParentRequestDTO.getParentintoFamilyDTO request) {
         Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
         Family family = parent.getFamily();
         Parent requester = parentRepository.findById(request.getParentId()).orElseThrow(() -> new RuntimeException("Sender not found"));
@@ -215,13 +215,15 @@ public class ParentService {
         ParentNotice requested = parentNoticeRepository.findByReceiverandSendertoJoinFamily(parent, requester);
         requested.setAccept(true);
         parentNoticeRepository.save(requested);
+        parentNoticeRepository.delete(requested);
         List<ParentNotice> otherRequested = parentNoticeRepository.findAllReceiverByNotice(requested.getNotice());
         for(ParentNotice otherRequest : otherRequested) {
             otherRequest.setAccept(true);
             parentNoticeRepository.save(otherRequest);
+            parentNoticeRepository.delete(otherRequest);
         }
 
-        family.getParents().add(requester);
-        familyRepository.save(family);
+        requester.setFamily(family);
+        parentRepository.save(requester);
     }
 }
