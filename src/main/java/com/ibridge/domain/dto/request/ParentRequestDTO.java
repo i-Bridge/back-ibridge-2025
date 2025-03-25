@@ -60,4 +60,13 @@ public class ParentRequestDTO {
     public static class DeleteNoticeDTO {
         Long noticeId;
     }
+
+    @Builder
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class editFamilyNameDTO {
+        String familyName;
+    }
+
 }

@@ -33,24 +33,70 @@ public class ParentService {
     private final ParentNoticeRepository parentNoticeRepository;
     private final FamilyRepository familyRepository;
 
+    public ParentHomeResponseDTO getParentHome(Long childId, String dateStr) {
+        LocalDate date = (dateStr != null && !dateStr.isEmpty())
+                ? LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                : LocalDate.now();
 
-    public ParentResponseDTO.GetMyPageDTO getMyPage(Long parentId) {
-        Parent parent = parentRepository.findById(parentId).get();
-        Family family = parent.getFamily();
+        // 자녀가 있는지
+        Child child = childRepository.findById(childId)
+                .orElseThrow(() -> new RuntimeException("해당 자녀를 찾을 수 없습니다."));
 
-        List<ParentResponseDTO.ChildIdDTO> childDTOList = new ArrayList<>();
-        List<Child> children = childRepository.findAllByFamily(family);
-        for(Child child : children) {
-            ParentResponseDTO.ChildIdDTO childDTO = ParentResponseDTO.ChildIdDTO.builder()
-                    .childId(child.getId()).build();
-            childDTOList.add(childDTO);
+        // 해당 자녀의 해당 월 모든 질문 조회
+        List<Question> monthlyQuestions = questionRepository.findByChildAndMonth(child, date.getYear(), date.getMonthValue());
+
+        // 날짜별 isAnswer=true 개수 집계
+        Map<Integer, Long> dailyAnswerCountMap = monthlyQuestions.stream()
+                .filter(Question::isAnswer)
+                .collect(Collectors.groupingBy(
+                        q -> q.getDate().toLocalDateTime().getDayOfMonth(),
+                        Collectors.counting()
+                ));
+
+        List<ParentHomeResponseDTO.AnswerCountDTO> answerCountDTOs = new ArrayList<>();
+        for (int i = 1; i <= date.lengthOfMonth(); i++) {
+            answerCountDTOs.add(ParentHomeResponseDTO.AnswerCountDTO.builder()
+                    .count(dailyAnswerCountMap.getOrDefault(i, 0L).intValue())
+                    .build());
         }
 
-        return ParentResponseDTO.GetMyPageDTO.builder()
-                .name(parent.getName())
-                .familyName(family.getName())
-                .children(childDTOList).build();
+        // 특정 날짜의 질문 목록 조회
+        List<Question> dailyQuestions = questionRepository.findByChildAndDate(child, date);
+        List<ParentHomeResponseDTO.QuestionDTO> questionDTOs = dailyQuestions.stream()
+                .map(q -> ParentHomeResponseDTO.QuestionDTO.builder()
+                        .questionId(q.getId())
+                        .question(q.getText())
+                        .type(q.getType())
+                        .time(q.getTime())
+                        .isAnswer(q.isAnswer())
+                        .date(q.getDate())
+                        .build())
+                .collect(Collectors.toList());
+
+        return ParentHomeResponseDTO.builder()
+                .answers(answerCountDTOs)
+                .questions(questionDTOs)
+                .build();
     }
+
+//현호
+    public ParentResponseDTO.GetMyPageDTO getMyPage(Long parentId) {
+    Parent parent = parentRepository.findById(parentId).get();
+    Family family = parent.getFamily();
+
+    List<ParentResponseDTO.ChildIdDTO> childDTOList = new ArrayList<>();
+    List<Child> children = childRepository.findAllByFamily(family);
+    for(Child child : children) {
+        ParentResponseDTO.ChildIdDTO childDTO = ParentResponseDTO.ChildIdDTO.builder()
+                .childId(child.getId()).build();
+        childDTOList.add(childDTO);
+    }
+
+    return ParentResponseDTO.GetMyPageDTO.builder()
+            .name(parent.getName())
+            .familyName(family.getName())
+            .children(childDTOList).build();
+}
 
     public ParentResponseDTO.GetFamilyInfoDTO getFamilyPage(Long parentId) {
         Parent parent = parentRepository.findById(parentId).get();
@@ -76,6 +122,13 @@ public class ParentService {
                 .familyName(family.getName())
                 .parents(parentInfoDTOList)
                 .children(childInfoDTOList).build();
+    }
+
+    public void editFamilyName(Long parentId, ParentRequestDTO.editFamilyNameDTO request) {
+        Parent parent = parentRepository.findById(parentId).get();
+        Family family = parent.getFamily();
+        family.setName(request.getFamilyName());
+        return;
     }
 
     public void deleteAccount(Long parentId) {
@@ -128,52 +181,9 @@ public class ParentService {
         return;
     }
 
-    public ParentHomeResponseDTO getParentHome(Long childId, String dateStr) {
-        LocalDate date = (dateStr != null && !dateStr.isEmpty())
-                ? LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                : LocalDate.now();
 
-        // 자녀가 있는지
-        Child child = childRepository.findById(childId)
-                .orElseThrow(() -> new RuntimeException("해당 자녀를 찾을 수 없습니다."));
 
-        // 해당 자녀의 해당 월 모든 질문 조회
-        List<Question> monthlyQuestions = questionRepository.findByChildAndMonth(child, date.getYear(), date.getMonthValue());
-
-        // 날짜별 isAnswer=true 개수 집계
-        Map<Integer, Long> dailyAnswerCountMap = monthlyQuestions.stream()
-                .filter(Question::isAnswer)
-                .collect(Collectors.groupingBy(
-                        q -> q.getDate().toLocalDateTime().getDayOfMonth(),
-                        Collectors.counting()
-                ));
-
-        List<ParentHomeResponseDTO.AnswerCountDTO> answerCountDTOs = new ArrayList<>();
-        for (int i = 1; i <= date.lengthOfMonth(); i++) {
-            answerCountDTOs.add(ParentHomeResponseDTO.AnswerCountDTO.builder()
-                    .count(dailyAnswerCountMap.getOrDefault(i, 0L).intValue())
-                    .build());
-        }
-
-        // 특정 날짜의 질문 목록 조회
-        List<Question> dailyQuestions = questionRepository.findByChildAndDate(child, date);
-        List<ParentHomeResponseDTO.QuestionDTO> questionDTOs = dailyQuestions.stream()
-                .map(q -> ParentHomeResponseDTO.QuestionDTO.builder()
-                        .questionId(q.getId())
-                        .question(q.getText())
-                        .type(q.getType())
-                        .time(q.getTime())
-                        .isAnswer(q.isAnswer())
-                        .date(q.getDate())
-                        .build())
-                .collect(Collectors.toList());
-
-        return ParentHomeResponseDTO.builder()
-                .answers(answerCountDTOs)
-                .questions(questionDTOs)
-                .build();
-    }
-
+    //알림
     public ParentResponseDTO.NoticeCheckDTO noticeCheck(Long parentId) {
         Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
 
@@ -213,34 +223,5 @@ public class ParentService {
 
         family.getParents().add(requester);
         familyRepository.save(family);
-    }
-
-    public void deleteNotice(Long parentId, ParentRequestDTO.DeleteNoticeDTO reqeust) {
-        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
-        Notice notice = noticeRepository.findById(reqeust.getNoticeId()).orElseThrow(() -> new RuntimeException("Notice not found"));
-        ParentNotice parentNotice = parentNoticeRepository.findByNoticeandReceiver(notice, parent);
-
-        List<ParentNotice> forOtherReceivers = parentNoticeRepository.findAllReceiverByNotice(notice);
-        boolean flag = false;
-        if(forOtherReceivers.size() > 1) {
-            flag = true;
-        }
-        parentNoticeRepository.delete(parentNotice);
-        if(flag) noticeRepository.delete(parentNotice.getNotice());
-    }
-
-    public void deleteNoticeAll(Long parentId) {
-        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
-        List<ParentNotice> parentNotices = parentNoticeRepository.findAllByParent(parent);
-        for(ParentNotice parentNotice : parentNotices) {
-            List<ParentNotice> forOtherReceivers = parentNoticeRepository.findAllReceiverByNotice(parentNotice.getNotice());
-            boolean flag = false;
-            if(forOtherReceivers.size() > 1) {
-                flag = true;
-            }
-            parentNoticeRepository.delete(parentNotice);
-            if(flag) noticeRepository.delete(parentNotice.getNotice());
-        }
-
     }
 }
