@@ -33,87 +33,6 @@ public class ParentService {
     private final ParentNoticeRepository parentNoticeRepository;
     private final FamilyRepository familyRepository;
 
-
-    public ParentResponseDTO.getMyPageDTO getMyPage(Long parentId) {
-        Parent parent = parentRepository.findById(parentId).get();
-        Family family = parent.getFamily();
-
-        List<ParentResponseDTO.childDTO> childDTOList = new ArrayList<>();
-        List<Child> children = childRepository.findByFamily(family);
-        for(Child child : children) {
-            ParentResponseDTO.childDTO childDTO = ParentResponseDTO.childDTO.builder()
-                    .childId(child.getId())
-                    .name(child.getName())
-                    .birth(child.getBirth().toString()).build();
-            childDTOList.add(childDTO);
-        }
-
-        return ParentResponseDTO.getMyPageDTO.builder()
-                .name(parent.getName())
-                .account(parent.getEmail())
-                .children(childDTOList).build();
-    }
-
-    public ParentResponseDTO.EditInfo editInfo(Long parentId, ParentRequestDTO.EditInfo request) throws ParseException {
-        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
-
-        parent.setName(request.getName());
-        parentRepository.save(parent);
-
-        return ParentResponseDTO.EditInfo.builder()
-                .parentId(parent.getId()).build();
-    }
-
-    public void deleteAccount(Long parentId) {
-        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
-        Family family = parent.getFamily();
-
-        if(parentRepository.getParentCount(family) > 1) {
-            parentRepository.deleteById(parentId);
-            return;
-        }
-
-        for(Child child : childRepository.findByFamily(family)) {
-            childRepository.delete(child);
-        }
-        famliyRepository.delete(family);
-    }
-
-    public ParentResponseDTO.AddChildDTO addChild(Long parentId, ParentRequestDTO.AddChildDTO request) throws ParseException {
-        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
-        Family family = parent.getFamily();
-
-        Child child = Child.builder()
-                .family(family)
-                .name(request.getName())
-                .birth(sdf.parse(request.getBirthday()))
-                .gender(Gender.values()[request.getGender()]).build();
-
-        return ParentResponseDTO.AddChildDTO.builder()
-                .childId(childRepository.save(child).getId()).build();
-    }
-
-    public ParentResponseDTO.PatchChildDTO patchChild(Long parentId, ParentRequestDTO.EditChildDTO request) throws ParseException {
-        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
-        Family family = parent.getFamily();
-
-        Child child = childRepository.findById(request.getChildId()).orElseThrow(() -> new RuntimeException("Child not found"));
-        child.setName(request.getName());
-        child.setBirth(sdf.parse(request.getBirthday()));
-        child.setGender(Gender.values()[request.getGender()]);
-        childRepository.save(child);
-
-        return ParentResponseDTO.PatchChildDTO.builder()
-                .childId(child.getId()).build();
-    }
-
-    public void deleteChild(ParentRequestDTO.DeleteChildDTO request) {
-        Child child = childRepository.findById(request.getChildId()).orElseThrow(() -> new RuntimeException("Child not found"));
-
-        childRepository.delete(child);
-        return;
-    }
-
     public ParentHomeResponseDTO getParentHome(Long childId, String dateStr) {
         LocalDate date = (dateStr != null && !dateStr.isEmpty())
                 ? LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
@@ -160,30 +79,135 @@ public class ParentService {
                 .build();
     }
 
-    public ParentResponseDTO.NoticeCheckDTO noticeCheck(Long parentId) {
+//현호
+    public ParentResponseDTO.GetMyPageDTO getMyPage(Long parentId) {
+    Parent parent = parentRepository.findById(parentId).get();
+    Family family = parent.getFamily();
+
+    List<ParentResponseDTO.ChildIdDTO> childDTOList = new ArrayList<>();
+    List<Child> children = childRepository.findAllByFamily(family);
+    for(Child child : children) {
+        ParentResponseDTO.ChildIdDTO childDTO = ParentResponseDTO.ChildIdDTO.builder()
+                .childId(child.getId()).build();
+        childDTOList.add(childDTO);
+    }
+
+    return ParentResponseDTO.GetMyPageDTO.builder()
+            .name(parent.getName())
+            .familyName(family.getName())
+            .children(childDTOList).build();
+}
+
+    public ParentResponseDTO.GetFamilyInfoDTO getFamilyPage(Long parentId) {
+        Parent parent = parentRepository.findById(parentId).get();
+        Family family = parent.getFamily();
+
+        List<ParentResponseDTO.ParentInfoDTO> parentInfoDTOList = new ArrayList<>();
+        for(Parent otherParent : parentRepository.findAllByFamily(family)) {
+            parentInfoDTOList.add(ParentResponseDTO.ParentInfoDTO.builder()
+                    .parentId(otherParent.getId())
+                    .parentName(otherParent.getName()).build());
+        }
+
+        List<ParentResponseDTO.ChildInfoDTO> childInfoDTOList = new ArrayList<>();
+        for(Child child : childRepository.findAllByFamily(family)) {
+            childInfoDTOList.add(ParentResponseDTO.ChildInfoDTO.builder()
+                    .childId(child.getId())
+                    .childName(child.getName())
+                    .childBirth(child.getBirth().toString())
+                    .childGender(child.getGender().ordinal()).build());
+        }
+
+        return ParentResponseDTO.GetFamilyInfoDTO.builder()
+                .familyName(family.getName())
+                .parents(parentInfoDTOList)
+                .children(childInfoDTOList).build();
+    }
+
+    public void editFamilyName(Long parentId, ParentRequestDTO.editFamilyNameDTO request) {
+        Parent parent = parentRepository.findById(parentId).get();
+        Family family = parent.getFamily();
+        family.setName(request.getFamilyName());
+        return;
+    }
+
+    public void deleteAccount(Long parentId) {
+        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
+        Family family = parent.getFamily();
+
+        if(parentRepository.getParentCount(family) > 1) {
+            parentRepository.deleteById(parentId);
+            return;
+        }
+
+        for(Child child : childRepository.findAllByFamily(family)) {
+            childRepository.delete(child);
+        }
+        famliyRepository.delete(family);
+    }
+
+    public ParentResponseDTO.ChildIdDTO addChild(Long parentId, ParentRequestDTO.AddChildDTO request) throws ParseException {
+        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
+        Family family = parent.getFamily();
+
+        Child child = Child.builder()
+                .family(family)
+                .name(request.getName())
+                .birth(sdf.parse(request.getBirthday()))
+                .gender(Gender.values()[request.getGender()]).build();
+
+        return ParentResponseDTO.ChildIdDTO.builder()
+                .childId(childRepository.save(child).getId()).build();
+    }
+
+    public ParentResponseDTO.ChildIdDTO patchChild(ParentRequestDTO.EditChildDTO request) throws ParseException {
+        Child child = childRepository.findById(request.getChildId()).orElseThrow(() -> new RuntimeException("Child not found"));
+        child.setName(request.getName());
+        child.setBirth(sdf.parse(request.getBirthday()));
+        child.setGender(Gender.values()[request.getGender()]);
+        childRepository.save(child);
+
+        return ParentResponseDTO.ChildIdDTO.builder()
+                .childId(child.getId()).build();
+    }
+
+    public void deleteChild(ParentRequestDTO.DeleteChildDTO request) {
+        Child child = childRepository.findById(request.getChildId()).orElseThrow(() -> new RuntimeException("Child not found"));
+
+        childRepository.delete(child);
+        return;
+    }
+
+
+
+    //알림
+    public ParentResponseDTO.NoticeCheckDTO getNotice(Long parentId) {
         Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
 
         List<ParentResponseDTO.NoticeDTO> noticeDTOList = new ArrayList<>();
         List<ParentNotice> noticesForParent = parentNoticeRepository.findAllByParent(parent);
-        for(ParentNotice notice : noticesForParent) {
-            Notice specNotice = notice.getNotice();
-            Boolean isAccept = null;
-            if(specNotice.getType() == 1) {
-                isAccept = notice.isAccept();
+        for(ParentNotice parentNotice : noticesForParent) {
+            Notice notice = parentNotice.getNotice();
+
+            if((notice.getType() == 1 || notice.getType() == 3) && parentNotice.isRead()) {
+                parentNoticeRepository.delete(parentNotice);
+                if(parentNoticeRepository.CountByNotice(notice) == 0) noticeRepository.delete(notice);
             }
-            ParentResponseDTO.NoticeDTO tempDTO = ParentResponseDTO.NoticeDTO.builder()
-                    .parentId(notice.getSender().getId())
-                    .type(specNotice.getType())
-                    .isAccept(isAccept)
-                    .parentName(notice.getSender().getName())
-                    .noticeId(specNotice.getId()).build();
-            noticeDTOList.add(tempDTO);
+            else {
+                ParentResponseDTO.NoticeDTO tempDTO = ParentResponseDTO.NoticeDTO.builder()
+                        .senderId(parentNotice.getSender().getId())
+                        .type(notice.getType())
+                        .isAccept(parentNotice.isAccept())
+                        .senderName(parentNotice.getSender().getName())
+                        .noticeId(notice.getId()).build();
+                noticeDTOList.add(tempDTO);
+            }
         }
 
         return ParentResponseDTO.NoticeCheckDTO.builder().notices(noticeDTOList).build();
     }
 
-    public void getParentintoFamily(Long parentId, ParentRequestDTO.getParentintoFamilyDTO request) {
+    public void addParentintoFamily(Long parentId, ParentRequestDTO.getParentintoFamilyDTO request) {
         Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
         Family family = parent.getFamily();
         Parent requester = parentRepository.findById(request.getParentId()).orElseThrow(() -> new RuntimeException("Sender not found"));
@@ -191,42 +215,15 @@ public class ParentService {
         ParentNotice requested = parentNoticeRepository.findByReceiverandSendertoJoinFamily(parent, requester);
         requested.setAccept(true);
         parentNoticeRepository.save(requested);
+        parentNoticeRepository.delete(requested);
         List<ParentNotice> otherRequested = parentNoticeRepository.findAllReceiverByNotice(requested.getNotice());
         for(ParentNotice otherRequest : otherRequested) {
             otherRequest.setAccept(true);
             parentNoticeRepository.save(otherRequest);
+            parentNoticeRepository.delete(otherRequest);
         }
 
-        family.getParents().add(requester);
-        familyRepository.save(family);
-    }
-
-    public void deleteNotice(Long parentId, ParentRequestDTO.DeleteNoticeDTO reqeust) {
-        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
-        Notice notice = noticeRepository.findById(reqeust.getNoticeId()).orElseThrow(() -> new RuntimeException("Notice not found"));
-        ParentNotice parentNotice = parentNoticeRepository.findByNoticeandReceiver(notice, parent);
-
-        List<ParentNotice> forOtherReceivers = parentNoticeRepository.findAllReceiverByNotice(notice);
-        boolean flag = false;
-        if(forOtherReceivers.size() > 1) {
-            flag = true;
-        }
-        parentNoticeRepository.delete(parentNotice);
-        if(flag) noticeRepository.delete(parentNotice.getNotice());
-    }
-
-    public void deleteNoticeAll(Long parentId) {
-        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
-        List<ParentNotice> parentNotices = parentNoticeRepository.findAllByParent(parent);
-        for(ParentNotice parentNotice : parentNotices) {
-            List<ParentNotice> forOtherReceivers = parentNoticeRepository.findAllReceiverByNotice(parentNotice.getNotice());
-            boolean flag = false;
-            if(forOtherReceivers.size() > 1) {
-                flag = true;
-            }
-            parentNoticeRepository.delete(parentNotice);
-            if(flag) noticeRepository.delete(parentNotice.getNotice());
-        }
-
+        requester.setFamily(family);
+        parentRepository.save(requester);
     }
 }
