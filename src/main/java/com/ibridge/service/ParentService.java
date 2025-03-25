@@ -34,32 +34,48 @@ public class ParentService {
     private final FamilyRepository familyRepository;
 
 
-    public ParentResponseDTO.getMyPageDTO getMyPage(Long parentId) {
+    public ParentResponseDTO.GetMyPageDTO getMyPage(Long parentId) {
         Parent parent = parentRepository.findById(parentId).get();
         Family family = parent.getFamily();
 
-        List<ParentResponseDTO.childDTO> childDTOList = new ArrayList<>();
-        List<Child> children = childRepository.findByFamily(family);
+        List<ParentResponseDTO.ChildIdDTO> childDTOList = new ArrayList<>();
+        List<Child> children = childRepository.findAllByFamily(family);
         for(Child child : children) {
-            ParentResponseDTO.childDTO childDTO = ParentResponseDTO.childDTO.builder()
+            ParentResponseDTO.ChildIdDTO childDTO = ParentResponseDTO.ChildIdDTO.builder()
                     .childId(child.getId()).build();
             childDTOList.add(childDTO);
         }
 
-        return ParentResponseDTO.getMyPageDTO.builder()
+        return ParentResponseDTO.GetMyPageDTO.builder()
                 .name(parent.getName())
                 .familyName(family.getName())
                 .children(childDTOList).build();
     }
 
-    public ParentResponseDTO.EditInfo editInfo(Long parentId, ParentRequestDTO.EditInfo request) throws ParseException {
-        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
+    public ParentResponseDTO.GetFamilyInfoDTO getFamilyPage(Long parentId) {
+        Parent parent = parentRepository.findById(parentId).get();
+        Family family = parent.getFamily();
 
-        parent.setName(request.getName());
-        parentRepository.save(parent);
+        List<ParentResponseDTO.ParentInfoDTO> parentInfoDTOList = new ArrayList<>();
+        for(Parent otherParent : parentRepository.findAllByFamily(family)) {
+            parentInfoDTOList.add(ParentResponseDTO.ParentInfoDTO.builder()
+                    .parentId(otherParent.getId())
+                    .parentName(otherParent.getName()).build());
+        }
 
-        return ParentResponseDTO.EditInfo.builder()
-                .parentId(parent.getId()).build();
+        List<ParentResponseDTO.ChildInfoDTO> childInfoDTOList = new ArrayList<>();
+        for(Child child : childRepository.findAllByFamily(family)) {
+            childInfoDTOList.add(ParentResponseDTO.ChildInfoDTO.builder()
+                    .childId(child.getId())
+                    .childName(child.getName())
+                    .childBirth(child.getBirth().toString())
+                    .childGender(child.getGender().ordinal()).build());
+        }
+
+        return ParentResponseDTO.GetFamilyInfoDTO.builder()
+                .familyName(family.getName())
+                .parents(parentInfoDTOList)
+                .children(childInfoDTOList).build();
     }
 
     public void deleteAccount(Long parentId) {
@@ -71,13 +87,13 @@ public class ParentService {
             return;
         }
 
-        for(Child child : childRepository.findByFamily(family)) {
+        for(Child child : childRepository.findAllByFamily(family)) {
             childRepository.delete(child);
         }
         famliyRepository.delete(family);
     }
 
-    public ParentResponseDTO.AddChildDTO addChild(Long parentId, ParentRequestDTO.AddChildDTO request) throws ParseException {
+    public ParentResponseDTO.ChildIdDTO addChild(Long parentId, ParentRequestDTO.AddChildDTO request) throws ParseException {
         Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
         Family family = parent.getFamily();
 
@@ -87,11 +103,11 @@ public class ParentService {
                 .birth(sdf.parse(request.getBirthday()))
                 .gender(Gender.values()[request.getGender()]).build();
 
-        return ParentResponseDTO.AddChildDTO.builder()
+        return ParentResponseDTO.ChildIdDTO.builder()
                 .childId(childRepository.save(child).getId()).build();
     }
 
-    public ParentResponseDTO.PatchChildDTO patchChild(Long parentId, ParentRequestDTO.EditChildDTO request) throws ParseException {
+    public ParentResponseDTO.ChildIdDTO patchChild(Long parentId, ParentRequestDTO.EditChildDTO request) throws ParseException {
         Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
         Family family = parent.getFamily();
 
@@ -101,7 +117,7 @@ public class ParentService {
         child.setGender(Gender.values()[request.getGender()]);
         childRepository.save(child);
 
-        return ParentResponseDTO.PatchChildDTO.builder()
+        return ParentResponseDTO.ChildIdDTO.builder()
                 .childId(child.getId()).build();
     }
 

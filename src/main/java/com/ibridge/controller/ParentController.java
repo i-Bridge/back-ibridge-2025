@@ -128,26 +128,34 @@ public class ParentController {
 //현호
     //마이페이지
     @GetMapping("/mypage")
-    public ApiResponse<ParentResponseDTO.getMyPageDTO> getMyPage() {
+    public ApiResponse<ParentResponseDTO.GetMyPageDTO> getMyPage() {
         Long parentId = 0L;
 
-        ParentResponseDTO.getMyPageDTO parentResponseDTO = parentService.getMyPage(parentId);
+        ParentResponseDTO.GetMyPageDTO parentResponseDTO = parentService.getMyPage(parentId);
         return ApiResponse.onSuccess(parentResponseDTO);
     }
 
-    @PostMapping("/mypage/child/add")
-    public ApiResponse<ParentResponseDTO.AddChildDTO> addChild(@RequestBody ParentRequestDTO.AddChildDTO addChildDTO) throws ParseException {
+    @GetMapping("/mypage/edit")
+    public ApiResponse<ParentResponseDTO.GetFamilyInfoDTO> getFamilyInfo() {
         Long parentId = 0L;
 
-        ParentResponseDTO.AddChildDTO data = parentService.addChild(parentId, addChildDTO);
+        ParentResponseDTO.GetFamilyInfoDTO data = parentService.getFamilyPage(parentId);
+        return ApiResponse.onSuccess(data);
+    }
+
+    @PostMapping("/mypage/child/add")
+    public ApiResponse<ParentResponseDTO.ChildIdDTO> addChild(@RequestBody ParentRequestDTO.AddChildDTO addChildDTO) throws ParseException {
+        Long parentId = 0L;
+
+        ParentResponseDTO.ChildIdDTO data = parentService.addChild(parentId, addChildDTO);
         return ApiResponse.onSuccess(data);
     }
 
     @PatchMapping("/mypage/child/edit")
-    public ApiResponse<ParentResponseDTO.PatchChildDTO> patchChild(@RequestBody ParentRequestDTO.EditChildDTO request) throws ParseException {
+    public ApiResponse<ParentResponseDTO.ChildIdDTO> patchChild(@RequestBody ParentRequestDTO.EditChildDTO request) throws ParseException {
         Long parentId = 0L;
 
-        ParentResponseDTO.PatchChildDTO data = parentService.patchChild(parentId, request);
+        ParentResponseDTO.ChildIdDTO data = parentService.patchChild(parentId, request);
         return ApiResponse.onSuccess(data);
     }
 
