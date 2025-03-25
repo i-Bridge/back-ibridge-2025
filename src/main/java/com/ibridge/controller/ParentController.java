@@ -22,7 +22,7 @@ public class ParentController {
     private final QuestionService questionService;
     private final AnalysisService analysisService;
 
-    //지웅
+//지웅
     @GetMapping("/{childId}/home")
     public ApiResponse<ParentHomeResponseDTO> getParentHome(
             @PathVariable Long childId,
@@ -125,30 +125,14 @@ public class ParentController {
 
 
 
-
-    //현호
+//현호
+    //마이페이지
     @GetMapping("/mypage")
     public ApiResponse<ParentResponseDTO.getMyPageDTO> getMyPage() {
         Long parentId = 0L;
 
         ParentResponseDTO.getMyPageDTO parentResponseDTO = parentService.getMyPage(parentId);
         return ApiResponse.onSuccess(parentResponseDTO);
-    }
-
-    @PatchMapping("/mypage/edit")
-    public ApiResponse<ParentResponseDTO.EditInfo> EditInfo(@RequestBody ParentRequestDTO.EditInfo editInfo) throws ParseException {
-        Long parentId = 0L;
-
-        ParentResponseDTO.EditInfo editInfoDTO = parentService.editInfo(parentId, editInfo);
-        return ApiResponse.onSuccess(editInfoDTO);
-    }
-
-    @DeleteMapping("/mypage/delete")
-    public ApiResponse<ParentResponseDTO.DeleteDTO> deleteParentHome() {
-        Long parentId = 0L;
-
-        parentService.deleteAccount(parentId);
-        return ApiResponse.onSuccess(null);
     }
 
     @PostMapping("/mypage/child/add")
@@ -173,7 +157,7 @@ public class ParentController {
         return ApiResponse.onSuccess(null);
     }
 
-
+    //알림
     @DeleteMapping("/{childId}/notice/delete")
     public ApiResponse deleteNotice(@PathVariable("childId") Long childId, ParentRequestDTO.DeleteNoticeDTO request) {
         Long parentId = 0L;
