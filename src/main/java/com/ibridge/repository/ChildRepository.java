@@ -10,5 +10,5 @@ import java.util.List;
 
 public interface ChildRepository extends JpaRepository<Child, Long> {
     @Query("SELECT c FROM Child c WHERE c.family = :family")
-    List<Child> findByFamily(@Param("family") Family family);
+    List<Child> findAllByFamily(@Param("family") Family family);
 }

@@ -2,7 +2,6 @@ package com.ibridge.domain.dto.response;
 
 import lombok.*;
 
-import java.util.Date;
 import java.util.List;
 
 
@@ -12,27 +11,36 @@ public class ParentResponseDTO {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class getMyPageDTO {
+    public static class GetMyPageDTO {
         String name;
-        String account;
-        List<childDTO> children;
+        String familyName;
+        List<ChildIdDTO> children;
     }
 
     @Builder
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class childDTO {
+    public static class ChildIdDTO {
         Long childId;
-        String name;
-        String birth;
     }
 
     @Builder
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class EditInfo {
+    public static class ChildInfoDTO {
+        Long childId;
+        String childName;
+        String childBirth;
+        int childGender;
+    }
+
+    @Builder
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ParentIdDTO {
         Long parentId;
     }
 
@@ -40,25 +48,19 @@ public class ParentResponseDTO {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class DeleteDTO {
-        Date deletedAt;
-        String account;
+    public static class ParentInfoDTO {
+        Long parentId;
+        String parentName;
     }
 
     @Builder
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class AddChildDTO {
-        Long childId;
-    }
-
-    @Builder
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class PatchChildDTO {
-        Long childId;
+    public static class GetFamilyInfoDTO {
+        String familyName;
+        List<ParentInfoDTO> parents;
+        List<ChildInfoDTO> children;
     }
 
     @Builder
@@ -76,8 +78,10 @@ public class ParentResponseDTO {
     public static class NoticeDTO {
         Long noticeId;
         int type;
-        Long parentId;
-        String parentName;
+        Long senderId;
+        String senderName;
         boolean isAccept;
     }
+
+
 }
