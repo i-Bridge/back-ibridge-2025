@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,16 +35,16 @@ public class StartService {
         boolean isFirst = !parentRepository.existsByEmail(email);
         //isFirst가 true -> db에 저장
         if(isFirst) {
-            Parent parent = Parent.builder()
-                    .email(email)
+            Parent parent = Parent.builder()//gender 추가 해야 함
                     .name(name)
+                    .email(email)
                     .build();
             parentRepository.save(parent);
         }
         return new StartResponseDTO(isFirst);
     }
 
-    public StartResponseDTO checkFamilyExistence(StartRequestDTO request, Parent parent) {
+    public void checkFamilyExistence(StartRequestDTO request, Parent parent) {
         Optional<Family> familyOptional = familyRepository.findByName(request.getFamilyName());
 
         if (familyOptional.isPresent()) {
@@ -55,8 +57,10 @@ public class StartService {
             for (Parent p : family.getParents()) {
                 ParentNotice parentNotice = ParentNotice.builder()
                         .isAccept(false) // 기본값 미수락
+                        .isRead(false)
+                        .send_at(new Timestamp(System.currentTimeMillis()))
                         .receiver(p)
-                        .sender(parent) //임의로 null 설정
+                        .sender(parent)
                         .notice(notice)
                         .build();
 
@@ -66,23 +70,30 @@ public class StartService {
 
             noticeRepository.save(notice);
 
-            return new StartResponseDTO(true);
+            return;
         }
 
         throw new IllegalArgumentException("해당 가족이 존재하지 않습니다.");
     }
 
-    public StartResponseDTO registerNewFamily(StartSignupNewRequestDTO request) {
-        Family family = Family.builder()
-                .name(request.getParent().getFamilyName())
-                .build();
-        familyRepository.save(family);
+    public Boolean checkFamilyDuplicate(StartRequestDTO request, Parent parent) {
+        Optional<Family> familyOptional = familyRepository.findByName(request.getFamilyName());
+        if (familyOptional.isEmpty()) {
+            List<Parent> parents = new ArrayList<>();
+            parents.add(parent);
+            Family family = Family.builder()
+                    .name(request.getFamilyName())
+                    .parents(parents)
+                    .build();
+            familyRepository.save(family);
+            return true;
+        }
+        throw new IllegalArgumentException("동일한 가족 이름이 존재합니다.");
+    }
 
-        Parent parent = Parent.builder()
-                .name("부모님 이름") // 임시 값
-                .family(family)
-                .build();
-        parentRepository.save(parent);
+    public void registerNewChildren(StartSignupNewRequestDTO request, String email) {
+        Parent parent = parentRepository.getParentByEmail(email);
+        Family family = parent.getFamily();
 
         List<Child> children = request.getChildren().stream()
                 .map(childRequest -> Child.builder()
@@ -94,43 +105,28 @@ public class StartService {
                 .collect(Collectors.toList());
 
         childRepository.saveAll(children);
-
-        return new StartResponseDTO(true);
     }
 
-    public StartUserSelectionResponseDTO getUserSelection(Long parentId) {
-        // 부모 정보 조회
-        Parent parent = parentRepository.findById(parentId)
-                .orElseThrow(() -> new RuntimeException("부모 정보를 찾을 수 없습니다."));
-
+    public StartUserSelectionResponseDTO getUserSelection(Parent parent) {
         // 가족 정보 조회
         Family family = parent.getFamily();
         if (family == null) {
             throw new RuntimeException("가족 정보가 없습니다.");
         }
-
-        // 부모 리스트 생성
-        List<StartUserSelectionResponseDTO.ParentDTO> parentDTOs = family.getParents().stream()
-                .map(p -> StartUserSelectionResponseDTO.ParentDTO.builder()
-                        .id(p.getId())
-                        .name(p.getName())
-                        .relation("부모") // 관계 설정 (추후 수정 가능)
-                        .build())
-                .collect(Collectors.toList());
-
+        ParentNotice parentNotice = parentNoticeRepository.findBySender(parent);
         // 자녀 리스트 생성
         List<StartUserSelectionResponseDTO.ChildDTO> childDTOs = family.getChildren().stream()
                 .map(c -> StartUserSelectionResponseDTO.ChildDTO.builder()
                         .id(c.getId())
                         .name(c.getName())
-                        .birth(c.getBirth().toString()) // Date -> String 변환
-                        .gender(c.getGender() == Gender.MALE ? 0 : 1) // Enum -> int 변환
+                        .birth(c.getBirth().toString())
+                        .gender(c.getGender() == Gender.MALE ? Gender.MALE : Gender.FEMALE)
                         .build())
                 .collect(Collectors.toList());
 
         return StartUserSelectionResponseDTO.builder()
-                .status(true) // 초대 수락 여부 (임시값, 로직 필요)
-                .parents(parentDTOs)
+                .isAccepted(parentNotice.isAccept())
+                .isSend(false) //임시로 false
                 .children(childDTOs)
                 .build();
     }

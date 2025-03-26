@@ -6,13 +6,9 @@ import com.ibridge.domain.dto.request.StartSignupNewRequestDTO;
 import com.ibridge.domain.dto.response.StartUserSelectionResponseDTO;
 import com.ibridge.domain.dto.response.StartResponseDTO;
 import com.ibridge.service.LoginService;
-import com.ibridge.service.ParentService;
 import com.ibridge.service.StartService;
 import com.ibridge.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -32,20 +28,25 @@ public class StartController {
     }
 
     @PostMapping("/signup/exist")
-    public ApiResponse<StartResponseDTO> checkFamilyExistence(@RequestBody StartRequestDTO request, @RequestHeader("X-User-Email") String email){
-        StartResponseDTO response = startService.checkFamilyExistence(request, loginService.getParentFromHeader(email));
-        return ApiResponse.onSuccess(response);
+    public ApiResponse<?> checkFamilyExistence(@RequestBody StartRequestDTO request, @RequestHeader("X-User-Email") String email) {
+        startService.checkFamilyExistence(request, loginService.getParentFromHeader(email));
+        return ApiResponse.onSuccess(null);
     }
 
-    @PostMapping("/signup/new")
-    public ApiResponse<StartResponseDTO> registerNewFamily(@RequestBody StartSignupNewRequestDTO request) {
-        StartResponseDTO response = startService.registerNewFamily(request);
+    @PostMapping("/signup/dup")
+    public ApiResponse<Boolean> checkDuplicateFamilyName(@RequestBody StartRequestDTO request, @RequestHeader("X-User_Email") String email){
+        Boolean response = startService.checkFamilyDuplicate(request, loginService.getParentFromHeader(email));
         return ApiResponse.onSuccess(response);
+    }
+    @PostMapping("/signup/new")
+    public ApiResponse<?> registerNewFamily(@RequestBody StartSignupNewRequestDTO request, @RequestHeader("X-User-Email") String email) {
+        startService.registerNewChildren(request, email);
+        return ApiResponse.onSuccess(null);
     }
 
     @GetMapping("/login")
-    public ApiResponse<StartUserSelectionResponseDTO> getUserSelection(@RequestParam Long parentId) {
-        StartUserSelectionResponseDTO response = startService.getUserSelection(parentId);
+    public ApiResponse<StartUserSelectionResponseDTO> getUserSelection(@RequestHeader("X-User-Email") String email) {
+        StartUserSelectionResponseDTO response = startService.getUserSelection(loginService.getParentFromHeader(email));
         return ApiResponse.onSuccess(response);
     }
 }

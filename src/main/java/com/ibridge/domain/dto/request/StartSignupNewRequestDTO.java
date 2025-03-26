@@ -11,9 +11,6 @@ import java.util.List;
 public class StartSignupNewRequestDTO {
 
     @NotNull
-    private ParentRequest parent;
-
-    @NotNull
     private List<ChildRequest> children;
 
     @Getter
