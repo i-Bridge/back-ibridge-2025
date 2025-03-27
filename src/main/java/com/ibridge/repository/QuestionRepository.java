@@ -14,10 +14,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QuestionRepository extends JpaRepository<Question, Long> {
-    @Query("SELECT q FROM Question q WHERE q.subject.id = :subjectId")
-    List<Question> findBySubjectId(@Param("subjectId") Long subjectId);
-    @Query("SELECT q FROM Question q WHERE q.id = :questionId AND q.subject.id = :subjectId")
-    Optional<Question> findByIdAndSubjectId(@Param("questionId") Long questionId,
+    @Query("SELECT q FROM Question q WHERE q.subject.id = :subjectId AND q.child.id = :childId")
+    List<Question> findBySubjectIdAndChildId(@Param("subjectId") Long subjectId,
+                                                    @Param("childId") Long childId);
+
+    @Query("SELECT q FROM Question q WHERE q.id = :questionId AND q.child.id = :childId AND q.subject.id = :subjectId")
+    Optional<Question> findByIdAndChildIdAndSubjectId(@Param("questionId") Long questionId,
+                                                      @Param("childId") Long childId,
                                                       @Param("subjectId") Long subjectId);
     Optional<Question> findByChildId(Long childId);
 }
