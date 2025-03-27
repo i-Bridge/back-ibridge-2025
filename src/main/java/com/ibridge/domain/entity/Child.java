@@ -32,6 +32,6 @@ public class Child {
     @JoinColumn(name = "family")
     private Family family;
 
-    @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Subject> subjects;
 }

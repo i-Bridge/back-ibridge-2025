@@ -10,8 +10,6 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 public interface AnalysisRepository extends JpaRepository<Analysis, Long> {
-    Optional<Analysis> findByChildIdAndQuestionId(Long childId, Long questionId);
-
     @Query("SELECT a FROM Analysis a WHERE a.question.id = :questionId")
     Optional<Analysis> findByQuestionId(@Param("questionId") Long questionId);
 }

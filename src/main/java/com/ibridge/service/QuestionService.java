@@ -49,7 +49,7 @@ public class QuestionService {
                 .collect(Collectors.toList());
 
         return QuestionAnalysisDTO.builder()
-                .subjects(Collections.singletonList(new SubjectDTO(subject.getId(), subject.getTitle())))
+                .subjects(Collections.singletonList(new SubjectDTO(subject.getId(), subject.getTitle(), subject.isAnswer())))
                 .questions(questions)
                 .build();
     }

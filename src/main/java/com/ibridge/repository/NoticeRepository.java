@@ -9,5 +9,4 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
-    boolean existsByChildId(Long childId);
 }
