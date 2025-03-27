@@ -7,6 +7,5 @@ import org.antlr.v4.runtime.misc.NotNull;
 @Getter
 @NoArgsConstructor
 public class StartRequestDTO {
-    @NotNull
     private String FamilyName;
 }
