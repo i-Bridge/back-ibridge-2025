@@ -18,8 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,12 +37,14 @@ public class QuestionService {
     private final SubjectRepository subjectRepository;
     private final AnalysisRepository analysisRepository;
     private final Random random = new Random();
+    private final ChildRepository childRepository;
 
     @Autowired
-    public QuestionService(QuestionRepository questionRepository, SubjectRepository subjectRepository, AnalysisRepository analysisRepository) {
+    public QuestionService(QuestionRepository questionRepository, SubjectRepository subjectRepository, AnalysisRepository analysisRepository, ChildRepository childRepository) {
         this.questionRepository = questionRepository;
         this.subjectRepository = subjectRepository;
         this.analysisRepository = analysisRepository;
+        this.childRepository = childRepository;
     }
 
     public QuestionAnalysisDTO getQuestionAnalysis(Long childId, Long subjectId, LocalDate date) {
@@ -74,32 +81,28 @@ public class QuestionService {
 
     @Transactional
     public void editQuestion(Long childId, EditQuestionRequestDTO request) {
-        Question question = questionRepository.findByChildId(childId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 아이의 질문을 찾을 수 없습니다."));
+        Subject subject = subjectRepository.findOneByChildId(childId);
 
-        question.setText(request.getTitle());
-        questionRepository.save(question);
+        subject.setTitle(request.getTitle());
+        subjectRepository.save(subject);
     }
 
     @Transactional(readOnly = true)
     public SubjectResponseDTO rerollQuestion(Long childId) {
-        List<Question> questions = questionRepository.findAll(); // 모든 질문 가져오기
-
-        // childId에 해당하는 질문만 필터링
-        List<Question> childQuestions = questions.stream()
-                .filter(q -> q.getChild().getId().equals(childId))
-                .collect(Collectors.toList());
-
-        if (childQuestions.isEmpty()) {
-            throw new EntityNotFoundException("해당 아이의 질문이 존재하지 않습니다.");
+        List<String> subjects = new ArrayList<>();
+        String filePath = "src/main/resources/SubjectList.txt";
+        try(BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while((line = br.readLine())!=null){
+                subjects.add(line);
+            }
+        }catch(IOException e){
+            e.printStackTrace();
         }
-
+        int id = random.nextInt(subjects.size());
         // 랜덤으로 하나 선택
-        Question randomQuestion = childQuestions.get(random.nextInt(childQuestions.size()));
-
-        return new SubjectResponseDTO(
-                randomQuestion.getSubject().getId(),
-                randomQuestion.getSubject().getTitle()
-        );
+        String randomQuestion = subjects.get(id);
+        subjectRepository.save(new Subject((long)id, randomQuestion, false, Timestamp.valueOf(LocalDateTime.now()), childRepository.findById(childId).get(), null));
+        return new SubjectResponseDTO((long)id, randomQuestion);
     }
 }

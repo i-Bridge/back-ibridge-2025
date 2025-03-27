@@ -38,6 +38,7 @@ public class StartController {
         Boolean response = startService.checkFamilyDuplicate(request, loginService.getParentFromHeader(email));
         return ApiResponse.onSuccess(response);
     }
+
     @PostMapping("/signup/new")
     public ApiResponse<?> registerNewFamily(@RequestBody StartSignupNewRequestDTO request, @RequestHeader("X-User-Email") String email) {
         startService.registerNewChildren(request, email);

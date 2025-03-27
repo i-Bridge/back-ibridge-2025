@@ -1,16 +1,14 @@
 package com.ibridge.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
 @Data
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
