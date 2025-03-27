@@ -11,7 +11,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // 모든 요청을 인증 없이 허용
+                        .requestMatchers("/**").permitAll()  // 모든 요청 허용 (테스트용)
+                        .anyRequest().authenticated()
                 );
 
         return http.build();
