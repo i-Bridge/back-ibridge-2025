@@ -8,4 +8,5 @@ import lombok.Getter;
 public class SubjectDTO {
     private Long subjectId;
     private String subjectTitle;
+    private boolean isAnswer;
 }

@@ -48,7 +48,7 @@ public class ParentService {
         }
 
         List<SubjectDTO> subjects = subjectRepository.findByChildId(childId).stream()
-                .map(subject -> new SubjectDTO(subject.getId(), subject.getTitle()))
+                .map(subject -> new SubjectDTO(subject.getId(), subject.getTitle(), subject.isAnswer()))
                 .collect(Collectors.toList());
 
         return ParentHomeResponseDTO.builder()
