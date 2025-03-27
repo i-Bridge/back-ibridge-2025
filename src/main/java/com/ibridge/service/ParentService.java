@@ -37,8 +37,15 @@ public class ParentService {
     private final FamilyRepository familyRepository;
     private final SubjectRepository subjectRepository;
 
-    public ParentHomeResponseDTO getParentHome(Long childId, LocalDate date) {
-        boolean noticeExist = noticeRepository.existsByChildId(childId);
+    public ParentHomeResponseDTO getParentHome(Long childId, LocalDate date, String email) {
+        Parent parent = parentRepository.findByEmail(email);
+        List<ParentNotice> parentNotice = parentNoticeRepository.findAllByParent(parent);
+        boolean noticeExist = false;
+        for(ParentNotice notice : parentNotice) {
+            if(!notice.isRead()){
+                noticeExist = true;
+            }
+        }
 
         List<SubjectDTO> subjects = subjectRepository.findByChildId(childId).stream()
                 .map(subject -> new SubjectDTO(subject.getId(), subject.getTitle()))

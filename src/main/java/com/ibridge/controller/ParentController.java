@@ -28,8 +28,9 @@ public class ParentController {
     @GetMapping("/{childId}/home")
     public ApiResponse<ParentHomeResponseDTO> getParentHome(
             @PathVariable Long childId,
-            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        ParentHomeResponseDTO response = parentService.getParentHome(childId, date);
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestHeader("X-User-Email") String email) {
+        ParentHomeResponseDTO response = parentService.getParentHome(childId, date, email);
         return ApiResponse.onSuccess(response);
     }
 
