@@ -89,7 +89,7 @@ public class StartService {
             familyRepository.save(family);
             return true;
         }
-        throw new IllegalArgumentException("동일한 가족 이름이 존재합니다.");
+        return false;
     }
 
     public void registerNewChildren(StartSignupNewRequestDTO request, String email) {

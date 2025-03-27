@@ -34,7 +34,7 @@ public class StartController {
     }
 
     @PostMapping("/signup/dup")
-    public ApiResponse<Boolean> checkDuplicateFamilyName(@RequestBody StartRequestDTO request, @RequestHeader("X-User_Email") String email){
+    public ApiResponse<Boolean> checkDuplicateFamilyName(@RequestBody StartRequestDTO request, @RequestHeader("X-User-Email") String email){
         Boolean response = startService.checkFamilyDuplicate(request, loginService.getParentFromHeader(email));
         return ApiResponse.onSuccess(response);
     }
