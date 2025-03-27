@@ -84,7 +84,7 @@ public class ParentController {
     //마이페이지
     @GetMapping("/mypage")
     public ApiResponse<ParentResponseDTO.GetMyPageDTO> getMyPage() {
-        Long parentId = 0L;
+        Long parentId = 1L;
 
         ParentResponseDTO.GetMyPageDTO parentResponseDTO = parentService.getMyPage(parentId);
         return ApiResponse.onSuccess(parentResponseDTO);
@@ -92,7 +92,7 @@ public class ParentController {
 
     @GetMapping("/mypage/edit")
     public ApiResponse<ParentResponseDTO.GetFamilyInfoDTO> getFamilyInfo() {
-        Long parentId = 0L;
+        Long parentId = 1L;
 
         ParentResponseDTO.GetFamilyInfoDTO data = parentService.getFamilyPage(parentId);
         return ApiResponse.onSuccess(data);
@@ -100,7 +100,7 @@ public class ParentController {
 
     @PatchMapping("/mypage/edit/familyName")
     public ApiResponse editFamilyName(@RequestBody ParentRequestDTO.editFamilyNameDTO request) {
-        Long parentId = 0L;
+        Long parentId = 1L;
 
         parentService.editFamilyName(parentId, request);
         return ApiResponse.onSuccess(null);
@@ -108,7 +108,7 @@ public class ParentController {
 
     @PostMapping("/mypage/edit/add")
     public ApiResponse<ParentResponseDTO.ChildIdDTO> addChild(@RequestBody ParentRequestDTO.AddChildDTO addChildDTO) throws ParseException {
-        Long parentId = 0L;
+        Long parentId = 1L;
 
         ParentResponseDTO.ChildIdDTO data = parentService.addChild(parentId, addChildDTO);
         return ApiResponse.onSuccess(data);
@@ -129,7 +129,7 @@ public class ParentController {
     //알림
     @GetMapping("/notice")
     public ApiResponse<ParentResponseDTO.NoticeCheckDTO> getNotice() {
-        Long parentId = 0L;
+        Long parentId = 1L;
 
         ParentResponseDTO.NoticeCheckDTO data = parentService.getNotice(parentId);
         return ApiResponse.onSuccess(data);
@@ -137,7 +137,7 @@ public class ParentController {
 
     @PostMapping("/notice/accept")
     public ApiResponse addParentintoFamily(@PathVariable Long childId, @RequestBody ParentRequestDTO.getParentintoFamilyDTO request) {
-        Long parentId = 0L;
+        Long parentId = 1L;
 
         parentService.addParentintoFamily(parentId, request);
         return ApiResponse.onSuccess(null);
