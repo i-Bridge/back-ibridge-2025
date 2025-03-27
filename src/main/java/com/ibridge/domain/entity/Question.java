@@ -25,8 +25,4 @@ public class Question {
 
     @OneToOne(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private Analysis analysis;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "child_id", nullable = false) // child 필드 추가
-    private Child child;
 }
