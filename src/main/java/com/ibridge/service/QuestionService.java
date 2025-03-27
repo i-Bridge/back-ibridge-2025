@@ -84,6 +84,7 @@ public class QuestionService {
         List<Subject> subjects = subjectRepository.findByChildId(childId);
         Subject subject = subjects.get(0);
         subject.setTitle(request.getTitle());
+        subject.setDate(Timestamp.valueOf(LocalDateTime.now()));
         subjectRepository.save(subject);
     }
 
