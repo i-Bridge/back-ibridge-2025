@@ -41,6 +41,7 @@ public class StartService {
                     .email(email)
                     .build();
             parentRepository.save(parent);
+            return new StartResponseDTO(isFirst);
         }
         return new StartResponseDTO(isFirst);
     }
