@@ -1,11 +1,14 @@
 package com.ibridge.service;
 
 import com.ibridge.domain.dto.request.ParentRequestDTO;
+import com.ibridge.domain.dto.response.NoticeCountDTO;
 import com.ibridge.domain.dto.response.ParentHomeResponseDTO;
 import com.ibridge.domain.dto.response.ParentResponseDTO;
+import com.ibridge.domain.dto.response.SubjectDTO;
 import com.ibridge.domain.entity.*;
 import com.ibridge.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,50 +35,18 @@ public class ParentService {
     private final NoticeRepository noticeRepository;
     private final ParentNoticeRepository parentNoticeRepository;
     private final FamilyRepository familyRepository;
+    private final SubjectRepository subjectRepository;
 
-    public ParentHomeResponseDTO getParentHome(Long childId, String dateStr) {
-        LocalDate date = (dateStr != null && !dateStr.isEmpty())
-                ? LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                : LocalDate.now();
+    public ParentHomeResponseDTO getParentHome(Long childId, LocalDate date) {
+        boolean noticeExist = noticeRepository.existsByChildId(childId);
 
-        // 자녀가 있는지
-        Child child = childRepository.findById(childId)
-                .orElseThrow(() -> new RuntimeException("해당 자녀를 찾을 수 없습니다."));
-
-        // 해당 자녀의 해당 월 모든 질문 조회
-        List<Question> monthlyQuestions = questionRepository.findByChildAndMonth(child, date.getYear(), date.getMonthValue());
-
-        // 날짜별 isAnswer=true 개수 집계
-        Map<Integer, Long> dailyAnswerCountMap = monthlyQuestions.stream()
-                .filter(Question::isAnswer)
-                .collect(Collectors.groupingBy(
-                        q -> q.getDate().toLocalDateTime().getDayOfMonth(),
-                        Collectors.counting()
-                ));
-
-        List<ParentHomeResponseDTO.AnswerCountDTO> answerCountDTOs = new ArrayList<>();
-        for (int i = 1; i <= date.lengthOfMonth(); i++) {
-            answerCountDTOs.add(ParentHomeResponseDTO.AnswerCountDTO.builder()
-                    .count(dailyAnswerCountMap.getOrDefault(i, 0L).intValue())
-                    .build());
-        }
-
-        // 특정 날짜의 질문 목록 조회
-        List<Question> dailyQuestions = questionRepository.findByChildAndDate(child, date);
-        List<ParentHomeResponseDTO.QuestionDTO> questionDTOs = dailyQuestions.stream()
-                .map(q -> ParentHomeResponseDTO.QuestionDTO.builder()
-                        .questionId(q.getId())
-                        .question(q.getText())
-                        .type(q.getType())
-                        .time(q.getTime())
-                        .isAnswer(q.isAnswer())
-                        .date(q.getDate())
-                        .build())
+        List<SubjectDTO> subjects = subjectRepository.findByChildId(childId).stream()
+                .map(subject -> new SubjectDTO(subject.getId(), subject.getTitle()))
                 .collect(Collectors.toList());
 
         return ParentHomeResponseDTO.builder()
-                .answers(answerCountDTOs)
-                .questions(questionDTOs)
+                .noticeCount(new NoticeCountDTO(noticeExist))
+                .subjects(subjects)
                 .build();
     }
 
@@ -96,7 +67,7 @@ public class ParentService {
             .name(parent.getName())
             .familyName(family.getName())
             .children(childDTOList).build();
-}
+    }
 
     public ParentResponseDTO.GetFamilyInfoDTO getFamilyPage(Long parentId) {
         Parent parent = parentRepository.findById(parentId).get();
