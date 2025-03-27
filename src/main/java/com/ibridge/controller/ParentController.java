@@ -1,5 +1,6 @@
 package com.ibridge.controller;
 
+import com.ibridge.domain.dto.request.EditQuestionRequestDTO;
 import com.ibridge.domain.dto.request.ParentRequestDTO;
 import com.ibridge.domain.dto.request.QuestionRequestDTO;
 import com.ibridge.domain.dto.request.QuestionUpdateRequestDTO;
@@ -50,6 +51,15 @@ public class ParentController {
 
         QuestionDetailResponseDTO response = questionService.getQuestionDetail(childId, subjectId, questionId, date);
         return ApiResponse.onSuccess(response);
+    }
+
+    @PutMapping("/{childId}/questions/edit")
+    public ApiResponse<Void> editQuestion(
+            @PathVariable Long childId,
+            @RequestBody EditQuestionRequestDTO request) {
+
+        questionService.editQuestion(childId, request);
+        return ApiResponse.onSuccess(null);
     }
 
 

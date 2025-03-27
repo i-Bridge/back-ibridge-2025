@@ -19,4 +19,5 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     @Query("SELECT q FROM Question q WHERE q.id = :questionId AND q.subject.id = :subjectId")
     Optional<Question> findByIdAndSubjectId(@Param("questionId") Long questionId,
                                                       @Param("subjectId") Long subjectId);
+    Optional<Question> findByChildId(Long childId);
 }

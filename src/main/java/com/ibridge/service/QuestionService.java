@@ -1,5 +1,6 @@
 package com.ibridge.service;
 
+import com.ibridge.domain.dto.request.EditQuestionRequestDTO;
 import com.ibridge.domain.dto.request.QuestionRequestDTO;
 import com.ibridge.domain.dto.request.QuestionUpdateRequestDTO;
 import com.ibridge.domain.dto.response.*;
@@ -67,5 +68,14 @@ public class QuestionService {
                 .question(questionDTO)
                 .analysis(analysisDTO)
                 .build();
+    }
+
+    @Transactional
+    public void editQuestion(Long childId, EditQuestionRequestDTO request) {
+        Question question = questionRepository.findByChildId(childId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 아이의 질문을 찾을 수 없습니다."));
+
+        question.setText(request.getTitle());
+        questionRepository.save(question);
     }
 }
