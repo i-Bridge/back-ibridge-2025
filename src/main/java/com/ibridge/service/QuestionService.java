@@ -2,12 +2,12 @@ package com.ibridge.service;
 
 import com.ibridge.domain.dto.request.QuestionRequestDTO;
 import com.ibridge.domain.dto.request.QuestionUpdateRequestDTO;
-import com.ibridge.domain.dto.response.QuestionAnalysisDTO;
-import com.ibridge.domain.dto.response.QuestionDTO;
-import com.ibridge.domain.dto.response.SubjectDTO;
+import com.ibridge.domain.dto.response.*;
+import com.ibridge.domain.entity.Analysis;
 import com.ibridge.domain.entity.Child;
 import com.ibridge.domain.entity.Question;
 import com.ibridge.domain.entity.Subject;
+import com.ibridge.repository.AnalysisRepository;
 import com.ibridge.repository.ChildRepository;
 import com.ibridge.repository.QuestionRepository;
 import com.ibridge.repository.SubjectRepository;
@@ -28,18 +28,20 @@ import java.util.stream.Collectors;
 public class QuestionService {
     private final QuestionRepository questionRepository;
     private final SubjectRepository subjectRepository;
+    private final AnalysisRepository analysisRepository;
 
     @Autowired
-    public QuestionService(QuestionRepository questionRepository, SubjectRepository subjectRepository) {
+    public QuestionService(QuestionRepository questionRepository, SubjectRepository subjectRepository, AnalysisRepository analysisRepository) {
         this.questionRepository = questionRepository;
         this.subjectRepository = subjectRepository;
+        this.analysisRepository = analysisRepository;
     }
 
     public QuestionAnalysisDTO getQuestionAnalysis(Long childId, Long subjectId, LocalDate date) {
         Subject subject = subjectRepository.findById(subjectId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 과목이 존재하지 않습니다."));
 
-        List<QuestionDTO> questions = questionRepository.findBySubjectIdAndChildIdAndDate(subjectId, childId, date).stream()
+        List<QuestionDTO> questions = questionRepository.findBySubjectId(subjectId).stream()
                 .map(q -> new QuestionDTO(q.getId(), q.getText()))
                 .collect(Collectors.toList());
 
@@ -49,5 +51,21 @@ public class QuestionService {
                 .build();
     }
 
+    public QuestionDetailResponseDTO getQuestionDetail(Long childId, Long subjectId, Long questionId, LocalDate date) {
+        Question question = questionRepository.findByIdAndSubjectId(questionId, subjectId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 질문이 존재하지 않습니다."));
 
+        Analysis analysis = analysisRepository.findByQuestionId(questionId)
+                .orElse(null); // 분석이 없을 수도 있음
+
+        QuestionDTO questionDTO = new QuestionDTO(question.getId(), question.getText());
+        AnalysisDTO analysisDTO = analysis != null
+                ? new AnalysisDTO(analysis.getId(), analysis.getAnswer())
+                : null;
+
+        return QuestionDetailResponseDTO.builder()
+                .question(questionDTO)
+                .analysis(analysisDTO)
+                .build();
+    }
 }

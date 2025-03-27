@@ -14,11 +14,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QuestionRepository extends JpaRepository<Question, Long> {
-    @Query("SELECT q FROM Question q WHERE q.subject.id = :subjectId AND q.child.id = :childId AND q.date = :date")
-    List<Question> findBySubjectIdAndChildIdAndDate(@Param("subjectId") Long subjectId,
-                                                    @Param("childId") Long childId,
-                                                    @Param("date") LocalDate date);
-    Optional<Question> findByIdAndChild_Id(Long questionId, Long childId);
-    List<Question> findByChildId(Long childId);
-    Page<Question> findAllByChildId(Long childId, Pageable pageable);
+    @Query("SELECT q FROM Question q WHERE q.subject.id = :subjectId")
+    List<Question> findBySubjectId(@Param("subjectId") Long subjectId);
+    @Query("SELECT q FROM Question q WHERE q.id = :questionId AND q.subject.id = :subjectId")
+    Optional<Question> findByIdAndSubjectId(@Param("questionId") Long questionId,
+                                                      @Param("subjectId") Long subjectId);
 }
