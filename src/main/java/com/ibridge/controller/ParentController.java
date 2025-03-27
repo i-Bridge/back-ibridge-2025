@@ -62,6 +62,12 @@ public class ParentController {
         return ApiResponse.onSuccess(null);
     }
 
+    @GetMapping("/{childId}/questions/reroll")
+    public ApiResponse<SubjectResponseDTO> rerollQuestion(@PathVariable Long childId) {
+        SubjectResponseDTO response = questionService.rerollQuestion(childId);
+        return ApiResponse.onSuccess(response);
+    }
+
 
 
 

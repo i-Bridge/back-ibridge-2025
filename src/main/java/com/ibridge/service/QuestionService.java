@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +31,7 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
     private final SubjectRepository subjectRepository;
     private final AnalysisRepository analysisRepository;
+    private final Random random = new Random();
 
     @Autowired
     public QuestionService(QuestionRepository questionRepository, SubjectRepository subjectRepository, AnalysisRepository analysisRepository) {
@@ -42,7 +44,7 @@ public class QuestionService {
         Subject subject = subjectRepository.findById(subjectId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 과목이 존재하지 않습니다."));
 
-        List<QuestionDTO> questions = questionRepository.findBySubjectId(subjectId).stream()
+        List<QuestionDTO> questions = questionRepository.findBySubjectIdAndChildId(subjectId, childId).stream()
                 .map(q -> new QuestionDTO(q.getId(), q.getText()))
                 .collect(Collectors.toList());
 
@@ -53,7 +55,7 @@ public class QuestionService {
     }
 
     public QuestionDetailResponseDTO getQuestionDetail(Long childId, Long subjectId, Long questionId, LocalDate date) {
-        Question question = questionRepository.findByIdAndSubjectId(questionId, subjectId)
+        Question question = questionRepository.findByIdAndChildIdAndSubjectId(questionId, childId,subjectId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 질문이 존재하지 않습니다."));
 
         Analysis analysis = analysisRepository.findByQuestionId(questionId)
@@ -77,5 +79,27 @@ public class QuestionService {
 
         question.setText(request.getTitle());
         questionRepository.save(question);
+    }
+
+    @Transactional(readOnly = true)
+    public SubjectResponseDTO rerollQuestion(Long childId) {
+        List<Question> questions = questionRepository.findAll(); // 모든 질문 가져오기
+
+        // childId에 해당하는 질문만 필터링
+        List<Question> childQuestions = questions.stream()
+                .filter(q -> q.getChild().getId().equals(childId))
+                .collect(Collectors.toList());
+
+        if (childQuestions.isEmpty()) {
+            throw new EntityNotFoundException("해당 아이의 질문이 존재하지 않습니다.");
+        }
+
+        // 랜덤으로 하나 선택
+        Question randomQuestion = childQuestions.get(random.nextInt(childQuestions.size()));
+
+        return new SubjectResponseDTO(
+                randomQuestion.getSubject().getId(),
+                randomQuestion.getSubject().getTitle()
+        );
     }
 }
