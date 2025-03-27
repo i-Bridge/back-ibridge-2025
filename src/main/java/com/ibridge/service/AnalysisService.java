@@ -16,10 +16,4 @@ public class AnalysisService {
         this.analysisRepository = analysisRepository;
     }
 
-    public QuestionAnalysisDTO getQuestionAnalysis(Long childId, Long questionId) {
-        Analysis analysis = analysisRepository.findByChildIdAndQuestionId(childId, questionId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 질문의 분석 결과를 찾을 수 없습니다."));
-
-        return QuestionAnalysisDTO.from(analysis);
-    }
 }

@@ -18,4 +18,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<Question> findBySubjectIdAndChildIdAndDate(@Param("subjectId") Long subjectId,
                                                     @Param("childId") Long childId,
                                                     @Param("date") LocalDate date);
+    Optional<Question> findByIdAndChild_Id(Long questionId, Long childId);
+    List<Question> findByChildId(Long childId);
+    Page<Question> findAllByChildId(Long childId, Pageable pageable);
 }
