@@ -13,7 +13,7 @@ public interface ParentNoticeRepository extends JpaRepository<ParentNotice, Long
     @Query("SELECT p FROM ParentNotice p WHERE p.receiver = :parent")
     List<ParentNotice> findAllByParent(@Param("parent") Parent parent);
 
-    @Query("SELECT p FROM ParentNotice p WHERE p.receiver = :receiver and p.sender = :sender and p.notice.type == 2")
+    @Query("SELECT p FROM ParentNotice p WHERE p.receiver = :receiver and p.sender = :sender and p.notice.type = 2")
     ParentNotice findByReceiverandSendertoJoinFamily(@Param("receiver")Parent receiver,@Param("sender") Parent sender);
 
     @Query("SELECT p FROM ParentNotice p WHERE p.receiver = :receiver and p.notice = :notice")
