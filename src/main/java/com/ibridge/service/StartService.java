@@ -15,6 +15,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -116,6 +117,7 @@ public class StartService {
         ParentNotice parentNotice = parentNoticeRepository.findBySender(parent);
         // 자녀 리스트 생성
         List<StartUserSelectionResponseDTO.ChildDTO> childDTOs = family.getChildren().stream()
+                .sorted(Comparator.comparing(Child::getBirth)) // 🔹 birth 기준 오름차순 정렬
                 .map(c -> StartUserSelectionResponseDTO.ChildDTO.builder()
                         .id(c.getId())
                         .name(c.getName())
