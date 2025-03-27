@@ -47,7 +47,7 @@ public class StartService {
     }
 
     public void checkFamilyExistence(StartRequestDTO request, Parent parent) {
-        Optional<Family> familyOptional = familyRepository.findByName(request.getFamilyName().trim());
+        Optional<Family> familyOptional = familyRepository.findByName(request.getFamilyName());
 
         if (familyOptional.isPresent()) {
             Family family = familyOptional.get();
