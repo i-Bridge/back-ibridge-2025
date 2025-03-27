@@ -18,4 +18,5 @@ public interface ParentRepository extends JpaRepository<Parent, Long> {
 
     @Query("SELECT p FROM Parent p WHERE p.family = :family")
     List<Parent> findAllByFamily(Family family);
+
 }

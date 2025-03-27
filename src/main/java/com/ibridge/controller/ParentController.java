@@ -9,9 +9,11 @@ import com.ibridge.service.ParentService;
 import com.ibridge.service.QuestionService;
 import com.ibridge.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -26,8 +28,7 @@ public class ParentController {
     @GetMapping("/{childId}/home")
     public ApiResponse<ParentHomeResponseDTO> getParentHome(
             @PathVariable Long childId,
-            @RequestParam(required = false) String date) {
-
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         ParentHomeResponseDTO response = parentService.getParentHome(childId, date);
         return ApiResponse.onSuccess(response);
     }
@@ -74,31 +75,7 @@ public class ParentController {
         return ApiResponse.onSuccess(null);
     }
 
-    @GetMapping("/{childId}/questions/regular")
-    public ApiResponse<List<QuestionResponseDTO>> getRegularQuestions(
-            @PathVariable Long childId) {
 
-        List<QuestionResponseDTO> questions = questionService.getRegularQuestions(childId);
-        return ApiResponse.onSuccess(questions);
-    }
-    @DeleteMapping("/{childId}/questions/delete/{questionId}")
-    public ApiResponse<Void> deleteQuestion(
-            @PathVariable Long childId,
-            @PathVariable Long questionId) {
-
-        questionService.deleteQuestion(childId, questionId);
-        return ApiResponse.onSuccess(null);
-    }
-
-    @GetMapping("/{childId}/questions/board")
-    public ApiResponse<QuestionBoardResponseDTO> getQuestionBoard(
-            @PathVariable Long childId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-
-        QuestionBoardResponseDTO response = questionService.getQuestionBoard(childId, page, size);
-        return ApiResponse.onSuccess(response);
-    }
 
 
 
