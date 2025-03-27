@@ -81,7 +81,7 @@ public class QuestionService {
 
     @Transactional
     public void editQuestion(Long childId, EditQuestionRequestDTO request) {
-        Subject subject = subjectRepository.findOneByChildId(childId);
+        Subject subject = subjectRepository.findSubjectByChildId(childId);
 
         subject.setTitle(request.getTitle());
         subjectRepository.save(subject);
