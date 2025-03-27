@@ -67,7 +67,6 @@ public class StartService {
                         .build();
 
                 parentNoticeRepository.save(parentNotice);
-                notice.getParentNotices().add(parentNotice);
             }
 
             noticeRepository.save(notice);
