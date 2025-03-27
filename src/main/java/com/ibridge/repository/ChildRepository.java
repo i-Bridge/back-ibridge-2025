@@ -9,6 +9,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface ChildRepository extends JpaRepository<Child, Long> {
-    @Query("SELECT c FROM Child c WHERE c.family = :family")
+    @Query("SELECT c FROM Child c WHERE c.family = :family ORDER BY c.birth ASC")
     List<Child> findAllByFamily(@Param("family") Family family);
 }
