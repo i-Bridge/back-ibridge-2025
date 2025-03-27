@@ -11,24 +11,7 @@ public class ChildResponseDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class getHomeDTO {
-        List<getQuestionsDTO> questions;
-    }
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class getQuestionsDTO {
-        Long questionId;
-        boolean isAnswer;
-    }
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class getQuestionDescriptionDTO {
+    public static class getQuestionDTO {
         String question;
     }
 }

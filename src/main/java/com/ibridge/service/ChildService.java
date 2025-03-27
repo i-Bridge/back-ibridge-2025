@@ -1,5 +1,6 @@
 package com.ibridge.service;
 
+import com.ibridge.domain.dto.request.ChildRequestDTO;
 import com.ibridge.domain.dto.response.ChildResponseDTO;
 import com.ibridge.domain.entity.Analysis;
 import com.ibridge.domain.entity.Child;
@@ -26,24 +27,13 @@ public class ChildService {
     private final QuestionRepository questionRepository;
     private final AnalysisRepository analysisRepository;
 
-    public ChildResponseDTO.getHomeDTO getHome(Long childId) {
+    public ChildResponseDTO.getQuestionDTO getHome(Long childId) {
         Child child = childRepository.findById(childId).get();
 
-        List<Question> questions = questionRepository.findByChildAndDate(child, LocalDate.now());
-        List<ChildResponseDTO.getQuestionsDTO> questionList = new ArrayList<>();
-        for(Question question : questions) {
-            ChildResponseDTO.getQuestionsDTO temp = new ChildResponseDTO.getQuestionsDTO();
-            temp.setQuestionId(question.getId());
-            Optional<Analysis> analysis = analysisRepository.findByChildIdAndQuestionId(childId, question.getId());
-            temp.setAnswer(analysis.isPresent());
-            questionList.add(temp);
-        }
-        return ChildResponseDTO.getHomeDTO.builder().questions(questionList).build();
+        return ChildResponseDTO.getQuestionDTO.builder().question(new Question().getText()).build();
     }
 
-    public ChildResponseDTO.getQuestionDescriptionDTO getQuestion(Long childId, Long questionId) {
-        Question question = questionRepository.findById(questionId).get();
-        return ChildResponseDTO.getQuestionDescriptionDTO.builder()
-                .question(question.getText()).build();
+    public ChildResponseDTO.getQuestionDTO getNextQuestion(Long childId, ChildRequestDTO.AnswerDTO request) {
+        return null;
     }
 }
