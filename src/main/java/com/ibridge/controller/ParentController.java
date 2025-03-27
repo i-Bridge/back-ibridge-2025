@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.util.List;
 
 @RestController
 @RequestMapping("/parent")
@@ -33,46 +32,13 @@ public class ParentController {
         return ApiResponse.onSuccess(response);
     }
 
-    @GetMapping("/{childId}/{questionId}")
+    @GetMapping("/{childId}/{subjectId}")
     public ApiResponse<QuestionAnalysisDTO> getAnalysis(
-            @PathVariable("childId") Long childId,
-            @PathVariable("questionId") Long questionId) {
-        QuestionAnalysisDTO data = analysisService.getQuestionAnalysis(childId, questionId);
-        return ApiResponse.onSuccess(data);
-    }
-
-    @PostMapping("/{childId}/add-temp")
-    public ApiResponse<QuestionResponseDTO> addTempQuestion(
-            @PathVariable("childId") Long childId,
-            @RequestBody QuestionRequestDTO request) {
-        QuestionResponseDTO data = questionService.addTempQuestion(childId, request);
-        return ApiResponse.onSuccess(data);
-    }
-
-    @GetMapping("/{parentId}/questions/edit/{questionId}")
-    public ApiResponse<QuestionResponseDTO> updateQuestion(
-            @PathVariable("parentId") Long parentId,
-            @PathVariable("questionId") Long questionId) {
-        QuestionResponseDTO updatedQuestion = questionService.getQuestionForEdit(parentId, questionId);
-        return ApiResponse.onSuccess(updatedQuestion);
-    }
-
-    @PutMapping("/{childId}/questions/edit/{questionId}")
-    public ApiResponse<?> updateQuestion(
             @PathVariable Long childId,
-            @PathVariable Long questionId,
-            @RequestBody QuestionUpdateRequestDTO requestDTO) {
-
-        questionService.updateQuestion(childId, questionId, requestDTO);
-        return ApiResponse.onSuccess(null);
-    }
-
-    @PostMapping("/{childId}/questions/add-regular")
-    public ApiResponse<?> addRegularQuestion(
-            @PathVariable Long childId,
-            @RequestBody(required = false) QuestionRequestDTO requestDTO) {
-        questionService.addRegularQuestion(childId, requestDTO);
-        return ApiResponse.onSuccess(null);
+            @PathVariable Long subjectId,
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        QuestionAnalysisDTO response = questionService.getQuestionAnalysis(childId, subjectId, date);
+        return ApiResponse.onSuccess(response);
     }
 
 

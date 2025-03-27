@@ -4,20 +4,12 @@ import com.ibridge.domain.entity.Analysis;
 import com.ibridge.domain.entity.Question;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
 public class QuestionAnalysisDTO {
-    private String video;
-    private String result;
-
-    public static QuestionAnalysisDTO from(Analysis entity) {
-        return QuestionAnalysisDTO.builder()
-                .video(entity.getVideo())
-                .result(entity.getAnswer())
-                .build();
-    }
+    private List<SubjectDTO> subjects;
+    private List<QuestionDTO> questions;
 }
 
