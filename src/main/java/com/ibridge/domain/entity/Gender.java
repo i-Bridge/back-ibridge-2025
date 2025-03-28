@@ -1,7 +1,7 @@
 package com.ibridge.domain.entity;
 
 public enum Gender {
-    NONE, MALE, FEMALE;
+    MALE, FEMALE, NONE;
 
     public String toString() {
         return this.name();
