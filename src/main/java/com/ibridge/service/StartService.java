@@ -30,9 +30,7 @@ public class StartService {
     private final ChildRepository childRepository;
     private final ParentNoticeRepository parentNoticeRepository;
 
-    public StartResponseDTO signIn(StartSigninRequestDTO startSigninRequestDTO) {
-        String email = startSigninRequestDTO.getEmail();
-        String name = startSigninRequestDTO.getName();
+    public StartResponseDTO signIn(String email, String name) {
         boolean isFirst = !parentRepository.existsByEmail(email);
         //isFirst가 true -> db에 저장
         if(isFirst) {
@@ -89,7 +87,7 @@ public class StartService {
             familyRepository.save(family);
             return true;
         }
-        throw new IllegalArgumentException("동일한 가족 이름이 존재합니다.");
+        return false;
     }
 
     public void registerNewChildren(StartSignupNewRequestDTO request, String email) {
