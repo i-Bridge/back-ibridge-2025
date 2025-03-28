@@ -5,7 +5,9 @@ import com.ibridge.domain.dto.request.ParentRequestDTO;
 import com.ibridge.domain.dto.request.QuestionRequestDTO;
 import com.ibridge.domain.dto.request.QuestionUpdateRequestDTO;
 import com.ibridge.domain.dto.response.*;
+import com.ibridge.domain.entity.Parent;
 import com.ibridge.service.AnalysisService;
+import com.ibridge.service.LoginService;
 import com.ibridge.service.ParentService;
 import com.ibridge.service.QuestionService;
 import com.ibridge.util.ApiResponse;
@@ -23,8 +25,9 @@ public class ParentController {
     private final ParentService parentService;
     private final QuestionService questionService;
     private final AnalysisService analysisService;
+    private final LoginService loginService;
 
-//지웅
+    //지웅
     @GetMapping("/{childId}/home")
     public ApiResponse<ParentHomeResponseDTO> getParentHome(
             @PathVariable Long childId,
@@ -83,32 +86,32 @@ public class ParentController {
 //현호
     //마이페이지
     @GetMapping("/mypage")
-    public ApiResponse<ParentResponseDTO.GetMyPageDTO> getMyPage() {
-        Long parentId = 1L;
+    public ApiResponse<ParentResponseDTO.GetMyPageDTO> getMyPage(@RequestHeader("X-User-Email") String email) {
+        Long parentId = loginService.getParentFromHeader(email).getId();
 
         ParentResponseDTO.GetMyPageDTO parentResponseDTO = parentService.getMyPage(parentId);
         return ApiResponse.onSuccess(parentResponseDTO);
     }
 
     @GetMapping("/mypage/edit")
-    public ApiResponse<ParentResponseDTO.GetFamilyInfoDTO> getFamilyInfo() {
-        Long parentId = 1L;
+    public ApiResponse<ParentResponseDTO.GetFamilyInfoDTO> getFamilyInfo(@RequestHeader("X-User-Email") String email) {
+        Long parentId = loginService.getParentFromHeader(email).getId();
 
         ParentResponseDTO.GetFamilyInfoDTO data = parentService.getFamilyPage(parentId);
         return ApiResponse.onSuccess(data);
     }
 
     @PatchMapping("/mypage/edit/familyName")
-    public ApiResponse editFamilyName(@RequestBody ParentRequestDTO.editFamilyNameDTO request) {
-        Long parentId = 1L;
+    public ApiResponse editFamilyName(@RequestHeader("X-User-Email") String email, @RequestBody ParentRequestDTO.editFamilyNameDTO request) {
+        Long parentId = loginService.getParentFromHeader(email).getId();
 
         parentService.editFamilyName(parentId, request);
         return ApiResponse.onSuccess(null);
     }
 
     @PostMapping("/mypage/edit/add")
-    public ApiResponse<ParentResponseDTO.ChildIdDTO> addChild(@RequestBody ParentRequestDTO.AddChildDTO addChildDTO) throws ParseException {
-        Long parentId = 1L;
+    public ApiResponse<ParentResponseDTO.ChildIdDTO> addChild(@RequestHeader("X-User-Email") String email, @RequestBody ParentRequestDTO.AddChildDTO addChildDTO) throws ParseException {
+        Long parentId = loginService.getParentFromHeader(email).getId();
 
         ParentResponseDTO.ChildIdDTO data = parentService.addChild(parentId, addChildDTO);
         return ApiResponse.onSuccess(data);
@@ -128,16 +131,16 @@ public class ParentController {
 
     //알림
     @GetMapping("/notice")
-    public ApiResponse<ParentResponseDTO.NoticeCheckDTO> getNotice() {
-        Long parentId = 1L;
+    public ApiResponse<ParentResponseDTO.NoticeCheckDTO> getNotice(@RequestHeader("X-User-Email") String email) {
+        Long parentId = loginService.getParentFromHeader(email).getId();
 
         ParentResponseDTO.NoticeCheckDTO data = parentService.getNotice(parentId);
         return ApiResponse.onSuccess(data);
     }
 
     @PostMapping("/notice/accept")
-    public ApiResponse addParentintoFamily(@PathVariable Long childId, @RequestBody ParentRequestDTO.getParentintoFamilyDTO request) {
-        Long parentId = 1L;
+    public ApiResponse addParentintoFamily(@RequestHeader("X-User-Email") String email, @PathVariable Long childId, @RequestBody ParentRequestDTO.getParentintoFamilyDTO request) {
+        Long parentId = loginService.getParentFromHeader(email).getId();
 
         parentService.addParentintoFamily(parentId, request);
         return ApiResponse.onSuccess(null);
