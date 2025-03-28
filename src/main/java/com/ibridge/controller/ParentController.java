@@ -139,7 +139,7 @@ public class ParentController {
     }
 
     @PostMapping("/notice/accept")
-    public ApiResponse addParentintoFamily(@RequestHeader("X-User-Email") String email, @PathVariable Long childId, @RequestBody ParentRequestDTO.getParentintoFamilyDTO request) {
+    public ApiResponse addParentintoFamily(@RequestHeader("X-User-Email") String email, @RequestBody ParentRequestDTO.getParentintoFamilyDTO request) {
         Long parentId = loginService.getParentFromHeader(email).getId();
 
         parentService.addParentintoFamily(parentId, request);
