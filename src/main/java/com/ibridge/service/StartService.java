@@ -30,9 +30,7 @@ public class StartService {
     private final ChildRepository childRepository;
     private final ParentNoticeRepository parentNoticeRepository;
 
-    public StartResponseDTO signIn(StartSigninRequestDTO startSigninRequestDTO) {
-        String email = startSigninRequestDTO.getEmail();
-        String name = startSigninRequestDTO.getName();
+    public StartResponseDTO signIn(String email, String name) {
         boolean isFirst = !parentRepository.existsByEmail(email);
         //isFirst가 true -> db에 저장
         if(isFirst) {

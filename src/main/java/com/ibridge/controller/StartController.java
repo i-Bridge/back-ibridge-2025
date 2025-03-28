@@ -18,12 +18,12 @@ public class StartController {
     private final StartService startService;
     private final LoginService loginService;
 
-    @GetMapping("/signin")
-    public ApiResponse<StartResponseDTO> signIn(@RequestBody StartSigninRequestDTO startSigninRequestDTO) {
-        if (startSigninRequestDTO == null) {
+    @PostMapping("/signin")
+    public ApiResponse<StartResponseDTO> signIn(@RequestHeader("X-User-Email") String email, @RequestHeader("X-User-Name") String name) {
+        if (email.isEmpty()) {
             return ApiResponse.onFailure("401", "인증되지 않은 사용자입니다.");
         }
-        StartResponseDTO response = startService.signIn(startSigninRequestDTO);
+        StartResponseDTO response = startService.signIn(email, name);
         return ApiResponse.onSuccess(response);
     }
 
