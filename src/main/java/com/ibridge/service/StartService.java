@@ -107,25 +107,32 @@ public class StartService {
     public StartUserSelectionResponseDTO getUserSelection(Parent parent) {
         // 가족 정보 조회
         Family family = parent.getFamily();
+        boolean isAccept = true;
         if (family == null) {
-            throw new RuntimeException("가족 정보가 없습니다.");
+            isAccept = false;
+            Optional<ParentNotice> parentNotice = parentNoticeRepository.findBySenderAndType(parent);
+            return StartUserSelectionResponseDTO.builder()
+                    .isAccepted(isAccept)
+                    .isSend(parentNotice.isPresent())
+                    .build();
         }
-        ParentNotice parentNotice = parentNoticeRepository.findBySender(parent);
-        // 자녀 리스트 생성
-        List<StartUserSelectionResponseDTO.ChildDTO> childDTOs = family.getChildren().stream()
-                .sorted(Comparator.comparing(Child::getBirth)) //  birth 기준 오름차순 정렬
-                .map(c -> StartUserSelectionResponseDTO.ChildDTO.builder()
-                        .id(c.getId())
-                        .name(c.getName())
-                        .birth(c.getBirth().toString())
-                        .gender(c.getGender() == Gender.MALE ? Gender.MALE : Gender.FEMALE)
-                        .build())
-                .collect(Collectors.toList());
+        else {        // 자녀 리스트 생성
+            List<StartUserSelectionResponseDTO.ChildDTO> childDTOs = family.getChildren().stream()
+                    .sorted(Comparator.comparing(Child::getBirth)) //  birth 기준 오름차순 정렬
+                    .map(c -> StartUserSelectionResponseDTO.ChildDTO.builder()
+                            .id(c.getId())
+                            .name(c.getName())
+                            .birth(c.getBirth().toString())
+                            .gender(c.getGender() == Gender.MALE ? Gender.MALE : Gender.FEMALE)
+                            .build())
+                    .toList();
 
-        return StartUserSelectionResponseDTO.builder()
-                .isAccepted(parentNotice.isAccept())
-                .isSend(false) //임시로 false
-                .children(childDTOs)
-                .build();
+            return StartUserSelectionResponseDTO.builder()
+                    .isAccepted(isAccept)
+                    .familyName(family.getName())
+                    .isSend(true) //임시로 false
+                    .children(childDTOs)
+                    .build();
+        }
     }
 }

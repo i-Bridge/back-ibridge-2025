@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ParentNoticeRepository extends JpaRepository<ParentNotice, Long> {
     @Query("SELECT p FROM ParentNotice p WHERE p.receiver = :parent")
@@ -26,4 +27,6 @@ public interface ParentNoticeRepository extends JpaRepository<ParentNotice, Long
   
     @Query("SELECT COUNT(p) FROM ParentNotice p WHERE p.notice = :notice")
     int CountByNotice(@Param("notice") Notice notice);
+    @Query("SELECT p from ParentNotice p where p.sender = :sender and p.notice.type = 2")
+    Optional<ParentNotice> findBySenderAndType(Parent sender);
 }
