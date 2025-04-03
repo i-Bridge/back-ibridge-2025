@@ -11,13 +11,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,7 +33,7 @@ public class StartService {
         //isFirst가 true -> db에 저장
         if(isFirst) {
             Parent parent = Parent.builder()//gender 추가 해야 함
-                    .name(name)
+                    .name(new String(Base64.getDecoder().decode(name), StandardCharsets.UTF_8))
                     .email(email)
                     .build();
             parentRepository.save(parent);
@@ -115,7 +113,7 @@ public class StartService {
         ParentNotice parentNotice = parentNoticeRepository.findBySender(parent);
         // 자녀 리스트 생성
         List<StartUserSelectionResponseDTO.ChildDTO> childDTOs = family.getChildren().stream()
-                .sorted(Comparator.comparing(Child::getBirth)) // 🔹 birth 기준 오름차순 정렬
+                .sorted(Comparator.comparing(Child::getBirth)) //  birth 기준 오름차순 정렬
                 .map(c -> StartUserSelectionResponseDTO.ChildDTO.builder()
                         .id(c.getId())
                         .name(c.getName())
