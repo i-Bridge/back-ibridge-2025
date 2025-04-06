@@ -3,8 +3,10 @@ package com.ibridge.controller;
 import com.ibridge.domain.dto.request.StartRequestDTO;
 import com.ibridge.domain.dto.request.StartSigninRequestDTO;
 import com.ibridge.domain.dto.request.StartSignupNewRequestDTO;
+import com.ibridge.domain.dto.response.FamilyExistDTO;
 import com.ibridge.domain.dto.response.StartUserSelectionResponseDTO;
 import com.ibridge.domain.dto.response.StartResponseDTO;
+import com.ibridge.domain.entity.Family;
 import com.ibridge.service.LoginService;
 import com.ibridge.service.StartService;
 import com.ibridge.util.ApiResponse;
@@ -28,9 +30,9 @@ public class StartController {
     }
 
     @PostMapping("/signup/exist")
-    public ApiResponse<?> checkFamilyExistence(@RequestBody StartRequestDTO request, @RequestHeader("X-User-Email") String email) {
-        startService.checkFamilyExistence(request, loginService.getParentFromHeader(email));
-        return ApiResponse.onSuccess(null);
+    public ApiResponse<FamilyExistDTO> checkFamilyExistence(@RequestBody StartRequestDTO request, @RequestHeader("X-User-Email") String email) {
+        FamilyExistDTO isExist = startService.checkFamilyExistence(request, loginService.getParentFromHeader(email));
+        return ApiResponse.onSuccess(isExist);
     }
 
     @PostMapping("/signup/dup")

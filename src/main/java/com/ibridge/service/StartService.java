@@ -3,6 +3,7 @@ package com.ibridge.service;
 import com.ibridge.domain.dto.request.StartRequestDTO;
 import com.ibridge.domain.dto.request.StartSigninRequestDTO;
 import com.ibridge.domain.dto.request.StartSignupNewRequestDTO;
+import com.ibridge.domain.dto.response.FamilyExistDTO;
 import com.ibridge.domain.dto.response.StartUserSelectionResponseDTO;
 import com.ibridge.domain.entity.*;
 import com.ibridge.repository.*;
@@ -42,7 +43,7 @@ public class StartService {
         return new StartResponseDTO(isFirst);
     }
 
-    public void checkFamilyExistence(StartRequestDTO request, Parent parent) {
+    public FamilyExistDTO checkFamilyExistence(StartRequestDTO request, Parent parent) {
         Optional<Family> familyOptional = familyRepository.findByName(request.getFamilyName());
 
         if (familyOptional.isPresent()) {
@@ -67,10 +68,10 @@ public class StartService {
 
             noticeRepository.save(notice);
 
-            return;
+            return new FamilyExistDTO(true);
         }
 
-        throw new IllegalArgumentException("해당 가족이 존재하지 않습니다.");
+        return new FamilyExistDTO(false);
     }
 
     public Boolean checkFamilyDuplicate(StartRequestDTO request, Parent parent) {
@@ -122,7 +123,7 @@ public class StartService {
                     .map(c -> StartUserSelectionResponseDTO.ChildDTO.builder()
                             .id(c.getId())
                             .name(c.getName())
-                            .birth(c.getBirth().toString())
+                            .birth(c.getBirth())
                             .gender(c.getGender() == Gender.MALE ? Gender.MALE : Gender.FEMALE)
                             .build())
                     .toList();

@@ -3,7 +3,9 @@ package com.ibridge.domain.dto.response;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -25,7 +27,7 @@ public class UserSelectionResponseDTO {
     public static class ChildInfo {
         private Long id;
         private String name;
-        private LocalDate birth;
+        private Date birth;
         private int gender;
     }
 }

@@ -4,6 +4,7 @@ import com.ibridge.domain.entity.Gender;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -19,7 +20,7 @@ public class StartUserSelectionResponseDTO {
     public static class ChildDTO {
         private Long id;
         private String name;
-        private String birth;
+        private Date birth;
         private Gender gender;
     }
 }
