@@ -15,12 +15,6 @@ public class StartSignupNewRequestDTO {
 
     @Getter
     @NoArgsConstructor
-    public static class ParentRequest {
-        private String familyName;
-    }
-
-    @Getter
-    @NoArgsConstructor
     public static class ChildRequest {
         private String name;
         private Integer gender;

@@ -1,24 +1,21 @@
 package com.ibridge.service;
 
 import com.ibridge.domain.dto.request.ParentRequestDTO;
-import com.ibridge.domain.dto.response.NoticeCountDTO;
+import com.ibridge.domain.dto.response.NoticeExistDTO;
 import com.ibridge.domain.dto.response.ParentHomeResponseDTO;
 import com.ibridge.domain.dto.response.ParentResponseDTO;
 import com.ibridge.domain.dto.response.SubjectDTO;
 import com.ibridge.domain.entity.*;
 import com.ibridge.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -52,7 +49,7 @@ public class ParentService {
                 .collect(Collectors.toList());
 
         return ParentHomeResponseDTO.builder()
-                .noticeCount(new NoticeCountDTO(noticeExist))
+                .noticeCount(new NoticeExistDTO(noticeExist))
                 .subjects(subjects)
                 .build();
     }

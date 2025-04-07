@@ -8,6 +8,5 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 public class QuestionDetailResponseDTO {
-    private QuestionDTO question;
     private AnalysisDTO analysis;
 }

@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class NoticeCountDTO {
+public class NoticeExistDTO {
     private boolean noticeExist;
 }

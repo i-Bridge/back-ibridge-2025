@@ -60,15 +60,16 @@ public class ParentController {
     @PutMapping("/{childId}/questions/edit")
     public ApiResponse<Void> editQuestion(
             @PathVariable Long childId,
-            @RequestBody EditQuestionRequestDTO request) {
+            @RequestBody EditQuestionRequestDTO request,
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 
-        questionService.editQuestion(childId, request);
+        questionService.editQuestion(childId, request, date);
         return ApiResponse.onSuccess(null);
     }
 
     @GetMapping("/{childId}/questions/reroll")
-    public ApiResponse<SubjectResponseDTO> rerollQuestion(@PathVariable Long childId) {
-        SubjectResponseDTO response = questionService.rerollQuestion(childId);
+    public ApiResponse<SubjectResponseDTO> rerollQuestion(@PathVariable Long childId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        SubjectResponseDTO response = questionService.rerollQuestion(childId, date);
         return ApiResponse.onSuccess(response);
     }
 

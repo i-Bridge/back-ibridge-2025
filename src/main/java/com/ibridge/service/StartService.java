@@ -74,7 +74,7 @@ public class StartService {
         return new FamilyExistDTO(false);
     }
 
-    public Boolean checkFamilyDuplicate(StartRequestDTO request, Parent parent) {
+    public FamilyExistDTO checkFamilyDuplicate(StartRequestDTO request, Parent parent) {
         Optional<Family> familyOptional = familyRepository.findByName(request.getFamilyName());
         if (familyOptional.isEmpty()) {
             List<Parent> parents = new ArrayList<>();
@@ -84,9 +84,9 @@ public class StartService {
                     .parents(parents)
                     .build();
             familyRepository.save(family);
-            return true;
+            return new FamilyExistDTO(false);
         }
-        return false;
+        return new FamilyExistDTO(true);
     }
 
     public void registerNewChildren(StartSignupNewRequestDTO request, String email) {

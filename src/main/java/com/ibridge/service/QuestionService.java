@@ -15,6 +15,7 @@ import com.ibridge.repository.SubjectRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,20 +33,14 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class QuestionService {
     private final QuestionRepository questionRepository;
     private final SubjectRepository subjectRepository;
     private final AnalysisRepository analysisRepository;
     private final Random random = new Random();
     private final ChildRepository childRepository;
-
-    @Autowired
-    public QuestionService(QuestionRepository questionRepository, SubjectRepository subjectRepository, AnalysisRepository analysisRepository, ChildRepository childRepository) {
-        this.questionRepository = questionRepository;
-        this.subjectRepository = subjectRepository;
-        this.analysisRepository = analysisRepository;
-        this.childRepository = childRepository;
-    }
 
     public QuestionAnalysisDTO getQuestionAnalysis(Long childId, Long subjectId, LocalDate date) {
         Subject subject = subjectRepository.findById(subjectId)
@@ -62,34 +57,27 @@ public class QuestionService {
     }
 
     public QuestionDetailResponseDTO getQuestionDetail(Long childId, Long subjectId, Long questionId, LocalDate date) {
-        Question question = questionRepository.findByIdAndChildIdAndSubjectId(questionId, childId,subjectId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 질문이 존재하지 않습니다."));
-
         Analysis analysis = analysisRepository.findByQuestionId(questionId)
                 .orElse(null); // 분석이 없을 수도 있음
-
-        QuestionDTO questionDTO = new QuestionDTO(question.getId(), question.getText());
         AnalysisDTO analysisDTO = analysis != null
                 ? new AnalysisDTO(analysis.getId(), analysis.getAnswer())
                 : null;
 
         return QuestionDetailResponseDTO.builder()
-                .question(questionDTO)
                 .analysis(analysisDTO)
                 .build();
     }
 
-    @Transactional
-    public void editQuestion(Long childId, EditQuestionRequestDTO request) {
-        List<Subject> subjects = subjectRepository.findByChildId(childId);
+    public void editQuestion(Long childId, EditQuestionRequestDTO request, LocalDate date) {
+        List<Subject> subjects = subjectRepository.findByChildIdAndDate(childId, date);
+        subjectRepository.deleteByChildIdAndDate(childId, date);
         Subject subject = subjects.get(0);
         subject.setTitle(request.getTitle());
         subject.setDate(Timestamp.valueOf(LocalDateTime.now()));
         subjectRepository.save(subject);
     }
 
-    @Transactional(readOnly = true)
-    public SubjectResponseDTO rerollQuestion(Long childId) {
+    public SubjectResponseDTO rerollQuestion(Long childId, LocalDate date) {
         List<String> subjects = new ArrayList<>();
         String filePath = "src/main/resources/SubjectList.txt";
         try(BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -103,6 +91,8 @@ public class QuestionService {
         int id = random.nextInt(subjects.size());
         // 랜덤으로 하나 선택
         String randomQuestion = subjects.get(id);
+        subjectRepository.deleteByChildIdAndDate(childId, date);
+
         subjectRepository.save(new Subject((long)id, randomQuestion, false, Timestamp.valueOf(LocalDateTime.now()), childRepository.findById(childId).get(), null));
         return new SubjectResponseDTO((long)id, randomQuestion);
     }

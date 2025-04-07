@@ -31,13 +31,13 @@ public class StartController {
 
     @PostMapping("/signup/exist")
     public ApiResponse<FamilyExistDTO> checkFamilyExistence(@RequestBody StartRequestDTO request, @RequestHeader("X-User-Email") String email) {
-        FamilyExistDTO isExist = startService.checkFamilyExistence(request, loginService.getParentFromHeader(email));
-        return ApiResponse.onSuccess(isExist);
+        FamilyExistDTO response = startService.checkFamilyExistence(request, loginService.getParentFromHeader(email));
+        return ApiResponse.onSuccess(response);
     }
 
     @PostMapping("/signup/dup")
-    public ApiResponse<Boolean> checkDuplicateFamilyName(@RequestBody StartRequestDTO request, @RequestHeader("X-User-Email") String email){
-        Boolean response = startService.checkFamilyDuplicate(request, loginService.getParentFromHeader(email));
+    public ApiResponse<FamilyExistDTO> checkDuplicateFamilyName(@RequestBody StartRequestDTO request, @RequestHeader("X-User-Email") String email){
+        FamilyExistDTO response = startService.checkFamilyDuplicate(request, loginService.getParentFromHeader(email));
         return ApiResponse.onSuccess(response);
     }
 
