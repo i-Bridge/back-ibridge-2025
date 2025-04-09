@@ -14,7 +14,7 @@ public class ParentResponseDTO {
     public static class GetMyPageDTO {
         String name;
         String familyName;
-        List<ChildIdDTO> children;
+        List<ChildSimpleInfoDTO> children;
     }
 
     @Builder
@@ -23,6 +23,15 @@ public class ParentResponseDTO {
     @NoArgsConstructor
     public static class ChildIdDTO {
         Long childId;
+    }
+
+    @Builder
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ChildSimpleInfoDTO {
+        Long childId;
+        String childName;
     }
 
     @Builder

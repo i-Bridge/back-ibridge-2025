@@ -59,18 +59,19 @@ public class ParentService {
     Parent parent = parentRepository.findById(parentId).get();
     Family family = parent.getFamily();
 
-    List<ParentResponseDTO.ChildIdDTO> childDTOList = new ArrayList<>();
+    List<ParentResponseDTO.ChildSimpleInfoDTO> childSimpleInfoDTOListDTOList = new ArrayList<>();
     List<Child> children = childRepository.findAllByFamily(family);
     for(Child child : children) {
-        ParentResponseDTO.ChildIdDTO childDTO = ParentResponseDTO.ChildIdDTO.builder()
-                .childId(child.getId()).build();
-        childDTOList.add(childDTO);
+        ParentResponseDTO.ChildSimpleInfoDTO childDTO = ParentResponseDTO.ChildSimpleInfoDTO.builder()
+                .childId(child.getId())
+                .childName(child.getName()).build();
+        childSimpleInfoDTOListDTOList.add(childDTO);
     }
 
     return ParentResponseDTO.GetMyPageDTO.builder()
             .name(parent.getName())
             .familyName(family.getName())
-            .children(childDTOList).build();
+            .children(childSimpleInfoDTOListDTOList).build();
     }
 
     public ParentResponseDTO.GetFamilyInfoDTO getFamilyPage(Long parentId) {
