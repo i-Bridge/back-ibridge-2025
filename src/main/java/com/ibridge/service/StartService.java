@@ -66,8 +66,6 @@ public class StartService {
                 parentNoticeRepository.save(parentNotice);
             }
 
-            noticeRepository.save(notice);
-
             return new FamilyExistDTO(true);
         }
 
