@@ -202,4 +202,12 @@ public class ParentService {
         requester.setFamily(family);
         parentRepository.save(requester);
     }
+
+    public void declineParentintoFamily(Long parentId, ParentRequestDTO.getParentintoFamilyDTO request) {
+        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
+        Parent sender = parentRepository.findById(request.getParentId()).orElseThrow(() -> new RuntimeException("Sender not found"));
+
+        ParentNotice requested = parentNoticeRepository.findByReceiverandSendertoJoinFamily(parent, sender);
+        parentNoticeRepository.delete(requested);
+    }
 }
