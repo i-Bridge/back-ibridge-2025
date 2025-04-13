@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Builder
 public class QuestionAnalysisDTO {
-    private List<SubjectDTO> subjects;
+    private SubjectDTO subjects;
     private List<QuestionDTO> questions;
 }
 

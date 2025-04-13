@@ -7,4 +7,6 @@ import lombok.*;
 public class QuestionDTO {
     private Long questionId;
     private String text;
+    private String video;
+    private String answer;
 }

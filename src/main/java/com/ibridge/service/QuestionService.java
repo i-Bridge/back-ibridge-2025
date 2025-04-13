@@ -26,10 +26,7 @@ import java.io.InputStream;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,16 +40,17 @@ public class QuestionService {
     private final ChildRepository childRepository;
 
     public QuestionAnalysisDTO getQuestionAnalysis(Long childId, Long subjectId, LocalDate date) {
-        Subject subject = subjectRepository.findById(subjectId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 과목이 존재하지 않습니다."));
-
-        List<QuestionDTO> questions = questionRepository.findBySubjectIdAndChildId(subjectId, childId).stream()
-                .map(q -> new QuestionDTO(q.getId(), q.getText()))
-                .collect(Collectors.toList());
+        Subject subject = subjectRepository.findById(subjectId).get();
+        List<Question> questions = questionRepository.findBySubjectIdAndChildId(subjectId, childId);
+        List<QuestionDTO> questionDTOs = new ArrayList<>();
+        for(Question q : questions) {
+            Analysis analysis = analysisRepository.findByQuestionId(q.getId()).get();
+            questionDTOs.add(new QuestionDTO(q.getId(), q.getText(), analysis.getVideo(), analysis.getAnswer()));
+        }
 
         return QuestionAnalysisDTO.builder()
-                .subjects(Collections.singletonList(new SubjectDTO(subject.getId(), subject.getTitle(), subject.isAnswer())))
-                .questions(questions)
+                .subjects(new SubjectDTO(subject.getId(), subject.getTitle(), subject.isAnswer()))
+                .questions(questionDTOs)
                 .build();
     }
 
