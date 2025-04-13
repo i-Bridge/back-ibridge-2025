@@ -146,4 +146,12 @@ public class ParentController {
         parentService.addParentintoFamily(parentId, request);
         return ApiResponse.onSuccess(null);
     }
+
+    @PostMapping("/notice/decline")
+    public ApiResponse declineParentintoFamily(@RequestHeader("X-User-Email") String email, @RequestBody ParentRequestDTO.getParentintoFamilyDTO request) {
+        Long parentId = loginService.getParentFromHeader(email).getId();
+
+        parentService.declineParentintoFamily(parentId, request);
+        return ApiResponse.onSuccess(null);
+    }
 }
