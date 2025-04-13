@@ -4,7 +4,7 @@ import com.ibridge.domain.dto.request.ParentRequestDTO;
 import com.ibridge.domain.dto.response.NoticeExistDTO;
 import com.ibridge.domain.dto.response.ParentHomeResponseDTO;
 import com.ibridge.domain.dto.response.ParentResponseDTO;
-import com.ibridge.domain.dto.response.SubjectDTO;
+import com.ibridge.domain.dto.SubjectDTO;
 import com.ibridge.domain.entity.*;
 import com.ibridge.repository.*;
 import lombok.RequiredArgsConstructor;

@@ -1,33 +1,28 @@
 package com.ibridge.service;
 
+import com.ibridge.domain.dto.AnalysisDTO;
+import com.ibridge.domain.dto.QuestionDTO;
+import com.ibridge.domain.dto.SubjectDTO;
 import com.ibridge.domain.dto.request.EditQuestionRequestDTO;
-import com.ibridge.domain.dto.request.QuestionRequestDTO;
-import com.ibridge.domain.dto.request.QuestionUpdateRequestDTO;
 import com.ibridge.domain.dto.response.*;
 import com.ibridge.domain.entity.Analysis;
-import com.ibridge.domain.entity.Child;
 import com.ibridge.domain.entity.Question;
 import com.ibridge.domain.entity.Subject;
 import com.ibridge.repository.AnalysisRepository;
 import com.ibridge.repository.ChildRepository;
 import com.ibridge.repository.QuestionRepository;
 import com.ibridge.repository.SubjectRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
