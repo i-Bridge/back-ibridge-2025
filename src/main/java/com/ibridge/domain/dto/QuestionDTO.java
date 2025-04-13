@@ -1,4 +1,4 @@
-package com.ibridge.domain.dto.response;
+package com.ibridge.domain.dto;
 
 import lombok.*;
 

@@ -83,13 +83,13 @@ public class StartService {
     public void registerNewChildren(StartSignupNewRequestDTO request, String email) {
         Parent parent = parentRepository.getParentByEmail(email);
 
-        List<Parent> parents = new ArrayList<>();
-        parents.add(parent);
         Family family = Family.builder()
                 .name(request.getFamilyName())
-                .parents(parents)
                 .build();
         familyRepository.save(family);
+
+        parent.setFamily(family);
+        parentRepository.save(parent);
 
         List<Child> children = request.getChildren().stream()
                 .map(childRequest -> Child.builder()
