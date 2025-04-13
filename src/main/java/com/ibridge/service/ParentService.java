@@ -169,17 +169,10 @@ public class ParentService {
                 parentNoticeRepository.delete(parentNotice);
                 if(parentNoticeRepository.CountByNotice(notice) == 0) noticeRepository.delete(notice);
             }
-            else if((notice.getType() == 1 || notice.getType() == 3) && !parentNotice.isRead()) {
-                parentNotice.setRead(true);
-                ParentResponseDTO.NoticeDTO tempDTO = ParentResponseDTO.NoticeDTO.builder()
-                        .senderId(parentId)
-                        .type(notice.getType())
-                        .isAccept(false)
-                        .senderName(parent.getName())
-                        .noticeId(notice.getId()).build();
-                noticeDTOList.add(tempDTO);
-            }
             else {
+                parentNotice.setRead(true);
+                parentNoticeRepository.save(parentNotice);
+
                 ParentResponseDTO.NoticeDTO tempDTO = ParentResponseDTO.NoticeDTO.builder()
                         .senderId(parentNotice.getSender().getId())
                         .type(notice.getType())
