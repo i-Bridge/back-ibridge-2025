@@ -203,6 +203,7 @@ public class ParentService {
         }
 
         requester.setFamily(family);
+        noticeRepository.delete(requested.getNotice());
         parentRepository.save(requester);
     }
 
