@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public class StartSignupNewRequestDTO {
-
+    private String familyName;
     @NotNull
     private List<ChildRequest> children;
 

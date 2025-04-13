@@ -72,16 +72,9 @@ public class StartService {
         return new FamilyExistDTO(false);
     }
 
-    public FamilyExistDTO checkFamilyDuplicate(StartRequestDTO request, Parent parent) {
+    public FamilyExistDTO checkFamilyDuplicate(StartRequestDTO request) {
         Optional<Family> familyOptional = familyRepository.findByName(request.getFamilyName());
         if (familyOptional.isEmpty()) {
-            List<Parent> parents = new ArrayList<>();
-            parents.add(parent);
-            Family family = Family.builder()
-                    .name(request.getFamilyName())
-                    .parents(parents)
-                    .build();
-            familyRepository.save(family);
             return new FamilyExistDTO(false);
         }
         return new FamilyExistDTO(true);
@@ -89,7 +82,14 @@ public class StartService {
 
     public void registerNewChildren(StartSignupNewRequestDTO request, String email) {
         Parent parent = parentRepository.getParentByEmail(email);
-        Family family = parent.getFamily();
+
+        List<Parent> parents = new ArrayList<>();
+        parents.add(parent);
+        Family family = Family.builder()
+                .name(request.getFamilyName())
+                .parents(parents)
+                .build();
+        familyRepository.save(family);
 
         List<Child> children = request.getChildren().stream()
                 .map(childRequest -> Child.builder()
