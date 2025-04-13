@@ -89,7 +89,10 @@ public class QuestionService {
         int id = random.nextInt(subjects.size());
         // 랜덤으로 하나 선택
         String randomQuestion = subjects.get(id);
-        subjectRepository.deleteByChildIdAndDate(childId, date);
+        List<Subject> subject = subjectRepository.findByChildIdAndDate(childId, date);
+        if(!subject.isEmpty()){
+            subjectRepository.deleteByChildIdAndDate(childId, date);
+        }
 
         subjectRepository.save(new Subject((long)id, randomQuestion, false, Timestamp.valueOf(LocalDateTime.now()), childRepository.findById(childId).get(), null));
         return new SubjectResponseDTO((long)id, randomQuestion);
