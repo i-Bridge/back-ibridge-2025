@@ -170,6 +170,9 @@ public class ParentService {
                 if(parentNoticeRepository.CountByNotice(notice) == 0) noticeRepository.delete(notice);
             }
             else {
+                parentNotice.setRead(true);
+                parentNoticeRepository.save(parentNotice);
+
                 ParentResponseDTO.NoticeDTO tempDTO = ParentResponseDTO.NoticeDTO.builder()
                         .senderId(parentNotice.getSender().getId())
                         .type(notice.getType())
@@ -200,6 +203,7 @@ public class ParentService {
         }
 
         requester.setFamily(family);
+        noticeRepository.delete(requested.getNotice());
         parentRepository.save(requester);
     }
 
