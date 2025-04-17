@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -66,7 +67,7 @@ public class QuestionService {
         subjectRepository.deleteByChildIdAndDate(childId, date);
         Subject subject = subjects.get(0);
         subject.setTitle(request.getTitle());
-        subject.setDate(Timestamp.valueOf(LocalDateTime.now()));
+        subject.setDate(LocalDate.now());
         subjectRepository.save(subject);
     }
 
@@ -89,7 +90,7 @@ public class QuestionService {
             subjectRepository.deleteByChildIdAndDate(childId, date);
         }
 
-        subjectRepository.save(new Subject((long)id, randomQuestion, false, Timestamp.valueOf(LocalDateTime.now()), childRepository.findById(childId).get(), null));
+        subjectRepository.save(new Subject((long)id, randomQuestion, false, LocalDate.now(), childRepository.findById(childId).get(), null));
         return new SubjectResponseDTO((long)id, randomQuestion);
     }
 }

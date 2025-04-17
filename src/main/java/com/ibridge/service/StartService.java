@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -95,7 +96,7 @@ public class StartService {
                 .map(childRequest -> Child.builder()
                         .name(childRequest.getName())
                         .gender(childRequest.getGender() == 0 ? Gender.MALE : Gender.FEMALE)
-                        .birth(Date.valueOf(childRequest.getBirth()))
+                        .birth(LocalDate.parse(childRequest.getBirth()))
                         .family(family)
                         .build())
                 .collect(Collectors.toList());
