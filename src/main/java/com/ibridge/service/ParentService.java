@@ -43,8 +43,15 @@ public class ParentService {
 //현호
     public ParentResponseDTO.GetMyPageDTO getMyPage(Long parentId) {
     Parent parent = parentRepository.findById(parentId).get();
-    Family family = parent.getFamily();
+    List<ParentNotice> parentNotice = parentNoticeRepository.findAllByParent(parent);
+    boolean noticeExist = false;
+    for(ParentNotice notice : parentNotice) {
+        if(!notice.isRead()){
+            noticeExist = true;
+        }
+    }
 
+    Family family = parent.getFamily();
     List<ParentResponseDTO.ChildSimpleInfoDTO> childSimpleInfoDTOListDTOList = new ArrayList<>();
     List<Child> children = childRepository.findAllByFamily(family);
     for(Child child : children) {
@@ -55,6 +62,7 @@ public class ParentService {
     }
 
     return ParentResponseDTO.GetMyPageDTO.builder()
+            .noticeExist(noticeExist)
             .name(parent.getName())
             .familyName(family.getName())
             .children(childSimpleInfoDTOListDTOList).build();

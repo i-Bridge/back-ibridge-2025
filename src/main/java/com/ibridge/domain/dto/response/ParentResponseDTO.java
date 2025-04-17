@@ -12,6 +12,7 @@ public class ParentResponseDTO {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class GetMyPageDTO {
+        boolean noticeExist;
         String name;
         String familyName;
         List<ChildSimpleInfoDTO> children;
