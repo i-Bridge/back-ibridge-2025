@@ -25,13 +25,9 @@ import java.util.stream.Collectors;
 public class ParentService {
     private final ParentRepository parentRepository;
     private final ChildRepository childRepository;
-    private final AnalysisRepository analysisRepository;
-    private final QuestionRepository questionRepository;
     private final FamilyRepository famliyRepository;
-    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     private final NoticeRepository noticeRepository;
     private final ParentNoticeRepository parentNoticeRepository;
-    private final FamilyRepository familyRepository;
     private final SubjectRepository subjectRepository;
 
     public ParentHomeResponseDTO getParentHome(Long childId, LocalDate date, String email) {
