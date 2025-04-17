@@ -9,6 +9,5 @@ import java.util.List;
 @Getter
 @Builder
 public class ParentHomeResponseDTO {
-    private NoticeExistDTO noticeCount;
     private List<SubjectDTO> subjects;
 }
