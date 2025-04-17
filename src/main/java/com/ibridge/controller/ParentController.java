@@ -12,6 +12,7 @@ import com.ibridge.service.ParentService;
 import com.ibridge.service.QuestionService;
 import com.ibridge.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,8 +32,11 @@ public class ParentController {
     @GetMapping("/{childId}/home")
     public ApiResponse<ParentHomeResponseDTO> getParentHome(
             @PathVariable Long childId,
-            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestHeader("X-User-Email") String email) {
+        if (date == null) {
+            date = LocalDate.now();
+        }
         ParentHomeResponseDTO response = parentService.getParentHome(childId, date, email);
         return ApiResponse.onSuccess(response);
     }
