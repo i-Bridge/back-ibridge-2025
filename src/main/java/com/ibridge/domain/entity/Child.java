@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -23,7 +23,7 @@ public class Child {
     private String name;
 
     @Column(nullable = false)
-    private Date birth;
+    private LocalDate birth;
 
     @Column(nullable = false)
     private Gender gender;

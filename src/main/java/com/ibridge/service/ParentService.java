@@ -129,7 +129,7 @@ public class ParentService {
         Child child = Child.builder()
                 .family(family)
                 .name(request.getName())
-                .birth(sdf.parse(request.getBirthday()))
+                .birth(LocalDate.parse(request.getBirthday()))
                 .gender(Gender.values()[request.getGender()]).build();
 
         return ParentResponseDTO.ChildIdDTO.builder()
@@ -139,7 +139,7 @@ public class ParentService {
     public ParentResponseDTO.ChildIdDTO patchChild(ParentRequestDTO.EditChildDTO request) throws ParseException {
         Child child = childRepository.findById(request.getChildId()).orElseThrow(() -> new RuntimeException("Child not found"));
         child.setName(request.getName());
-        child.setBirth(sdf.parse(request.getBirthday()));
+        child.setBirth(LocalDate.parse(request.getBirthday()));
         child.setGender(Gender.values()[request.getGender()]);
         childRepository.save(child);
 
