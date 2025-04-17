@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -24,7 +25,7 @@ public class Subject {
     private boolean isAnswer;
 
     @Column(nullable = false)
-    private Timestamp date;
+    private LocalDate date;
 
     @ManyToOne
     @JoinColumn(name = "child")
