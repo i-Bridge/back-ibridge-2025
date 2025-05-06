@@ -25,4 +25,9 @@ public class ChildController {
         ChildResponseDTO.getQuestionDTO data = childService.getNextQuestion(childId, request);
         return ApiResponse.onSuccess(data);
     }
+
+    @PostMapping("/{childId}/getURL")
+    public ApiResponse<ChildResponseDTO.getPresignedURLDTO> getPresignedURL(@PathVariable Long childId) {
+        return null;
+    }
 }

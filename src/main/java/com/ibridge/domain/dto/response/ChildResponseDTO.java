@@ -13,5 +13,14 @@ public class ChildResponseDTO {
     @AllArgsConstructor
     public static class getQuestionDTO {
         String question;
+        boolean isCompleted;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class getPresignedURLDTO {
+        String url;
     }
 }
