@@ -23,6 +23,9 @@ public class Analysis {
     private String answer;
 
     @Column
+    private String image;
+
+    @Column
     private String video;
 
     @OneToOne
