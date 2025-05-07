@@ -12,7 +12,9 @@ public class ChildRequestDTO {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class AnswerDTO {
-        MultipartFile video;
+        boolean isFinished;
+        String video;
+        String text;
     }
 
 }
