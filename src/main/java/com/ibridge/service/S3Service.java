@@ -1,0 +1,46 @@
+package com.ibridge.service;
+
+import org.springframework.stereotype.Service;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+
+import java.net.URL;
+import java.time.Duration;
+
+@Service
+public class S3Service {
+    private final String bucketName = "ibridge-10150107";
+    private final Region region = Region.AP_NORTHEAST_2;
+
+    private final S3Presigner presigner;
+
+    public S3Service() {
+        this.presigner = S3Presigner.builder()
+                .region(region)
+                .credentialsProvider(
+                        StaticCredentialsProvider.create(
+                                AwsBasicCredentials.create("YOUR_ACCESS_KEY", "YOUR_SECRET_KEY")
+                        )
+                )
+                .build();
+    }
+
+    public String generatePresignedUrl(String objectKey, long expireSeconds) {
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(objectKey)
+                .build();
+
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .getObjectRequest(getObjectRequest)
+                .signatureDuration(Duration.ofSeconds(expireSeconds))
+                .build();
+
+        URL presignedUrl = presigner.presignGetObject(presignRequest).url();
+        return presignedUrl.toString();
+    }
+}
