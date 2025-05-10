@@ -8,8 +8,11 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.io.File;
 import java.net.URL;
@@ -27,17 +30,18 @@ public class S3Service {
     }
 
     public String generatePresignedUrl(String objectKey, long expireSeconds) {
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(objectKey)
+                .contentType("video/webm")
                 .build();
 
-        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .getObjectRequest(getObjectRequest)
+        PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
+                .putObjectRequest(putObjectRequest)
                 .signatureDuration(Duration.ofSeconds(expireSeconds))
                 .build();
 
-        URL presignedUrl = presigner.presignGetObject(presignRequest).url();
-        return presignedUrl.toString();
+        PresignedPutObjectRequest presignedRequest = presigner.presignPutObject(presignRequest);
+        return presignedRequest.url().toString();
     }
 }
