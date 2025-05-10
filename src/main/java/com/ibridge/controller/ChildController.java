@@ -41,8 +41,8 @@ public class ChildController {
         String objectKey = childId + "/" + formattedSended;
 
         if(type.equals("video")) {
-            contentType = "video/wmeb";
-            objectKey = formattedSended + ".wmeb";
+            contentType = "video/webm";
+            objectKey = formattedSended + ".webm";
         }
         else if(type.equals("image")) {
             contentType = "image/jpeg";
