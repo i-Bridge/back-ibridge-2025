@@ -16,9 +16,9 @@ import java.time.Duration;
 public class S3Service {
     private final String bucketName = "ibridge-10150107";
     private final Region region = Region.AP_NORTHEAST_2;
-    @Value("${S3_ACCESS_KEY}")
+    @Value("${cloud.aws.credentials.access-key}")
     private String s3AccessKey;
-    @Value("${S3_SECRET_KEY}")
+    @Value("${cloud.aws.credentials.secret-key}")
     private String s3SecretKey;
     private final S3Presigner presigner;
 
