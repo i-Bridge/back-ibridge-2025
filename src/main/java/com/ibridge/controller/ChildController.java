@@ -42,11 +42,11 @@ public class ChildController {
 
         if(type.equals("video")) {
             contentType = "video/webm";
-            objectKey = formattedSended + ".webm";
+            objectKey += ".webm";
         }
         else if(type.equals("image")) {
             contentType = "image/jpeg";
-            objectKey = formattedSended + ".jpeg";
+            objectKey += ".jpeg";
         }
 
         ChildResponseDTO.getPresignedURLDTO data = ChildResponseDTO.getPresignedURLDTO.builder()
