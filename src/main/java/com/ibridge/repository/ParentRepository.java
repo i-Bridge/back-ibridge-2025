@@ -11,6 +11,7 @@ public interface ParentRepository extends JpaRepository<Parent, Long> {
 
     @Query("SELECT COUNT(p) FROM Parent p WHERE p.family = :family")
     int getParentCount(@Param("family") Family family);
+
     boolean existsByEmail(String email);
     Parent getParentByEmail(String email);
 

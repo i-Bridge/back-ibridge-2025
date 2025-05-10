@@ -6,12 +6,12 @@ import com.ibridge.domain.dto.request.StartSignupNewRequestDTO;
 import com.ibridge.domain.dto.response.FamilyExistDTO;
 import com.ibridge.domain.dto.response.StartUserSelectionResponseDTO;
 import com.ibridge.domain.dto.response.StartResponseDTO;
-import com.ibridge.domain.entity.Family;
 import com.ibridge.service.LoginService;
 import com.ibridge.service.StartService;
 import com.ibridge.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/start")
@@ -21,34 +21,34 @@ public class StartController {
     private final LoginService loginService;
 
     @PostMapping("/signin")
-    public ApiResponse<StartResponseDTO> signIn(@RequestHeader("X-User-Email") String email, @RequestHeader("X-User-Name") String name) {
-        if (email.isEmpty()) {
-            return ApiResponse.onFailure("401", "인증되지 않은 사용자입니다.");
-        }
-        StartResponseDTO response = startService.signIn(email, name);
+    public ApiResponse<StartResponseDTO> signIn(@RequestBody StartSigninRequestDTO request) {
+        StartResponseDTO response = startService.signIn(request.getEmail(), request.getName());
         return ApiResponse.onSuccess(response);
     }
 
     @PostMapping("/signup/exist")
-    public ApiResponse<FamilyExistDTO> checkFamilyExistence(@RequestBody StartRequestDTO request, @RequestHeader("X-User-Email") String email) {
+    public ApiResponse<FamilyExistDTO> checkFamilyExistence(HttpServletRequest r, @RequestBody StartRequestDTO request) {
+        String email = (String) r.getAttribute("email");
         FamilyExistDTO response = startService.checkFamilyExistence(request, loginService.getParentFromHeader(email));
         return ApiResponse.onSuccess(response);
     }
 
     @PostMapping("/signup/dup")
-    public ApiResponse<FamilyExistDTO> checkDuplicateFamilyName(@RequestBody StartRequestDTO request, @RequestHeader("X-User-Email") String email){
+    public ApiResponse<FamilyExistDTO> checkDuplicateFamilyName(@RequestBody StartRequestDTO request){
         FamilyExistDTO response = startService.checkFamilyDuplicate(request);
         return ApiResponse.onSuccess(response);
     }
 
     @PostMapping("/signup/new")
-    public ApiResponse<?> registerNewFamily(@RequestBody StartSignupNewRequestDTO request, @RequestHeader("X-User-Email") String email) {
+    public ApiResponse<?> registerNewFamily(HttpServletRequest r, @RequestBody StartSignupNewRequestDTO request) {
+        String email = (String) r.getAttribute("email");
         startService.registerNewChildren(request, email);
         return ApiResponse.onSuccess(null);
     }
 
     @GetMapping("/login")
-    public ApiResponse<StartUserSelectionResponseDTO> getUserSelection(@RequestHeader("X-User-Email") String email) {
+    public ApiResponse<StartUserSelectionResponseDTO> getUserSelection(HttpServletRequest r) {
+        String email = (String) r.getAttribute("email");
         StartUserSelectionResponseDTO response = startService.getUserSelection(loginService.getParentFromHeader(email));
         return ApiResponse.onSuccess(response);
     }
