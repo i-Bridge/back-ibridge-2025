@@ -1,5 +1,6 @@
 package com.ibridge.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -15,7 +16,10 @@ import java.time.Duration;
 public class S3Service {
     private final String bucketName = "ibridge-10150107";
     private final Region region = Region.AP_NORTHEAST_2;
-
+    @Value("${S3_ACCESS_KEY}")
+    private String s3AccessKey;
+    @Value("${S3_SECRET_KEY}")
+    private String s3SecretKey;
     private final S3Presigner presigner;
 
     public S3Service() {
@@ -23,7 +27,7 @@ public class S3Service {
                 .region(region)
                 .credentialsProvider(
                         StaticCredentialsProvider.create(
-                                AwsBasicCredentials.create("${S3_ACCESS_KEY}", "${S3_SECRET_KEY}")
+                                AwsBasicCredentials.create(s3AccessKey, s3SecretKey)
                         )
                 )
                 .build();
