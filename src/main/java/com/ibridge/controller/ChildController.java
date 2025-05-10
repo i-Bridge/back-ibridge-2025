@@ -50,7 +50,7 @@ public class ChildController {
         }
 
         ChildResponseDTO.getPresignedURLDTO data = ChildResponseDTO.getPresignedURLDTO.builder()
-                .url(s3Service.generatePresignedUrl(objectKey, 600)).build();
+                .url(s3Service.generatePresignedUrl(objectKey, contentType, 600)).build();
         return ApiResponse.onSuccess(data);
     }
 
