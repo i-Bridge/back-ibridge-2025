@@ -21,6 +21,9 @@ public class TokenValidationInterceptor implements HandlerInterceptor {
     @Value("${GOOGLE_CLIENT_ID}")
     private String googleClientId;
 
+    @Value("${NAVER_CLIENT_ID}")
+    private String naverClientId;
+
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Override
@@ -34,29 +37,61 @@ public class TokenValidationInterceptor implements HandlerInterceptor {
         }
 
         String accessToken = authHeader.substring(7);
+        String provider = request.getHeader("Provider");  // 구글/네이버를 구분하는 헤더
 
         try {
-            String url = "https://www.googleapis.com/oauth2/v3/userinfo";
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(accessToken);
-
-            HttpEntity<?> httpEntity = new HttpEntity<>(headers);
-            ResponseEntity<Map> userInfoResponse = restTemplate.exchange(url, HttpMethod.GET, httpEntity, Map.class);
-
-            Map<String, Object> body = userInfoResponse.getBody();
-            String email = (String) body.get("email");
-            String name = (String) body.get("name");
-
-            request.setAttribute("userEmail", email);
-            request.setAttribute("userName", name);
-
-            return true;
+            if ("google".equalsIgnoreCase(provider)) {
+                return validateGoogleToken(request, response, accessToken);
+            } else if ("naver".equalsIgnoreCase(provider)) {
+                return validateNaverToken(request, response, accessToken);
+            } else {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("Invalid provider.");
+                return false;
+            }
 
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Invalid or expired access token.");
             return false;
         }
+    }
+
+    private boolean validateGoogleToken(HttpServletRequest request, HttpServletResponse response, String accessToken) throws IOException {
+        String url = "https://www.googleapis.com/oauth2/v3/userinfo";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+
+        HttpEntity<?> httpEntity = new HttpEntity<>(headers);
+        ResponseEntity<Map> userInfoResponse = restTemplate.exchange(url, HttpMethod.GET, httpEntity, Map.class);
+
+        Map<String, Object> body = userInfoResponse.getBody();
+        String email = (String) body.get("email");
+        String name = (String) body.get("name");
+
+        request.setAttribute("userEmail", email);
+        request.setAttribute("userName", name);
+        return true;
+    }
+
+    private boolean validateNaverToken(HttpServletRequest request, HttpServletResponse response, String accessToken) throws IOException {
+        String url = "https://openapi.naver.com/v1/nid/me";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        headers.set("X-Naver-Client-Id", naverClientId);
+        headers.set("X-Naver-Client-Secret", "YOUR_NAVER_SECRET"); // 네이버 클라이언트 시크릿 추가
+
+        HttpEntity<?> httpEntity = new HttpEntity<>(headers);
+        ResponseEntity<Map> userInfoResponse = restTemplate.exchange(url, HttpMethod.GET, httpEntity, Map.class);
+
+        Map<String, Object> body = userInfoResponse.getBody();
+        Map<String, Object> responseBody = (Map<String, Object>) body.get("response");
+        String email = (String) responseBody.get("email");
+        String name = (String) responseBody.get("name");
+
+        request.setAttribute("userEmail", email);
+        request.setAttribute("userName", name);
+        return true;
     }
 }
 
