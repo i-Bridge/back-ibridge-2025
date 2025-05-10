@@ -37,7 +37,7 @@ public class ChildController {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
         String formattedSended = sended.format(formatter);
 
-        String objectKey = childId + "/" + formattedSended;
+        String objectKey = childId + "/" + formattedSended + ".webm";
         ChildResponseDTO.getPresignedURLDTO data = ChildResponseDTO.getPresignedURLDTO.builder()
                 .url(s3Service.generatePresignedUrl(objectKey, 600)).build();
         return ApiResponse.onSuccess(data);
