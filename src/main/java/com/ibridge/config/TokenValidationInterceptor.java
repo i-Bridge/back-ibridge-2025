@@ -71,8 +71,8 @@ public class TokenValidationInterceptor implements HandlerInterceptor {
         String email = (String) body.get("email");
         String name = (String) body.get("name");
 
-        request.setAttribute("userEmail", email);
-        request.setAttribute("userName", name);
+        request.setAttribute("email", email);
+        request.setAttribute("name", name);
         return true;
     }
 
@@ -91,8 +91,8 @@ public class TokenValidationInterceptor implements HandlerInterceptor {
         String email = (String) responseBody.get("email");
         String name = (String) responseBody.get("name");
 
-        request.setAttribute("userEmail", email);
-        request.setAttribute("userName", name);
+        request.setAttribute("email", email);
+        request.setAttribute("name", name);
         return true;
     }
 }
