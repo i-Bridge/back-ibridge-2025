@@ -31,18 +31,27 @@ public class ChildController {
         return ApiResponse.onSuccess(data);
     }
 
-    @GetMapping("/{childId}/getURL")
-    public ApiResponse<ChildResponseDTO.getPresignedURLDTO> getPresignedURL(@PathVariable Long childId) {
+    //s3 저장 경로 양식 : {childId}/{yyyymmdd_hhmmss}.webm / {childId}/{yyyymmdd_hhmmss}.jpeg
+    @GetMapping("/{childId}/getURL/{type}")
+    public ApiResponse<ChildResponseDTO.getPresignedURLDTO> getVideoPresignedURL(@PathVariable Long childId, @PathVariable String type) {
         LocalDateTime sended = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
         String formattedSended = sended.format(formatter);
+        String contentType = "";
+        String objectKey = childId + "/" + formattedSended;
 
-        String objectKey = childId + "/" + formattedSended + ".webm";
+        if(type.equals("video")) {
+            contentType = "video/wmeb";
+            objectKey = formattedSended + ".wmeb";
+        }
+        else if(type.equals("image")) {
+            contentType = "audio/jpeg";
+            objectKey = formattedSended + ".jpeg";
+        }
+
         ChildResponseDTO.getPresignedURLDTO data = ChildResponseDTO.getPresignedURLDTO.builder()
                 .url(s3Service.generatePresignedUrl(objectKey, 600)).build();
         return ApiResponse.onSuccess(data);
     }
 
-
-    //s3 저장 경로 양식 : {childId}/{yyyymmdd_hhmmss}.webm
 }
