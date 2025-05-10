@@ -23,7 +23,7 @@ public class TokenValidationInterceptor implements HandlerInterceptor {
 
     @Value("${NAVER_CLIENT_ID}")
     private String naverClientId;
-    @Value("${NAVER_SECRET_ID}")
+    @Value("${NAVER_CLIENT_SECRET}")
     private String naverSecretId;
 
     private final RestTemplate restTemplate = new RestTemplate();
