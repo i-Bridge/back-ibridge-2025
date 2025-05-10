@@ -29,11 +29,11 @@ public class S3Service {
         this.presigner = presigner;
     }
 
-    public String generatePresignedUrl(String objectKey, long expireSeconds) {
+    public String generatePresignedUrl(String objectKey, String contentType, long expireSeconds) {
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(objectKey)
-                .contentType("video/webm")
+                .contentType(contentType)
                 .build();
 
         PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
@@ -42,6 +42,8 @@ public class S3Service {
                 .build();
 
         PresignedPutObjectRequest presignedRequest = presigner.presignPutObject(presignRequest);
+
         return presignedRequest.url().toString();
+    }
     }
 }
