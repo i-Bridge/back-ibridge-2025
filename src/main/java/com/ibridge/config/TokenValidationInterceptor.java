@@ -23,6 +23,8 @@ public class TokenValidationInterceptor implements HandlerInterceptor {
 
     @Value("${NAVER_CLIENT_ID}")
     private String naverClientId;
+    @Value("${NAVER_SECRET_ID}")
+    private String naverSecretId;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -79,7 +81,7 @@ public class TokenValidationInterceptor implements HandlerInterceptor {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
         headers.set("X-Naver-Client-Id", naverClientId);
-        headers.set("X-Naver-Client-Secret", "YOUR_NAVER_SECRET"); // 네이버 클라이언트 시크릿 추가
+        headers.set("X-Naver-Client-Secret", naverSecretId);
 
         HttpEntity<?> httpEntity = new HttpEntity<>(headers);
         ResponseEntity<Map> userInfoResponse = restTemplate.exchange(url, HttpMethod.GET, httpEntity, Map.class);
