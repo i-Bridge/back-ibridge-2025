@@ -31,7 +31,7 @@ public class ChildController {
         return ApiResponse.onSuccess(data);
     }
 
-    @PostMapping("/{childId}/getURL")
+    @GetMapping("/{childId}/getURL")
     public ApiResponse<ChildResponseDTO.getPresignedURLDTO> getPresignedURL(@PathVariable Long childId) {
         LocalDateTime sended = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
