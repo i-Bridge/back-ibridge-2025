@@ -14,7 +14,5 @@ public class ChildRequestDTO {
     public static class AnswerDTO {
         boolean isFinished;
         String video;
-        String text;
     }
-
 }
