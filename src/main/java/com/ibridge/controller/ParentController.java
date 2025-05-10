@@ -11,6 +11,7 @@ import com.ibridge.service.LoginService;
 import com.ibridge.service.ParentService;
 import com.ibridge.service.QuestionService;
 import com.ibridge.util.ApiResponse;
+import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.bind.DefaultValue;
@@ -93,32 +94,32 @@ public class ParentController {
 //현호
     //마이페이지
     @GetMapping("/mypage")
-    public ApiResponse<ParentResponseDTO.GetMyPageDTO> getMyPage(@RequestHeader("X-User-Email") String email) {
-        Long parentId = loginService.getParentFromHeader(email).getId();
+    public ApiResponse<ParentResponseDTO.GetMyPageDTO> getMyPage(HttpServletRequest r) {
+        Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
 
         ParentResponseDTO.GetMyPageDTO parentResponseDTO = parentService.getMyPage(parentId);
         return ApiResponse.onSuccess(parentResponseDTO);
     }
 
     @GetMapping("/mypage/edit")
-    public ApiResponse<ParentResponseDTO.GetFamilyInfoDTO> getFamilyInfo(@RequestHeader("X-User-Email") String email) {
-        Long parentId = loginService.getParentFromHeader(email).getId();
+    public ApiResponse<ParentResponseDTO.GetFamilyInfoDTO> getFamilyInfo(HttpServletRequest r) {
+        Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
 
         ParentResponseDTO.GetFamilyInfoDTO data = parentService.getFamilyPage(parentId);
         return ApiResponse.onSuccess(data);
     }
 
     @PatchMapping("/mypage/edit/familyName")
-    public ApiResponse editFamilyName(@RequestHeader("X-User-Email") String email, @RequestBody ParentRequestDTO.editFamilyNameDTO request) {
-        Long parentId = loginService.getParentFromHeader(email).getId();
+    public ApiResponse editFamilyName(HttpServletRequest r, @RequestBody ParentRequestDTO.editFamilyNameDTO request) {
+        Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
 
         parentService.editFamilyName(parentId, request);
         return ApiResponse.onSuccess(null);
     }
 
     @PostMapping("/mypage/edit/add")
-    public ApiResponse<ParentResponseDTO.ChildIdDTO> addChild(@RequestHeader("X-User-Email") String email, @RequestBody ParentRequestDTO.AddChildDTO addChildDTO) throws ParseException {
-        Long parentId = loginService.getParentFromHeader(email).getId();
+    public ApiResponse<ParentResponseDTO.ChildIdDTO> addChild(HttpServletRequest r, @RequestBody ParentRequestDTO.AddChildDTO addChildDTO) throws ParseException {
+        Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
 
         ParentResponseDTO.ChildIdDTO data = parentService.addChild(parentId, addChildDTO);
         return ApiResponse.onSuccess(data);
@@ -138,24 +139,24 @@ public class ParentController {
 
     //알림
     @GetMapping("/notice")
-    public ApiResponse<ParentResponseDTO.NoticeCheckDTO> getNotice(@RequestHeader("X-User-Email") String email) {
-        Long parentId = loginService.getParentFromHeader(email).getId();
+    public ApiResponse<ParentResponseDTO.NoticeCheckDTO> getNotice(HttpServletRequest r) {
+        Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
 
         ParentResponseDTO.NoticeCheckDTO data = parentService.getNotice(parentId);
         return ApiResponse.onSuccess(data);
     }
 
     @PostMapping("/notice/accept")
-    public ApiResponse addParentintoFamily(@RequestHeader("X-User-Email") String email, @RequestBody ParentRequestDTO.getParentintoFamilyDTO request) {
-        Long parentId = loginService.getParentFromHeader(email).getId();
+    public ApiResponse addParentintoFamily(HttpServletRequest r, @RequestBody ParentRequestDTO.getParentintoFamilyDTO request) {
+        Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
 
         parentService.addParentintoFamily(parentId, request);
         return ApiResponse.onSuccess(null);
     }
 
     @PostMapping("/notice/decline")
-    public ApiResponse declineParentintoFamily(@RequestHeader("X-User-Email") String email, @RequestBody ParentRequestDTO.getParentintoFamilyDTO request) {
-        Long parentId = loginService.getParentFromHeader(email).getId();
+    public ApiResponse declineParentintoFamily(HttpServletRequest r, @RequestBody ParentRequestDTO.getParentintoFamilyDTO request) {
+        Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
 
         parentService.declineParentintoFamily(parentId, request);
         return ApiResponse.onSuccess(null);
