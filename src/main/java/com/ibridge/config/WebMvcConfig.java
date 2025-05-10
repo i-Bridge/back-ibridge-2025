@@ -16,6 +16,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(tokenValidationInterceptor)
-                .addPathPatterns("/start/*", "/parent/*"); // 인증 필요한 경로만 걸기
+                .addPathPatterns("/start/*", "/parent/*", "/child/{childId}/home", "/child/{childId}/answer"); // 인증 필요한 경로만 걸기
     }
 }
