@@ -1,5 +1,7 @@
 package com.ibridge.service;
 
+import com.amazonaws.services.s3.AmazonS3;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -9,6 +11,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
+import java.io.File;
 import java.net.URL;
 import java.time.Duration;
 
@@ -16,21 +19,11 @@ import java.time.Duration;
 public class S3Service {
     private final String bucketName = "ibridge-10150107";
     private final Region region = Region.AP_NORTHEAST_2;
-    @Value("${cloud.aws.credentials.access-key}")
-    private String s3AccessKey;
-    @Value("${cloud.aws.credentials.secret-key}")
-    private String s3SecretKey;
     private final S3Presigner presigner;
 
-    public S3Service() {
-        this.presigner = S3Presigner.builder()
-                .region(region)
-                .credentialsProvider(
-                        StaticCredentialsProvider.create(
-                                AwsBasicCredentials.create(s3AccessKey, s3SecretKey)
-                        )
-                )
-                .build();
+    @Autowired
+    public S3Service(S3Presigner presigner) {
+        this.presigner = presigner;
     }
 
     public String generatePresignedUrl(String objectKey, long expireSeconds) {
