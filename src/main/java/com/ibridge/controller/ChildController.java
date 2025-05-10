@@ -31,13 +31,13 @@ public class ChildController {
         return ApiResponse.onSuccess(data);
     }
 
-    @PostMapping("/{childId}/getURL")
+    @GetMapping("/{childId}/getURL")
     public ApiResponse<ChildResponseDTO.getPresignedURLDTO> getPresignedURL(@PathVariable Long childId) {
         LocalDateTime sended = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
         String formattedSended = sended.format(formatter);
 
-        String objectKey = childId + "/" + formattedSended;
+        String objectKey = childId + "/" + formattedSended + ".webm";
         ChildResponseDTO.getPresignedURLDTO data = ChildResponseDTO.getPresignedURLDTO.builder()
                 .url(s3Service.generatePresignedUrl(objectKey, 600)).build();
         return ApiResponse.onSuccess(data);
