@@ -45,7 +45,7 @@ public class ChildController {
             objectKey = formattedSended + ".wmeb";
         }
         else if(type.equals("image")) {
-            contentType = "audio/jpeg";
+            contentType = "image/jpeg";
             objectKey = formattedSended + ".jpeg";
         }
 
