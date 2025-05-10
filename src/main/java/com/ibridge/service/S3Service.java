@@ -23,7 +23,7 @@ public class S3Service {
                 .region(region)
                 .credentialsProvider(
                         StaticCredentialsProvider.create(
-                                AwsBasicCredentials.create("YOUR_ACCESS_KEY", "YOUR_SECRET_KEY")
+                                AwsBasicCredentials.create("${S3_ACCESS_KEY}", "${S3_SECRET_KEY}")
                         )
                 )
                 .build();
