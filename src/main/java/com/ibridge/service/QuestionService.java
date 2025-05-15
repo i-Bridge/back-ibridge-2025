@@ -87,10 +87,12 @@ public class QuestionService {
         String randomQuestion = subjects.get(id);
         List<Subject> subject = subjectRepository.findByChildIdAndDate(childId, date);
         if(!subject.isEmpty()){
-            subjectRepository.deleteByChildIdAndDate(childId, date);
+            subject.get(0).setTitle(randomQuestion);
+            subjectRepository.save(subject.get(0));
         }
-
-        subjectRepository.save(new Subject((long)id, randomQuestion, false, LocalDate.now(), childRepository.findById(childId).get(), null));
+        Question question=questionRepository.findBySubjectId(subject.get(0).getId());
+        question.setText(randomQuestion);
+        questionRepository.save(question);
         return new SubjectResponseDTO((long)id, randomQuestion);
     }
 }

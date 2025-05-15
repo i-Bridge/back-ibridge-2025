@@ -21,4 +21,5 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     Optional<Question> findByIdAndChildIdAndSubjectId(@Param("questionId") Long questionId,
                                                       @Param("childId") Long childId,
                                                       @Param("subjectId") Long subjectId);
+    Question findBySubjectId(Long subjectId);
 }
