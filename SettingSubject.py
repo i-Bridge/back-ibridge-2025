@@ -4,11 +4,15 @@ SERVER_URL = "http://localhost:8080/back/setSubject"
 
 def send_request():
     try:
-        response = requests.get(SERVER_URL)
+        return requests.get(SERVER_URL)
     except requests.exceptions.RequestException as e:
         print(f"Error sending request: {e}")
         return None
 
 if __name__ == "__main__":
-    send_request()
-    print("Request sent successfully.")
+    response = send_request()
+    if response.code == 200:
+        print("Request was successful.")
+    else:
+        print(f"Request failed with status code: {response.code}")
+        print(f"Response message : {response.message}")
