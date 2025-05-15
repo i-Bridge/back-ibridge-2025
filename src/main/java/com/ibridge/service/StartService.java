@@ -87,9 +87,8 @@ public class StartService {
         Family family = Family.builder()
                 .name(request.getFamilyName())
                 .build();
-        familyRepository.save(family);
-
-        parent.setFamily(family);
+        Family f = familyRepository.save(family);
+        parent.setFamily(f);
         parentRepository.save(parent);
 
         List<Child> children = request.getChildren().stream()
