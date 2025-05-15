@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 public class ChildRequestDTO {
     @Data
@@ -12,7 +11,17 @@ public class ChildRequestDTO {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class AnswerDTO {
-        boolean isFinished;
+        Long subjectId;
         String video;
+    }
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class GetPresignedURLDTO {
+        String type;
+        Long subjectId;
+        Long questionId;
     }
 }

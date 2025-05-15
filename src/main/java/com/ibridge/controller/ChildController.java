@@ -1,7 +1,6 @@
 package com.ibridge.controller;
 
 import com.ibridge.domain.dto.request.ChildRequestDTO;
-import com.ibridge.domain.dto.request.StartSignupNewRequestDTO;
 import com.ibridge.domain.dto.response.ChildResponseDTO;
 import com.ibridge.service.ChildService;
 import com.ibridge.service.S3Service;
@@ -31,20 +30,20 @@ public class ChildController {
         return ApiResponse.onSuccess(data);
     }
 
-    //s3 저장 경로 양식 : {childId}/{yyyymmdd_hhmmss}.webm / {childId}/{yyyymmdd_hhmmss}.jpeg
-    @GetMapping("/{childId}/getURL/{type}")
-    public ApiResponse<ChildResponseDTO.getPresignedURLDTO> getVideoPresignedURL(@PathVariable Long childId, @PathVariable String type) {
+    //s3 저장 경로 양식 : {childId}/{subjectId}/{questionId}/{yyyymmdd_hhmmss}.webm / {childId}/{yyyymmdd_hhmmss}.jpeg
+    @GetMapping("/{childId}/getURL")
+    public ApiResponse<ChildResponseDTO.getPresignedURLDTO> getVideoPresignedURL(@PathVariable Long childId, @RequestBody ChildRequestDTO.GetPresignedURLDTO request) {
         LocalDateTime sended = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
         String formattedSended = sended.format(formatter);
         String contentType = "";
-        String objectKey = childId + "/" + formattedSended;
+        String objectKey = childId + "/" + request.getSubjectId() + "/" + request.getQuestionId() + "/" + formattedSended;
 
-        if(type.equals("video")) {
+        if(request.getType().equals("video")) {
             contentType = "video/webm";
             objectKey += ".webm";
         }
-        else if(type.equals("image")) {
+        else if(request.getType().equals("image")) {
             contentType = "image/jpeg";
             objectKey += ".jpeg";
         }
