@@ -13,11 +13,8 @@ public interface ParentRepository extends JpaRepository<Parent, Long> {
     int getParentCount(@Param("family") Family family);
 
     boolean existsByEmail(String email);
-    Parent getParentByEmail(String email);
+    Parent findParentByEmail(String email);
 
     @Query("SELECT p FROM Parent p WHERE p.family = :family")
     List<Parent> findAllByFamily(Family family);
-
-    Parent findByEmail(String email);
-
 }

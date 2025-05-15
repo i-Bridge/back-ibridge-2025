@@ -1,7 +1,6 @@
 package com.ibridge.service;
 
 import com.ibridge.domain.dto.request.StartRequestDTO;
-import com.ibridge.domain.dto.request.StartSigninRequestDTO;
 import com.ibridge.domain.dto.request.StartSignupNewRequestDTO;
 import com.ibridge.domain.dto.response.FamilyExistDTO;
 import com.ibridge.domain.dto.response.StartUserSelectionResponseDTO;
@@ -13,10 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -82,7 +79,7 @@ public class StartService {
     }
 
     public void registerNewChildren(StartSignupNewRequestDTO request, String email) {
-        Parent parent = parentRepository.getParentByEmail(email);
+        Parent parent = parentRepository.findParentByEmail(email);
 
         Family family = Family.builder()
                 .name(request.getFamilyName())
