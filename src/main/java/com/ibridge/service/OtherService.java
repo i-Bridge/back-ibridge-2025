@@ -11,9 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,13 +30,17 @@ public class OtherService {
     public void setSubject() {
         List<Child> children = childRepository.findAll();
         List<String> subjects = new ArrayList<>();
-        String filePath = "src/main/resources/SubjectList.txt";
-        try(BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+        try (InputStream inputStream = QuestionService.class.getClassLoader().getResourceAsStream("SubjectList.txt")) {
+            if (inputStream == null) {
+                System.out.println("파일을 찾을 수 없습니다.");
+                throw new RuntimeException();
+            }
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             String line;
-            while((line = br.readLine())!=null){
+            while ((line = reader.readLine()) != null) {
                 subjects.add(line);
             }
-        }catch(IOException e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         int id = random.nextInt(subjects.size());
