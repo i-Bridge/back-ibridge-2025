@@ -11,8 +11,14 @@ def send_request():
 
 if __name__ == "__main__":
     response = send_request()
-    if response.code == 200:
-        print("Request was successful.")
+    if response is not None:
+        if response.status_code == 200:
+            print("✅ Request was successful.")
+            print("Response body:", response.text)
+        elif response.status_code == 404:
+            print("❌ Not Found (404)")
+        else:
+            print(f"⚠️ Request failed with status code: {response.status_code}")
+            print(f"Response body: {response.text}")
     else:
-        print(f"Request failed with status code: {response.code}")
-        print(f"Response message : {response.message}")
+        print("❌ No response received.")
