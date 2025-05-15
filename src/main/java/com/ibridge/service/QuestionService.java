@@ -69,6 +69,9 @@ public class QuestionService {
         subject.setTitle(request.getTitle());
         subject.setDate(LocalDate.now());
         subjectRepository.save(subject);
+        Question question = questionRepository.findBySubjectId(subjects.get(0).getId());
+        question.setText(request.getTitle());
+        questionRepository.save(question);
     }
 
     public SubjectResponseDTO rerollQuestion(Long childId, LocalDate date) {
