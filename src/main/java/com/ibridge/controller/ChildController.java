@@ -2,6 +2,7 @@ package com.ibridge.controller;
 
 import com.ibridge.domain.dto.request.ChildRequestDTO;
 import com.ibridge.domain.dto.response.ChildResponseDTO;
+import com.ibridge.repository.ChildRepository;
 import com.ibridge.service.ChildService;
 import com.ibridge.service.S3Service;
 import com.ibridge.util.ApiResponse;
@@ -25,32 +26,21 @@ public class ChildController {
     }
 
     @PostMapping("/{childId}/answer")
-    public ApiResponse<ChildResponseDTO.getQuestionDTO> getQuestion(@PathVariable Long childId, @RequestBody ChildRequestDTO.AnswerDTO request) {
-        ChildResponseDTO.getQuestionDTO data = childService.getNextQuestion(childId, request);
+    public ApiResponse<ChildResponseDTO.getAI> getQuestion(@PathVariable Long childId, @RequestBody ChildRequestDTO.AnswerDTO request) {
+        ChildResponseDTO.getAI data = childService.getNextQuestion(childId, request);
         return ApiResponse.onSuccess(data);
     }
 
-    //s3 저장 경로 양식 : {childId}/{subjectId}/{questionId}/{yyyymmdd_hhmmss}.webm / {childId}/{yyyymmdd_hhmmss}.jpeg
     @GetMapping("/{childId}/getURL")
     public ApiResponse<ChildResponseDTO.getPresignedURLDTO> getVideoPresignedURL(@PathVariable Long childId, @RequestBody ChildRequestDTO.GetPresignedURLDTO request) {
-        LocalDateTime sended = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
-        String formattedSended = sended.format(formatter);
-        String contentType = "";
-        String objectKey = childId + "/" + request.getSubjectId() + "/" + request.getQuestionId() + "/" + formattedSended;
-
-        if(request.getType().equals("video")) {
-            contentType = "video/webm";
-            objectKey += ".webm";
-        }
-        else if(request.getType().equals("image")) {
-            contentType = "image/jpeg";
-            objectKey += ".jpeg";
-        }
-
-        ChildResponseDTO.getPresignedURLDTO data = ChildResponseDTO.getPresignedURLDTO.builder()
-                .url(s3Service.generatePresignedUrl(objectKey, contentType, 600)).build();
+        ChildResponseDTO.getPresignedURLDTO data = childService.getPresignedURL(childId, request);
         return ApiResponse.onSuccess(data);
+    }
+
+    @PostMapping("/{childId}/uploaded")
+    public ApiResponse s3Uploaded(@PathVariable Long childId, @RequestBody ChildRequestDTO.UploadedDTO request) {
+        childService.uploaded(request);
+        return ApiResponse.onSuccess(null);
     }
 
 }

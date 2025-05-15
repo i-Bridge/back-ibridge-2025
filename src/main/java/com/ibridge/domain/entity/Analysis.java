@@ -28,6 +28,9 @@ public class Analysis {
     @Column
     private String video;
 
+    @Column
+    private boolean uploaded;
+
     @OneToOne
     @JoinColumn(name = "question")
     private Question question;

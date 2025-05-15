@@ -20,6 +20,15 @@ public class ChildResponseDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class getAI {
+        Long id;
+        String ai;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class getPresignedURLDTO {
         String url;
     }

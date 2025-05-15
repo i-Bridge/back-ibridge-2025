@@ -12,7 +12,7 @@ public class ChildRequestDTO {
     @NoArgsConstructor
     public static class AnswerDTO {
         Long subjectId;
-        String video;
+        String text;
     }
 
     @Data
@@ -21,7 +21,16 @@ public class ChildRequestDTO {
     @NoArgsConstructor
     public static class GetPresignedURLDTO {
         String type;
-        Long subjectId;
-        Long questionId;
+        Long id;
+    }
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UploadedDTO {
+        Long id;
+        String image;
+        String video;
     }
 }
