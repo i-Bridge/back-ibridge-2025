@@ -1,6 +1,6 @@
 import requests
 
-SERVER_URL = "http://10.0.12.38:8080/back/setSubject"
+SERVER_URL = "http://localhost:8080/back/setSubject"
 
 def send_request():
     try:
