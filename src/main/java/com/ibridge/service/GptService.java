@@ -1,61 +1,67 @@
 package com.ibridge.service;
 
+import lombok.RequiredArgsConstructor;
+import okhttp3.*;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class GptService {
     @Value("${openai.api.key}")
-    private String apiKey;
+    private String OPENAI_API_KEY;
+    private static final String API_URL = "https://api.openai.com/v1/chat/completions";
 
-    private final String GPT_API_URL = "https://api.openai.com/v1/chat/completions";
+    private final OkHttpClient client = new OkHttpClient();
 
-    public String generateQuestionFromAnswer(String childAnswer) {
-        RestTemplate restTemplate = new RestTemplate();
+    public String askGpt(String question) {
+        try {
+            JSONObject message = new JSONObject()
+                    .put("role", "user")
+                    .put("content", question);
 
-        // 요청 본문 구성
-        Map<String, Object> message = Map.of("role", "user", "content",
-                "다음은 아이의 답변이야: \"" + childAnswer + "\". 이 답변에 대해 후속 질문 하나를 만들어줘.");
+            JSONObject body = new JSONObject()
+                    .put("model", "gpt-3.5-turbo")
+                    .put("messages", List.of(message));
 
-        Map<String, Object> requestBody = Map.of(
-                "model", "gpt-3.5-turbo",
-                "messages", List.of(message),
-                "temperature", 0.7 //창의성 조절 파라미터라고 하네요
-        );
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(apiKey);
+            RequestBody requestBody = RequestBody.create(
+                    body.toString(),
+                    MediaType.parse("application/json")
+            );
 
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+            Request request = new Request.Builder()
+                    .url(API_URL)
+                    .addHeader("Authorization", "Bearer " + OPENAI_API_KEY)
+                    .addHeader("Content-Type", "application/json")
+                    .post(requestBody)
+                    .build();
 
-        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
-                GPT_API_URL,
-                HttpMethod.POST,
-                entity,
-                new ParameterizedTypeReference<>() {}
-        );
+            try (Response response = client.newCall(request).execute()) {
+                if (response.body() != null) {
+                    String responseBody = response.body().string();
+                    JSONObject jsonResponse = new JSONObject(responseBody);
 
-        Map<String, Object> responseBody = response.getBody();
-
-        if (responseBody == null || !responseBody.containsKey("choices")) {
-            throw new RuntimeException("GPT 응답이 비어 있거나 'choices' 키가 없습니다.");
+                    if (jsonResponse.has("choices")) {
+                        return jsonResponse
+                                .getJSONArray("choices")
+                                .getJSONObject(0)
+                                .getJSONObject("message")
+                                .getString("content")
+                                .trim();
+                    } else {
+                        return "OpenAI API 오류 응답: " + responseBody;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            return "GPT 응답 중 오류 발생: " + e.getMessage();
         }
 
-        List<?> choices = (List<?>) responseBody.get("choices");
-        if (choices.isEmpty()) {
-            throw new RuntimeException("GPT 응답의 'choices'가 비어 있습니다.");
-        }
-
-        Map<?, ?> firstChoice = (Map<?, ?>) choices.get(0);
-        Map<?, ?> messageMap = (Map<?, ?>) firstChoice.get("message");
-        String content = (String) messageMap.get("content");
-
-        return content;
+        return "GPT 응답 없음";
     }
 }

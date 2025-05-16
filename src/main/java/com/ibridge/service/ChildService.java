@@ -45,7 +45,7 @@ public class ChildService {
 
     public ChildResponseDTO.getAI getNextQuestion(Long childId, ChildRequestDTO.AnswerDTO request) {
         List<Subject> todaySubject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
-        String ai = gptService.generateQuestionFromAnswer(request.getText());
+        String ai = gptService.askGpt(request.getText());
 
         if(request.getSubjectId() == 1) {
             List<Subject> subject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
