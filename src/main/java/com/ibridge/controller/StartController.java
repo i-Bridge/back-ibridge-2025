@@ -42,10 +42,9 @@ public class StartController {
     @PostMapping("/signup/new")
     public ApiResponse<?> registerNewFamily(HttpServletRequest r, @RequestBody StartSignupNewRequestDTO request) {
         String email = (String) r.getAttribute("email");
-        throw new RuntimeException(email);
 
-        //startService.registerNewChildren(request, email);
-        //return ApiResponse.onSuccess(null);
+        startService.registerNewChildren(request, email);
+        return ApiResponse.onSuccess(null);
     }
 
     @GetMapping("/login")
