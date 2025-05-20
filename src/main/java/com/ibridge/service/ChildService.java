@@ -49,6 +49,9 @@ public class ChildService {
 
         if(request.getSubjectId() == 1) {
             List<Subject> subject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
+            subject.get(0).setAnswer(true);
+            subjectRepository.save(subject.get(0));
+
             Question question = Question.builder()
                     .subject(subject.get(0))
                     .text(ai).build();
