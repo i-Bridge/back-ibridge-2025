@@ -49,9 +49,6 @@ public class ChildService {
 
         if(request.getSubjectId() == 1) {
             List<Subject> subject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
-            subject.get(0).setAnswer(true);
-            subjectRepository.save(subject.get(0));
-
             Question question = Question.builder()
                     .subject(subject.get(0))
                     .text(ai).build();
@@ -86,11 +83,15 @@ public class ChildService {
                         .id(analysis.getId()).build();
             }
             else {
+                Subject prevSubject = todaySubject.get(todaySubject.size() - 2);
+                prevSubject.setAnswer(true);
+                subjectRepository.save(prevSubject);
+
                 Subject subject = Subject.builder()
                         .child(childRepository.findById(childId).get())
                         .title(ai)
                         .date(LocalDate.now())
-                        .isAnswer(true).build();
+                        .isAnswer(false).build();
                 subjectRepository.save(subject);
 
                 Question question = Question.builder()
