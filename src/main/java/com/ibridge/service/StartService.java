@@ -80,7 +80,9 @@ public class StartService {
 
     public void registerNewChildren(StartSignupNewRequestDTO request, String email) {
         Parent parent = parentRepository.findParentByEmail(email);
-
+        if (parent == null) {
+            throw new RuntimeException("존재하지 않는 이메일입니다: " + email);
+        }
         Family family = Family.builder()
                 .name(request.getFamilyName())
                 .build();

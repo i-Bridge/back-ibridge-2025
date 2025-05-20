@@ -69,6 +69,11 @@ public class TokenValidationInterceptor implements HandlerInterceptor {
 
         Map<String, Object> body = userInfoResponse.getBody();
         String email = (String) body.get("email");
+        if (email == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("유효하지 않은 access token입니다.");
+            return false;
+        }
         String name = (String) body.get("name");
 
         request.setAttribute("email", email);
@@ -89,6 +94,11 @@ public class TokenValidationInterceptor implements HandlerInterceptor {
         Map<String, Object> body = userInfoResponse.getBody();
         Map<String, Object> responseBody = (Map<String, Object>) body.get("response");
         String email = (String) responseBody.get("email");
+        if (email == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("유효하지 않은 access token입니다.");
+            return false;
+        }
         String name = (String) responseBody.get("name");
 
         request.setAttribute("email", email);
