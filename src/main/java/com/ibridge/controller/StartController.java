@@ -42,8 +42,8 @@ public class StartController {
     @PostMapping("/signup/new")
     public ApiResponse<?> registerNewFamily(HttpServletRequest r, @RequestBody StartSignupNewRequestDTO request) {
         String email = (String) r.getAttribute("email");
-        if(email == null){
-            throw new RuntimeException("email is null");
+        if(email != null){
+            throw new RuntimeException("email is " + email);
         }
         startService.registerNewChildren(request, email);
         return ApiResponse.onSuccess(null);
