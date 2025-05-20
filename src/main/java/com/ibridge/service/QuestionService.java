@@ -62,7 +62,6 @@ public class QuestionService {
 
     public void editQuestion(Long childId, EditQuestionRequestDTO request, LocalDate date) {
         List<Subject> subjects = subjectRepository.findByChildIdAndDate(childId, date);
-        subjectRepository.deleteByChildIdAndDate(childId, date);
         Subject subject = subjects.get(0);
         subject.setTitle(request.getTitle());
         subject.setDate(LocalDate.now());
