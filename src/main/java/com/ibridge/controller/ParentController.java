@@ -64,7 +64,7 @@ public class ParentController {
         return ApiResponse.onSuccess(response);
     }
 
-    @PutMapping("/{childId}/questions/edit")
+    @PatchMapping("/{childId}/questions/edit")
     public ApiResponse<Void> editQuestion(
             @PathVariable Long childId,
             @RequestBody EditQuestionRequestDTO request,
