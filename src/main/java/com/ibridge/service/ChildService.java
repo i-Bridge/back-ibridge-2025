@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -86,6 +87,14 @@ public class ChildService {
                 Subject prevSubject = todaySubject.get(todaySubject.size() - 2);
                 prevSubject.setAnswer(true);
                 subjectRepository.save(prevSubject);
+
+                List<Question> prevQuestions = questionRepository.findAllBySubject(prevSubject);
+                Question prevLastQuestion = prevQuestions.get(prevQuestions.size() - 1);
+                Optional<Analysis> optionalAnalysis = analysisRepository.findById(prevLastQuestion.getId());
+                if(!optionalAnalysis.isPresent()) analysisRepository.save(Analysis.builder()
+                        .question(prevLastQuestion)
+                        .uploaded(false)
+                        .answer("답변이 없습니다").build());
 
                 Subject subject = Subject.builder()
                         .child(childRepository.findById(childId).get())
