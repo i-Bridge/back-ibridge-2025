@@ -64,7 +64,7 @@ public class QuestionService {
         List<Subject> subjects = subjectRepository.findByChildIdAndDate(childId, date);
         Subject subject = subjects.get(0);
         subject.setTitle(request.getTitle());
-        subject.setDate(LocalDate.now());
+        subject.setDate(date);
         subjectRepository.save(subject);
         Question question = questionRepository.findBySubjectId(subjects.get(0).getId());
         question.setText(request.getTitle());
