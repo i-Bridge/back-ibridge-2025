@@ -84,6 +84,7 @@ public class ChildService {
                         .id(analysis.getId()).build();
             }
             else {
+                //새로운 주제 등장으로 기존 주제 처리
                 Subject prevSubject = todaySubject.get(todaySubject.size() - 2);
                 prevSubject.setAnswer(true);
                 subjectRepository.save(prevSubject);
@@ -96,6 +97,8 @@ public class ChildService {
                         .uploaded(false)
                         .answer("답변이 없습니다").build());
 
+                
+                //새로운 주제에 대한 처리
                 Subject subject = Subject.builder()
                         .child(childRepository.findById(childId).get())
                         .title(ai)
