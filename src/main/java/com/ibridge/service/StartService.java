@@ -11,7 +11,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.sql.Array;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.*;
@@ -26,6 +30,8 @@ public class StartService {
     private final NoticeRepository noticeRepository;
     private final ChildRepository childRepository;
     private final ParentNoticeRepository parentNoticeRepository;
+    private final SubjectRepository subjectRepository;
+    private final QuestionRepository questionRepository;
 
     public StartResponseDTO signIn(String email, String name) {
         boolean isFirst = !parentRepository.existsByEmail(email);
@@ -83,20 +89,51 @@ public class StartService {
         if (parent == null) {
             throw new RuntimeException("존재하지 않는 이메일입니다: " + email);
         }
-        Family family = Family.builder()
+
+        Family family = familyRepository.save(Family.builder()
                 .name(request.getFamilyName())
-                .build();
-        Family f = familyRepository.save(family);
-        parent.setFamily(f);
+                .build());
+
+        parent.setFamily(family);
         parentRepository.save(parent);
 
+        List<String> subjectsPool = loadQuestionsFromFile();
+        if (subjectsPool.isEmpty()) {
+            throw new RuntimeException("질문 목록이 비어있습니다.");
+        }
+
+        Random random = new Random();
+
         List<Child> children = request.getChildren().stream()
-                .map(childRequest -> Child.builder()
-                        .name(childRequest.getName())
-                        .gender(childRequest.getGender() == 0 ? Gender.MALE : Gender.FEMALE)
-                        .birth(LocalDate.parse(childRequest.getBirth()))
-                        .family(family)
-                        .build())
+                .map(childRequest -> {
+                    String questionText = subjectsPool.get(random.nextInt(subjectsPool.size()));
+
+                    Question question = Question.builder()
+                            .text(questionText)
+                            .build();
+
+                    Subject subject = Subject.builder()
+                            .title(questionText)
+                            .isAnswer(false)
+                            .date(LocalDate.now())
+                            .questions(new ArrayList<>(List.of(question)))
+                            .build();
+
+                    question.setSubject(subject);
+
+                    Child child = Child.builder()
+                            .name(childRequest.getName())
+                            .gender(childRequest.getGender() == 0 ? Gender.MALE : Gender.FEMALE)
+                            .birth(LocalDate.parse(childRequest.getBirth()))
+                            .family(family)
+                            .subjects(new ArrayList<>(List.of(subject)))
+                            .build();
+
+                    subject.setChild(child);
+                    subjectRepository.save(subject);
+                    questionRepository.save(question);
+                    return child;
+                })
                 .collect(Collectors.toList());
 
         childRepository.saveAll(children);
@@ -133,4 +170,23 @@ public class StartService {
                     .build();
         }
     }
+    private List<String> loadQuestionsFromFile() {
+        List<String> subjects = new ArrayList<>();
+        try (InputStream inputStream = QuestionService.class.getClassLoader().getResourceAsStream("SubjectList.txt")) {
+            if (inputStream == null) {
+                System.out.println("파일을 찾을 수 없습니다.");
+                throw new RuntimeException();
+            }
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                subjects.add(line);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return subjects;
+    }
+
+
 }
