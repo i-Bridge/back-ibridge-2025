@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -49,9 +50,6 @@ public class ChildService {
 
         if(request.getSubjectId() == 1) {
             List<Subject> subject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
-            subject.get(0).setAnswer(true);
-            subjectRepository.save(subject.get(0));
-
             Question question = Question.builder()
                     .subject(subject.get(0))
                     .text(ai).build();
@@ -86,11 +84,26 @@ public class ChildService {
                         .id(analysis.getId()).build();
             }
             else {
+                //새로운 주제 등장으로 기존 주제 처리
+                Subject prevSubject = todaySubject.get(todaySubject.size() - 2);
+                prevSubject.setAnswer(true);
+                subjectRepository.save(prevSubject);
+
+                List<Question> prevQuestions = questionRepository.findAllBySubject(prevSubject);
+                Question prevLastQuestion = prevQuestions.get(prevQuestions.size() - 1);
+                Optional<Analysis> optionalAnalysis = analysisRepository.findById(prevLastQuestion.getId());
+                if(!optionalAnalysis.isPresent()) analysisRepository.save(Analysis.builder()
+                        .question(prevLastQuestion)
+                        .uploaded(false)
+                        .answer("답변이 없습니다").build());
+
+                
+                //새로운 주제에 대한 처리
                 Subject subject = Subject.builder()
                         .child(childRepository.findById(childId).get())
                         .title(ai)
                         .date(LocalDate.now())
-                        .isAnswer(true).build();
+                        .isAnswer(false).build();
                 subjectRepository.save(subject);
 
                 Question question = Question.builder()
