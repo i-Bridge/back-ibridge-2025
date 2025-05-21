@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.List;
 
 public class ChildResponseDTO {
     @Data
@@ -12,7 +11,6 @@ public class ChildResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class getQuestionDTO {
-        String question;
         boolean isCompleted;
     }
 
@@ -20,8 +18,25 @@ public class ChildResponseDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class getPredesignedQuestionDTO {
+        Long subjectId;
+        String question;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class getNewQuestionDTO {
+        Long subjectId;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class getAI {
-        Long id;
+        boolean isFinished;
         String ai;
     }
 

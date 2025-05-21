@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SubjectRepository extends JpaRepository<Subject, Long> {
-    @Query("SELECT s FROM Subject s where s.child.id = :childId and s.date = :date")
+    @Query("SELECT s FROM Subject s where s.child.id = :childId and s.date = :date ORDER BY s.id")
     List<Subject> findByChildIdAndDate(Long childId, LocalDate date);
 
     Optional<Subject> findById(Long subjectId);

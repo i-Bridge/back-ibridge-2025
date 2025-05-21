@@ -25,9 +25,21 @@ public class ChildController {
         return ApiResponse.onSuccess(data);
     }
 
+    @GetMapping("/{childId}/predesigned")
+    public ApiResponse<ChildResponseDTO.getPredesignedQuestionDTO> getPredesignedQuestion(@PathVariable Long childId) {
+        ChildResponseDTO.getPredesignedQuestionDTO data = childService.getPredesignedQuestion(childId);
+        return ApiResponse.onSuccess(data);
+    }
+
+    @GetMapping("/{childId}/new")
+    public ApiResponse<ChildResponseDTO.getNewQuestionDTO> getNewQuestion(@PathVariable Long childId) {
+        ChildResponseDTO.getNewQuestionDTO data = childService.getNewSubject(childId);
+        return ApiResponse.onSuccess(data);
+    }
+
     @PostMapping("/{childId}/answer")
     public ApiResponse<ChildResponseDTO.getAI> getQuestion(@PathVariable Long childId, @RequestBody ChildRequestDTO.AnswerDTO request) {
-        ChildResponseDTO.getAI data = childService.getNextQuestion(childId, request);
+        ChildResponseDTO.getAI data = childService.getNextQuestion(request);
         return ApiResponse.onSuccess(data);
     }
 

@@ -3,6 +3,7 @@ package com.ibridge.service;
 import com.ibridge.domain.dto.request.ChildRequestDTO;
 import com.ibridge.domain.dto.response.ChildResponseDTO;
 import com.ibridge.domain.entity.Analysis;
+import com.ibridge.domain.entity.Child;
 import com.ibridge.domain.entity.Question;
 import com.ibridge.domain.entity.Subject;
 import com.ibridge.repository.AnalysisRepository;
@@ -31,96 +32,73 @@ public class ChildService {
     private final GptService gptService;
 
     public ChildResponseDTO.getQuestionDTO getHome(Long childId) {
-        boolean isCompleted = false;
         List<Subject> todaySubject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
-        if(todaySubject.size() > 1) isCompleted = true;
-        else {
-            List<Question> questionsBySubject = questionRepository.findBySubjectIdAndChildId(todaySubject.get(0).getId(), childId);
-            if(questionsBySubject.size() > 0) isCompleted = true;
-        }
+        boolean isCompleted = todaySubject.get(0).isAnswer();
 
         return ChildResponseDTO.getQuestionDTO.builder()
-                .isCompleted(isCompleted)
-                .question(todaySubject.get(0).getTitle()).build();
+                .isCompleted(isCompleted).build();
     }
 
-    public ChildResponseDTO.getAI getNextQuestion(Long childId, ChildRequestDTO.AnswerDTO request) {
+    public ChildResponseDTO.getPredesignedQuestionDTO getPredesignedQuestion(Long childId) {
         List<Subject> todaySubject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
-        String ai = gptService.askGpt(request.getText());
+        return ChildResponseDTO.getPredesignedQuestionDTO.builder()
+                .question(todaySubject.get(0).getTitle())
+                .subjectId(todaySubject.get(0).getId()).build();
+    }
 
-        if(request.getSubjectId() == 1) {
-            List<Subject> subject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
-            Question question = Question.builder()
-                    .subject(subject.get(0))
-                    .text(ai).build();
-            questionRepository.save(question);
+    public ChildResponseDTO.getNewQuestionDTO getNewSubject(Long childId) {
+        List<Subject> todaySubject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
 
-            Analysis analysis = Analysis.builder()
-                    .question(question)
-                    .uploaded(false).build();
-            analysisRepository.save(analysis);
+        for(Subject subject : todaySubject) {
+            if (!subject.isAnswer()) {
+                List<Question> tempQuestions = subject.getQuestions();
+                questionRepository.delete(tempQuestions.get(tempQuestions.size() - 1));
+            }
+        }
+
+        Subject newSubject = Subject.builder()
+                .child(childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + " Not Found ")))
+                .title("아이의 얘기 " + todaySubject.size())
+                .date(LocalDate.now())
+                .isAnswer(false).build();
+        subjectRepository.save(newSubject);
+
+        Question question = Question.builder()
+                .subject(newSubject)
+                .text("무슨 이야기를 하고 싶어?").build();
+        questionRepository.save(question);
+
+        return ChildResponseDTO.getNewQuestionDTO.builder()
+                .subjectId(newSubject.getId()).build();
+    }
+
+    public ChildResponseDTO.getAI getNextQuestion(ChildRequestDTO.AnswerDTO request) {
+        Subject targetSubject = subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject " + request.getSubjectId() + " Not Found "));
+        List<Question> questions = questionRepository.findAllBySubject(targetSubject);
+        Analysis analysis = Analysis.builder()
+                .question(questions.get(questions.size() - 1))
+                .answer(request.getText())
+                .uploaded(false).build();
+        analysisRepository.save(analysis);
+
+        if(questions.size() == 5) {
+            targetSubject.setAnswer(true);
+            subjectRepository.save(targetSubject);
 
             return ChildResponseDTO.getAI.builder()
-                    .ai(ai)
-                    .id(analysis.getId()).build();
+                    .isFinished(true).build();
         }
         else {
-            if(request.getSubjectId() == todaySubject.size()) {
-                Subject target = todaySubject.get(todaySubject.size() - 1);
+            String ai = gptService.askGpt(request.getText());
+            Question question = Question.builder()
+                    .text(ai)
+                    .subject(targetSubject)
+                    .build();
+            questionRepository.save(question);
 
-                Question question = Question.builder()
-                        .text(ai)
-                        .subject(target).build();
-                questionRepository.save(question);
-
-                Analysis analysis = Analysis.builder()
-                        .question(question)
-                        .uploaded(false)
-                        .answer(request.getText()).build();
-                analysisRepository.save(analysis);
-
-                return ChildResponseDTO.getAI.builder()
-                        .ai(ai)
-                        .id(analysis.getId()).build();
-            }
-            else {
-                //새로운 주제 등장으로 기존 주제 처리
-                Subject prevSubject = todaySubject.get(todaySubject.size() - 2);
-                prevSubject.setAnswer(true);
-                subjectRepository.save(prevSubject);
-
-                List<Question> prevQuestions = questionRepository.findAllBySubject(prevSubject);
-                Question prevLastQuestion = prevQuestions.get(prevQuestions.size() - 1);
-                Optional<Analysis> optionalAnalysis = analysisRepository.findById(prevLastQuestion.getId());
-                if(!optionalAnalysis.isPresent()) analysisRepository.save(Analysis.builder()
-                        .question(prevLastQuestion)
-                        .uploaded(false)
-                        .answer("답변이 없습니다").build());
-
-                
-                //새로운 주제에 대한 처리
-                Subject subject = Subject.builder()
-                        .child(childRepository.findById(childId).get())
-                        .title(ai)
-                        .date(LocalDate.now())
-                        .isAnswer(false).build();
-                subjectRepository.save(subject);
-
-                Question question = Question.builder()
-                        .subject(subject)
-                        .text(ai).build();
-                questionRepository.save(question);
-
-                Analysis analysis = Analysis.builder()
-                        .question(question)
-                        .answer(request.getText())
-                        .uploaded(false).build();
-                analysisRepository.save(analysis);
-
-                return ChildResponseDTO.getAI.builder()
-                        .id(analysis.getId())
-                        .ai(ai).build();
-            }
+            return ChildResponseDTO.getAI.builder()
+                    .isFinished(false)
+                    .ai(ai).build();
         }
     }
 
