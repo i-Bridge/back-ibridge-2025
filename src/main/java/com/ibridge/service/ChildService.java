@@ -41,7 +41,7 @@ public class ChildService {
 
     public ChildResponseDTO.getPredesignedQuestionDTO getPredesignedQuestion(Long childId) {
         List<Subject> todaySubject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
-        List<Question> questions = todaySubject.get(0).getQuestions();
+        List<Question> questions = questionRepository.findAllBySubject(todaySubject.get(0));
         Question question = questions.get(questions.size() - 1);
 
         return ChildResponseDTO.getPredesignedQuestionDTO.builder()
@@ -55,7 +55,7 @@ public class ChildService {
             for(int i = 1; i < todaySubject.size(); i++) {
                 Subject subject = todaySubject.get(i);
                 if (!subject.isAnswer()) {
-                    List<Question> tempQuestions = subject.getQuestions();
+                    List<Question> tempQuestions = questionRepository.findAllBySubject(subject);
                     questionRepository.delete(tempQuestions.get(tempQuestions.size() - 1));
 
                     if(tempQuestions.size() == 1) {
