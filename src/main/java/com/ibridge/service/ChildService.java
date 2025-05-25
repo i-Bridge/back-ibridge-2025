@@ -41,8 +41,11 @@ public class ChildService {
 
     public ChildResponseDTO.getPredesignedQuestionDTO getPredesignedQuestion(Long childId) {
         List<Subject> todaySubject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
+        List<Question> questions = todaySubject.get(0).getQuestions();
+        Question question = questions.get(questions.size() - 1);
+
         return ChildResponseDTO.getPredesignedQuestionDTO.builder()
-                .question(todaySubject.get(0).getTitle())
+                .question(question.getText())
                 .subjectId(todaySubject.get(0).getId()).build();
     }
 
@@ -96,7 +99,7 @@ public class ChildService {
         else {
             String record = "";
             for(Question question : questions) {
-                record += question + "\n" + analysisRepository.findByQuestionId(question.getId()).get().getAnswer() + "\n";
+                record += question.getText() + "\n" + analysisRepository.findByQuestionId(question.getId()).get().getAnswer() + "\n";
             }
             String ai = gptService.askGpt(record);
             Question question = Question.builder()
