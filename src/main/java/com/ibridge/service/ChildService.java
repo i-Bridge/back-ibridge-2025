@@ -91,7 +91,11 @@ public class ChildService {
                     .isFinished(true).build();
         }
         else {
-            String ai = gptService.askGpt(request.getText());
+            String record = "";
+            for(Question question : questions) {
+                record += question + "\n" + analysisRepository.findByQuestionId(question.getId()).get().getAnswer() + "\n";
+            }
+            String ai = gptService.askGpt(record);
             Question question = Question.builder()
                     .text(ai)
                     .subject(targetSubject)
