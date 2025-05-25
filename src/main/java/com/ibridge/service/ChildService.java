@@ -104,13 +104,13 @@ public class ChildService {
         }
     }
 
-    //s3 저장 경로 양식 : {childId}/{analysisId}/{yyyymmdd_hhmmss}.webm / {childId}/{analysisId}/{yyyymmdd_hhmmss}.jpeg
+    //s3 저장 경로 양식 : {childId}/{subjectId}/{yyyymmdd_hhmmss}.webm / {childId}/{subjectId}/{yyyymmdd_hhmmss}.jpeg
     public ChildResponseDTO.getPresignedURLDTO getPresignedURL(Long childId, ChildRequestDTO.GetPresignedURLDTO request) {
         LocalDateTime sended = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
         String formattedSended = sended.format(formatter);
         String contentType = "";
-        String objectKey = childId + "/" + request.getId() + "/" + formattedSended;
+        String objectKey = childId + "/" + request.getSubjectId() + "/" + formattedSended;
 
         if(request.getType().equals("video")) {
             contentType = "video/webm";

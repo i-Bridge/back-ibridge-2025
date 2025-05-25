@@ -21,7 +21,7 @@ public class ChildRequestDTO {
     @NoArgsConstructor
     public static class GetPresignedURLDTO {
         String type;
-        Long id;
+        Long subjectId;
     }
 
     @Data
