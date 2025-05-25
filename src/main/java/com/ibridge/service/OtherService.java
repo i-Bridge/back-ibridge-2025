@@ -43,9 +43,10 @@ public class OtherService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        int id = random.nextInt(subjects.size());
-        String randomQuestion = subjects.get(id);
         for (Child child : children) {
+            int id = random.nextInt(subjects.size());
+            String randomQuestion = subjects.get(id);
+
             Subject todaySubject = Subject.builder()
                     .title(randomQuestion)
                     .child(child)
@@ -57,8 +58,6 @@ public class OtherService {
                     .subject(todaySubject)
                     .text(randomQuestion).build();
             questionRepository.save(question);
-
-            questionService.rerollQuestion(child.getId(), LocalDate.now());
         }
     }
 }
