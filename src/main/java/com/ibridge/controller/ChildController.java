@@ -43,7 +43,7 @@ public class ChildController {
         return ApiResponse.onSuccess(data);
     }
 
-    @GetMapping("/{childId}/getURL")
+    @PostMapping("/{childId}/getURL")
     public ApiResponse<ChildResponseDTO.getPresignedURLDTO> getVideoPresignedURL(@PathVariable Long childId, @RequestBody ChildRequestDTO.GetPresignedURLDTO request) {
         ChildResponseDTO.getPresignedURLDTO data = childService.getPresignedURL(childId, request);
         return ApiResponse.onSuccess(data);
