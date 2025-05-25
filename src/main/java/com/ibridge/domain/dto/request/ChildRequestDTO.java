@@ -33,4 +33,12 @@ public class ChildRequestDTO {
         String image;
         String video;
     }
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class FinishedDTO {
+        Long subjectId;
+    }
 }

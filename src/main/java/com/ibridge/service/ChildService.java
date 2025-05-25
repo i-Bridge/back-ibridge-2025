@@ -155,4 +155,20 @@ public class ChildService {
             }
         }
     }
+
+    public void answerFinished(ChildRequestDTO.FinishedDTO request) {
+        Subject subject = subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject " + request.getSubjectId() + " Not Found "));
+        List<Question> questions = questionRepository.findAllBySubject(subject);
+
+        if(questions.size() == 1) {
+            questionRepository.delete(questions.get(0));
+            subjectRepository.delete(subject);
+            return;
+        }
+        questionRepository.delete(questions.get(questions.size() - 1));
+        subject.setAnswer(true);
+        subjectRepository.save(subject);
+
+        return;
+    }
 }
