@@ -26,7 +26,7 @@ public class GptService {
                     .put("content", "이때까지 대화내용 : " + question + "\n마지막 답변에 대한 질문을 만들어서 질문 내용만 보내줘");
 
             JSONObject body = new JSONObject()
-                    .put("model", "gpt-4.0-turbo")
+                    .put("model", "gpt-4-turbo")
                     .put("messages", List.of(message));
 
             RequestBody requestBody = RequestBody.create(
