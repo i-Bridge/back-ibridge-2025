@@ -29,7 +29,7 @@ public class ChildRequestDTO {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class UploadedDTO {
-        Long id;
+        Long subjectId;
         String image;
         String video;
     }

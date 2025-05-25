@@ -126,10 +126,16 @@ public class ChildService {
     }
 
     public void uploaded(ChildRequestDTO.UploadedDTO request) {
-        Analysis analysis = analysisRepository.findByQuestionId(request.getId()).orElseThrow(() -> new RuntimeException("해당하는 Id가 없습니다"));
-        analysis.setVideo(request.getVideo());
-        analysis.setImage(request.getImage());
-        analysis.setUploaded(true);
-        analysisRepository.save(analysis);
+        List<Question> questions = questionRepository.findAllBySubject(subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject " + request.getSubjectId() + " Not Found ")));
+        for(Question question : questions) {
+            Analysis analysis = analysisRepository.findByQuestionId(question.getId()).orElseThrow(() -> new RuntimeException("Question " + question.getId() + " Not Found "));
+            if(!analysis.isUploaded()) {
+                analysis.setVideo(request.getVideo());
+                analysis.setImage(request.getImage());
+                analysis.setUploaded(true);
+                analysisRepository.save(analysis);
+                break;
+            }
+        }
     }
 }
