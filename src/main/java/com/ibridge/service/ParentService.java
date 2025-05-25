@@ -28,6 +28,8 @@ public class ParentService {
     private final NoticeRepository noticeRepository;
     private final ParentNoticeRepository parentNoticeRepository;
     private final SubjectRepository subjectRepository;
+    private final QuestionRepository questionRepository;
+    private final AnalysisRepository analysisRepository;
 
     public ParentHomeResponseDTO getParentHome(Long childId, LocalDate date, String email) {
         List<SubjectDTO> subjects = subjectRepository.findByChildIdAndDate(childId, date).stream()
@@ -142,9 +144,17 @@ public class ParentService {
 
     public void deleteChild(ParentRequestDTO.DeleteChildDTO request) {
         Child child = childRepository.findById(request.getChildId()).orElseThrow(() -> new RuntimeException("Child not found"));
-
+        List<Subject> subjectList = subjectRepository.findAllByChild(child);
+        for(Subject subject : subjectList) {
+            List<Question> questions = questionRepository.findAllBySubject(subject);
+            for(Question question : questions) {
+                Analysis analysis = analysisRepository.findByQuestionId(question.getId()).get();
+                analysisRepository.delete(analysis);
+                questionRepository.delete(question);
+            }
+            subjectRepository.delete(subject);
+        }
         childRepository.delete(child);
-        return;
     }
 
 

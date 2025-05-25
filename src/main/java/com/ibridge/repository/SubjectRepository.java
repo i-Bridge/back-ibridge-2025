@@ -1,5 +1,6 @@
 package com.ibridge.repository;
 
+import com.ibridge.domain.entity.Child;
 import com.ibridge.domain.entity.Subject;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,5 +14,7 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
     List<Subject> findByChildIdAndDate(Long childId, LocalDate date);
 
     Optional<Subject> findById(Long subjectId);
-    void deleteByChildIdAndDate(Long childId, LocalDate date);
+
+    @Query("SELECT s FROM Subject s WHERE s.child = :child")
+    List<Subject> findAllByChild(Child child);
 }
