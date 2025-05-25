@@ -48,14 +48,17 @@ public class ChildService {
 
     public ChildResponseDTO.getNewQuestionDTO getNewSubject(Long childId) {
         List<Subject> todaySubject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
+        if(todaySubject.size() > 1) {
+            for(int i = 1; i < todaySubject.size(); i++) {
+                Subject subject = todaySubject.get(i);
+                if (!subject.isAnswer()) {
+                    List<Question> tempQuestions = subject.getQuestions();
+                    questionRepository.delete(tempQuestions.get(tempQuestions.size() - 1));
 
-        for(Subject subject : todaySubject) {
-            if (!subject.isAnswer()) {
-                List<Question> tempQuestions = subject.getQuestions();
-                questionRepository.delete(tempQuestions.get(tempQuestions.size() - 1));
+                    subject.setAnswer(true);
+                    subjectRepository.save(subject);
+                }
             }
-            subject.setAnswer(true);
-            subjectRepository.save(subject);
         }
 
         Subject newSubject = Subject.builder()
