@@ -54,6 +54,8 @@ public class ChildService {
                 List<Question> tempQuestions = subject.getQuestions();
                 questionRepository.delete(tempQuestions.get(tempQuestions.size() - 1));
             }
+            subject.setAnswer(true);
+            subjectRepository.save(subject);
         }
 
         Subject newSubject = Subject.builder()
