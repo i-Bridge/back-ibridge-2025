@@ -58,8 +58,13 @@ public class ChildService {
                     List<Question> tempQuestions = subject.getQuestions();
                     questionRepository.delete(tempQuestions.get(tempQuestions.size() - 1));
 
-                    subject.setAnswer(true);
-                    subjectRepository.save(subject);
+                    if(tempQuestions.size() == 1) {
+                        subjectRepository.delete(subject);
+                    }
+                    else {
+                        subject.setAnswer(true);
+                        subjectRepository.save(subject);
+                    }
                 }
             }
         }
