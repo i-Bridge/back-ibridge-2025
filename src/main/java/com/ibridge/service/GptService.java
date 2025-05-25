@@ -23,7 +23,7 @@ public class GptService {
         try {
             JSONObject message = new JSONObject()
                     .put("role", "user")
-                    .put("content", "이때까지 대화내용 : " + question + "\n마지막 답변에 대한 질문을 어린 아이에게 말하듯이 만들어서 질문 내용만 보내줘");
+                    .put("content", "이때까지 대화내용 : " + question + "\n마지막 답변에 대한 질문을 어린 아이에게 말하듯이 존댓말을 사용하지 말고 만들어서 질문 내용만 보내줘");
 
             JSONObject body = new JSONObject()
                     .put("model", "gpt-4-turbo")
