@@ -78,6 +78,12 @@ public class ChildService {
 
         if(questions.size() == 5) {
             targetSubject.setAnswer(true);
+            String conv = "";
+            for(Question question : questions) {
+                conv += question.getText() + "\n" + analysisRepository.findByQuestionId(question.getId()).get().getAnswer() + "\n";
+            }
+            String summary = gptService.summarizeGPT(conv);
+            targetSubject.setTitle(summary);
             subjectRepository.save(targetSubject);
 
             return ChildResponseDTO.getAI.builder()
@@ -146,9 +152,15 @@ public class ChildService {
             return;
         }
         questionRepository.delete(questions.get(questions.size() - 1));
+        questions.remove(questions.size() - 1);
         subject.setAnswer(true);
-        subjectRepository.save(subject);
 
-        return;
+        String conv = "";
+        for(Question question : questions) {
+            conv += question.getText() + "\n" + analysisRepository.findByQuestionId(question.getId()).get().getAnswer() + "\n";
+        }
+        String summary = gptService.summarizeGPT(conv);
+        subject.setTitle(summary);
+        subjectRepository.save(subject);
     }
 }
