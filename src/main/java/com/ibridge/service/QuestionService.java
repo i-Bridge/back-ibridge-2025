@@ -12,7 +12,9 @@ import com.ibridge.repository.AnalysisRepository;
 import com.ibridge.repository.ChildRepository;
 import com.ibridge.repository.QuestionRepository;
 import com.ibridge.repository.SubjectRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,12 +36,21 @@ public class QuestionService {
     private final ChildRepository childRepository;
 
     public QuestionAnalysisDTO getQuestionAnalysis(Long childId, Long subjectId, LocalDate date) {
-        Subject subject = subjectRepository.findById(subjectId).get();
-        List<Question> questions = questionRepository.findBySubjectIdAndChildId(subjectId, childId);
+        Subject subject = subjectRepository.findById(subjectId)
+                .orElseThrow(() -> new EntityNotFoundException("Subject not found: " + subjectId));
+
+        if (!subject.getChild().getId().equals(childId)) {
+            throw new AccessDeniedException("Subject does not belong to the given child.");
+        }
+
+        List<Question> questions = subject.getQuestions();
         List<QuestionDTO> questionDTOs = new ArrayList<>();
-        for(Question q : questions) {
-            Analysis analysis = analysisRepository.findByQuestionId(q.getId()).get();
-            questionDTOs.add(new QuestionDTO(q.getId(), q.getText(), analysis.getVideo(), analysis.getAnswer()));
+
+        for (Question q : questions) {
+            Analysis analysis = q.getAnalysis(); // 직접 접근
+            String video = analysis != null ? analysis.getVideo() : null;
+            String answer = analysis != null ? analysis.getAnswer() : null;
+            questionDTOs.add(new QuestionDTO(q.getId(), q.getText(), video, answer));
         }
 
         return QuestionAnalysisDTO.builder()
@@ -47,6 +58,7 @@ public class QuestionService {
                 .questions(questionDTOs)
                 .build();
     }
+
 
     public QuestionDetailResponseDTO getQuestionDetail(Long childId, Long subjectId, Long questionId, LocalDate date) {
         Analysis analysis = analysisRepository.findByQuestionId(questionId)
