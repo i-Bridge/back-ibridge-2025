@@ -43,7 +43,7 @@ public class QuestionService {
             throw new AccessDeniedException("Subject does not belong to the given child.");
         }
 
-        List<Question> questions = subject.getQuestions();
+        List<Question> questions = questionRepository.findAllBySubject(subject);
         List<QuestionDTO> questionDTOs = new ArrayList<>();
 
         for (Question q : questions) {
