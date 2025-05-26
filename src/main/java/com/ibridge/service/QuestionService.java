@@ -47,10 +47,11 @@ public class QuestionService {
         List<QuestionDTO> questionDTOs = new ArrayList<>();
 
         for (Question q : questions) {
-            Analysis analysis = q.getAnalysis(); // 직접 접근
+            Analysis analysis = q.getAnalysis();
             String video = analysis != null ? analysis.getVideo() : null;
+            String image = analysis != null ? analysis.getImage() : null;
             String answer = analysis != null ? analysis.getAnswer() : null;
-            questionDTOs.add(new QuestionDTO(q.getId(), q.getText(), video, answer));
+            questionDTOs.add(new QuestionDTO(q.getId(), q.getText(), video, image, answer));
         }
 
         return QuestionAnalysisDTO.builder()
