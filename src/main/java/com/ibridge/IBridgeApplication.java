@@ -12,5 +12,4 @@ public class IBridgeApplication {
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
         SpringApplication.run(IBridgeApplication.class, args);
     }
-
 }

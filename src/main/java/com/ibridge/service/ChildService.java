@@ -51,29 +51,9 @@ public class ChildService {
 
     public ChildResponseDTO.getNewQuestionDTO getNewSubject(Long childId) {
         List<Subject> todaySubject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
-        boolean deleted = false;
-        if(todaySubject.size() > 1) {
-            for(int i = 1; i < todaySubject.size(); i++) {
-                Subject subject = todaySubject.get(i);
-                if (!subject.isAnswer()) {
-                    List<Question> tempQuestions = questionRepository.findAllBySubject(subject);
-                    questionRepository.delete(tempQuestions.get(tempQuestions.size() - 1));
-
-                    if(tempQuestions.size() == 1) {
-                        deleted = true;
-                        subjectRepository.delete(subject);
-                    }
-                    else {
-                        subject.setAnswer(true);
-                        subjectRepository.save(subject);
-                    }
-                }
-            }
-        }
-
         Subject newSubject = Subject.builder()
                 .child(childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + " Not Found ")))
-                .title("아이의 얘기 " + (deleted ? todaySubject.size() - 1 : todaySubject.size()))
+                .title("아이의 얘기 " + (todaySubject.size()))
                 .date(LocalDate.now())
                 .isAnswer(false).build();
         subjectRepository.save(newSubject);
