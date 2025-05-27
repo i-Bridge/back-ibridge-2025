@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import requests
 
 SERVER_URL = "http://localhost:8080/back/setSubject"
