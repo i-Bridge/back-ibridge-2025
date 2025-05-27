@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 import requests
 
@@ -23,4 +23,5 @@ if __name__ == "__main__":
             print(f"⚠️ Request failed with status code: {response.status_code}")
             print(f"Response body: {response.text}")
     else:
+>>>>>>> 3b2f20ff211228800efbfbebd43267f586677937
         print("❌ No response received.")
