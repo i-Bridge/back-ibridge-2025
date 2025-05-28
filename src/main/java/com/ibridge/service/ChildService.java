@@ -88,6 +88,7 @@ public class ChildService {
             subjectRepository.save(targetSubject);
 
             return ChildResponseDTO.getAI.builder()
+                    .ai(gptService.closingGPT(conv))
                     .isFinished(true).build();
         }
         else {
