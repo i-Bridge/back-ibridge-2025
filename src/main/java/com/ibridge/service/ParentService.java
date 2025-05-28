@@ -32,12 +32,14 @@ public class ParentService {
     private final AnalysisRepository analysisRepository;
 
     public ParentHomeResponseDTO getParentHome(Long childId, LocalDate date, String email) {
+        Child child = childRepository.findById(childId).orElse(null);
         List<SubjectDTO> subjects = subjectRepository.findByChildIdAndDate(childId, date).stream()
                 .map(subject -> new SubjectDTO(subject.getId(), subject.getTitle(), subject.isAnswer()))
                 .collect(Collectors.toList());
 
         return ParentHomeResponseDTO.builder()
                 .subjects(subjects)
+                .name(child.getName())
                 .build();
     }
 

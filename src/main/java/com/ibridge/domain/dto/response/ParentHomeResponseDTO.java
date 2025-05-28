@@ -10,4 +10,5 @@ import java.util.List;
 @Builder
 public class ParentHomeResponseDTO {
     private List<SubjectDTO> subjects;
+    private String name;
 }
