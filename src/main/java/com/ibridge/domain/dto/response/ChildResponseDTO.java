@@ -11,6 +11,7 @@ public class ChildResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class getQuestionDTO {
+        String name;
         boolean isCompleted;
     }
 
