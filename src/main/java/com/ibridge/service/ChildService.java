@@ -36,6 +36,7 @@ public class ChildService {
         boolean isCompleted = todaySubject.get(0).isAnswer();
 
         return ChildResponseDTO.getQuestionDTO.builder()
+                .name(childRepository.findById(childId).orElseThrow(() -> new RuntimeException(childId + "인 child가 없습니다.")).getName())
                 .isCompleted(isCompleted).build();
     }
 
