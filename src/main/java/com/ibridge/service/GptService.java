@@ -123,4 +123,63 @@ public class GptService {
         }
         return "GPT 응답 없음";
     }
+    public String closingGPT(String conversation) {
+        String prompt = """
+            너는 지금 3살부터 7살 사이의 어린이와 대화하고 있어. 아래는 너와 아이가 나눈 대화 내용이야.
+            아이의 말투, 감정 상태, 관심사, 성향(수줍음, 활발함 등)을 고려해서, 대화가 끝났다는 느낌을 줄 수 있는 따뜻한 마무리 멘트를 한두 문장으로 만들어줘.
+
+            조건은 다음과 같아:
+            - 아이가 위로받고 있다고 느낄 수 있도록 다정한 말투로 말해줘.
+            - 아이가 말한 내용에서 흥미로웠던 부분을 짧게 언급해줘.
+            - 다음에 또 이야기하고 싶게 만드는 마무리를 해줘.
+            - 말투는 아이 눈높이에 맞게 쉽고 친근하게 해줘. 예를 들어 "~했구나!", "~해서 즐거웠겠다!", "다음에 또 얘기해 줄래?" 같은 말투.
+            - 출력은 마무리 멘트만 해줘.
+
+            [대화 내용 시작]
+            %s
+            [대화 내용 끝]
+            """.formatted(conversation);
+        try {
+            JSONObject message = new JSONObject()
+                    .put("role", "user")
+                    .put("content", prompt);
+
+            JSONObject body = new JSONObject()
+                    .put("model", "gpt-4-turbo")
+                    .put("messages", List.of(message));
+
+            RequestBody requestBody = RequestBody.create(
+                    body.toString(),
+                    MediaType.parse("application/json")
+            );
+
+            Request request = new Request.Builder()
+                    .url(API_URL)
+                    .addHeader("Authorization", "Bearer " + OPENAI_API_KEY)
+                    .addHeader("Content-Type", "application/json")
+                    .post(requestBody)
+                    .build();
+
+            try (Response response = client.newCall(request).execute()) {
+                if (response.body() != null) {
+                    String responseBody = response.body().string();
+                    JSONObject jsonResponse = new JSONObject(responseBody);
+
+                    if (jsonResponse.has("choices")) {
+                        return jsonResponse
+                                .getJSONArray("choices")
+                                .getJSONObject(0)
+                                .getJSONObject("message")
+                                .getString("content")
+                                .trim();
+                    } else {
+                        return "OpenAI API 오류 응답: " + responseBody;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            return "GPT 응답 중 오류 발생: " + e.getMessage();
+        }
+        return "GPT 응답 없음";
+    }
 }
