@@ -2,18 +2,14 @@ package com.ibridge.service;
 
 import com.ibridge.domain.dto.request.ChildRequestDTO;
 import com.ibridge.domain.dto.response.ChildResponseDTO;
-import com.ibridge.domain.entity.Analysis;
-import com.ibridge.domain.entity.Child;
-import com.ibridge.domain.entity.Question;
-import com.ibridge.domain.entity.Subject;
-import com.ibridge.repository.AnalysisRepository;
-import com.ibridge.repository.ChildRepository;
-import com.ibridge.repository.QuestionRepository;
-import com.ibridge.repository.SubjectRepository;
+import com.ibridge.domain.entity.*;
+import com.ibridge.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -30,6 +26,9 @@ public class ChildService {
     private final SubjectRepository subjectRepository;
     private final S3Service s3Service;
     private final GptService gptService;
+    private final ParentRepository parentRepository;
+    private final NoticeRepository noticeRepository;
+    private final ParentNoticeRepository parentNoticeRepository;
 
     public ChildResponseDTO.getQuestionDTO getHome(Long childId) {
         List<Subject> todaySubject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
@@ -86,6 +85,8 @@ public class ChildService {
             String summary = gptService.summarizeGPT(conv);
             targetSubject.setTitle(summary);
             subjectRepository.save(targetSubject);
+
+            makeNotice(targetSubject);
 
             return ChildResponseDTO.getAI.builder()
                     .ai(gptService.closingGPT(conv))
@@ -164,5 +165,27 @@ public class ChildService {
         String summary = gptService.summarizeGPT(conv);
         subject.setTitle(summary);
         subjectRepository.save(subject);
+
+        makeNotice(subject);
+    }
+
+    private void makeNotice(Subject subject) {
+        Child child = subject.getChild();
+        Family family = child.getFamily();
+        List<Parent> parents = parentRepository.findAllByFamily(family);
+
+        Notice notice = Notice.builder()
+                .type(1).build();
+        notice = noticeRepository.save(notice);
+
+        for(Parent parent : parents) {
+            ParentNotice parentNotice = ParentNotice.builder()
+                    .notice(notice)
+                    .isRead(false)
+                    .receiver(parent)
+                    .send_at(Timestamp.valueOf((LocalDateTime.now())))
+                    .build();
+            parentNoticeRepository.save(parentNotice);
+        }
     }
 }
