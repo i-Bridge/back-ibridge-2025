@@ -31,6 +31,7 @@ public class TokenValidationInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
         String authHeader = request.getHeader("Authorization");
+        System.out.println("Interceptor called: " + request.getRequestURL());
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
