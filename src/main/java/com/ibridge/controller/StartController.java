@@ -46,6 +46,12 @@ public class StartController {
         startService.registerNewChildren(request, email);
         return ApiResponse.onSuccess(null);
     }
+    @PostMapping("/signup/undo")
+    public ApiResponse<?> undoRequest(HttpServletRequest r) {
+        String email = (String) r.getAttribute("email");
+        startService.undoRequest(email);
+        return ApiResponse.onSuccess(null);
+    }
 
     @GetMapping("/login")
     public ApiResponse<StartUserSelectionResponseDTO> getUserSelection(HttpServletRequest r) {
