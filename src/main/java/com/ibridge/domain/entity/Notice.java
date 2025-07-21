@@ -22,6 +22,7 @@ public class Notice {
     @Column(nullable = false)
     Integer type;
 
-    @OneToMany
-    List<ParentNotice> parentNotices;
+    @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ParentNotice> parentNotices;
+
 }

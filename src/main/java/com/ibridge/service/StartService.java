@@ -191,12 +191,16 @@ public class StartService {
 
     public void undoRequest(String email) {
         Parent parent = parentRepository.findParentByEmail(email);
-        List<ParentNotice> parentNotice = parentNoticeRepository.findAllByParent(parent);
-        List<Notice> notice = new ArrayList<>();
-        for(ParentNotice pn : parentNotice){
-            notice.add(pn.getNotice());
-        }
-        parentNoticeRepository.deleteAll(parentNotice);
-        noticeRepository.deleteAll(notice);
+
+        List<ParentNotice> parentNotices = parentNoticeRepository.findAllByReceiver(parent);
+
+        Set<Notice> noticesToDelete = parentNotices.stream()
+                .map(ParentNotice::getNotice)
+                .collect(Collectors.toSet());
+
+        parentNoticeRepository.deleteAll(parentNotices);
+
+        noticeRepository.deleteAll(noticesToDelete);
     }
+
 }

@@ -29,6 +29,6 @@ public class Parent {
     @JoinColumn(name = "family")
     private Family family;
 
-    @OneToMany
-    List<ParentNotice> parentNotices;
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ParentNotice> parentNotices;
 }

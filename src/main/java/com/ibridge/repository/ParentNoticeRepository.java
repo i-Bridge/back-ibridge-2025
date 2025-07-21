@@ -29,4 +29,5 @@ public interface ParentNoticeRepository extends JpaRepository<ParentNotice, Long
     int CountByNotice(@Param("notice") Notice notice);
     @Query("SELECT p from ParentNotice p where p.sender = :sender and p.notice.type = 2")
     Optional<ParentNotice> findBySenderAndType(Parent sender);
+    List<ParentNotice> findAllByReceiver(Parent receiver);
 }
