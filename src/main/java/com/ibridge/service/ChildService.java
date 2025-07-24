@@ -68,6 +68,7 @@ public class ChildService {
     }
 
     public ChildResponseDTO.getAI getNextQuestion(ChildRequestDTO.AnswerDTO request) {
+        System.out.println("Requesting Next Question: " + request.getText());
         Subject targetSubject = subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject " + request.getSubjectId() + " Not Found "));
         List<Question> questions = questionRepository.findAllBySubject(targetSubject);
         Analysis analysis = Analysis.builder()
@@ -75,8 +76,10 @@ public class ChildService {
                 .answer(request.getText())
                 .uploaded(false).build();
         analysisRepository.save(analysis);
+        System.out.println("Analysis Saved: " + analysis.getId());
 
         if(questions.size() == 5) {
+            System.out.println("Completely Finished with " + questions.get(questions.size()- 1).getId());
             targetSubject.setAnswer(true);
             String conv = "";
             for(Question question : questions) {
@@ -104,6 +107,8 @@ public class ChildService {
                     .build();
             questionRepository.save(question);
 
+            System.out.println("New Question: " + question.getId() + " / " + question.getText());
+
             return ChildResponseDTO.getAI.builder()
                     .isFinished(false)
                     .ai(ai).build();
@@ -112,6 +117,7 @@ public class ChildService {
 
     //s3 저장 경로 양식 : {childId}/{subjectId}/{yyyymmdd_hhmmss}.webm / {childId}/{subjectId}/{yyyymmdd_hhmmss}.jpeg
     public ChildResponseDTO.getPresignedURLDTO getPresignedURL(Long childId, ChildRequestDTO.GetPresignedURLDTO request) {
+        System.out.println("Requesting PresignedURL: " + request.getSubjectId());
         LocalDateTime sended = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
         String formattedSended = sended.format(formatter);
@@ -132,6 +138,7 @@ public class ChildService {
     }
 
     public void uploaded(ChildRequestDTO.UploadedDTO request) {
+        System.out.println("Video Uploaded" + request.getSubjectId());
         List<Question> questions = questionRepository.findAllBySubject(subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject " + request.getSubjectId() + " Not Found ")));
         for(Question question : questions) {
             Analysis analysis = analysisRepository.findByQuestionId(question.getId()).orElseThrow(() -> new RuntimeException("Question " + question.getId() + " Not Found "));
@@ -146,10 +153,12 @@ public class ChildService {
     }
 
     public void answerFinished(ChildRequestDTO.FinishedDTO request) {
+        System.out.println("Requesting answer is finished in mid: " + request.getSubjectId());
         Subject subject = subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject " + request.getSubjectId() + " Not Found "));
         List<Question> questions = questionRepository.findAllBySubject(subject);
 
         if(questions.size() == 1) {
+            System.out.println("questions' size == 1, deleted");
             questionRepository.delete(questions.get(0));
             subjectRepository.delete(subject);
             return;
@@ -158,6 +167,7 @@ public class ChildService {
         questions.remove(questions.size() - 1);
         subject.setAnswer(true);
 
+        System.out.println("Questions' Size: " + questions.size());
         String conv = "";
         for(Question question : questions) {
             conv += question.getText() + "\n" + analysisRepository.findByQuestionId(question.getId()).get().getAnswer() + "\n";
