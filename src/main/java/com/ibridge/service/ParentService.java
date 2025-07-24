@@ -11,11 +11,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +31,7 @@ public class ParentService {
     private final FamilyRepository famliyRepository;
     private final NoticeRepository noticeRepository;
     private final ParentNoticeRepository parentNoticeRepository;
+    private final Random random = new Random();
     private final SubjectRepository subjectRepository;
     private final QuestionRepository questionRepository;
     private final AnalysisRepository analysisRepository;
@@ -128,6 +133,36 @@ public class ParentService {
                 .name(request.getName())
                 .birth(LocalDate.parse(request.getBirthday()))
                 .gender(Gender.values()[request.getGender()]).build();
+
+        List<String> subjects = new ArrayList<>();
+        try (InputStream inputStream = QuestionService.class.getClassLoader().getResourceAsStream("SubjectList.txt")) {
+            if (inputStream == null) {
+                System.out.println("파일을 찾을 수 없습니다.");
+                throw new RuntimeException();
+            }
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                subjects.add(line);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        int id = random.nextInt(subjects.size());
+        String randomQuestion = subjects.get(id);
+
+        Subject todaySubject = Subject.builder()
+                .title(randomQuestion)
+                .child(child)
+                .date(LocalDate.now())
+                .isAnswer(false).build();
+        subjectRepository.save(todaySubject);
+
+        Question question = Question.builder()
+                .subject(todaySubject)
+                .text(randomQuestion).build();
+        questionRepository.save(question);
 
         return ParentResponseDTO.ChildIdDTO.builder()
                 .childId(childRepository.save(child).getId()).build();
