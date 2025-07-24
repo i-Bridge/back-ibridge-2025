@@ -201,7 +201,7 @@ public class StartService {
 
         System.out.println("Parent 조회 완료 - id: " + parent.getId());
 
-        List<ParentNotice> parentNotices = parentNoticeRepository.findAllByReceiver(parent);
+        List<ParentNotice> parentNotices = parentNoticeRepository.findAllBySender(parent);
         System.out.println("조회된 ParentNotice 수: " + parentNotices.size());
 
         Set<Notice> noticesToDelete = parentNotices.stream()
