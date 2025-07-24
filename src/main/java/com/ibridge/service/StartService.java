@@ -191,35 +191,16 @@ public class StartService {
 
     @Transactional
     public void undoRequest(String email) {
-        System.out.println("undoRequest 시작 - email: " + email);
-
         Parent parent = parentRepository.findParentByEmail(email);
-        if (parent == null) {
-            System.out.println("Parent 조회 실패 - email: " + email);
-            return;
-        }
-
-        System.out.println("Parent 조회 완료 - id: " + parent.getId());
 
         List<ParentNotice> parentNotices = parentNoticeRepository.findAllBySender(parent);
-        System.out.println("조회된 ParentNotice 수: " + parentNotices.size());
 
         Set<Notice> noticesToDelete = parentNotices.stream()
                 .map(ParentNotice::getNotice)
                 .collect(Collectors.toSet());
-
-        System.out.println("삭제할 Notice 수: " + noticesToDelete.size());
-        for (Notice notice : noticesToDelete) {
-            System.out.println("삭제 예정 Notice ID: " + notice.getId());
-        }
-
         parentNoticeRepository.deleteAll(parentNotices);
-        System.out.println("parentNoticeRepository.deleteAll() 호출 완료");
 
         noticeRepository.deleteAll(noticesToDelete);
-        System.out.println("noticeRepository.deleteAll() 호출 완료");
-
-        System.out.println("undoRequest 종료");
     }
 
 
