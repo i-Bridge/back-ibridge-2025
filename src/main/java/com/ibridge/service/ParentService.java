@@ -8,6 +8,7 @@ import com.ibridge.domain.dto.SubjectDTO;
 import com.ibridge.domain.entity.*;
 import com.ibridge.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +30,6 @@ public class ParentService {
     private final ParentRepository parentRepository;
     private final ChildRepository childRepository;
     private final FamilyRepository famliyRepository;
-    private final NoticeRepository noticeRepository;
     private final ParentNoticeRepository parentNoticeRepository;
     private final Random random = new Random();
     private final SubjectRepository subjectRepository;
@@ -202,25 +202,18 @@ public class ParentService {
 
         List<ParentResponseDTO.NoticeDTO> noticeDTOList = new ArrayList<>();
         List<ParentNotice> noticesForParent = parentNoticeRepository.findAllByParent(parent);
-        for(ParentNotice parentNotice : noticesForParent) {
-            Notice notice = parentNotice.getNotice();
 
-            if((notice.getType() == 1 || notice.getType() == 3) && parentNotice.isRead()) {
-                parentNoticeRepository.delete(parentNotice);
-                if(parentNoticeRepository.CountByNotice(notice) == 0) noticeRepository.delete(notice);
-            }
-            else {
-                parentNotice.setRead(true);
-                parentNoticeRepository.save(parentNotice);
+        for(ParentNotice notice : noticesForParent) {
+            notice.setRead(true);
+            parentNoticeRepository.save(notice);
 
-                ParentResponseDTO.NoticeDTO tempDTO = ParentResponseDTO.NoticeDTO.builder()
-                        .senderId(parentNotice.getSender().getId())
-                        .type(notice.getType())
-                        .isAccept(parentNotice.isAccept())
-                        .senderName(parentNotice.getSender().getName())
-                        .noticeId(notice.getId()).build();
-                noticeDTOList.add(tempDTO);
-            }
+            noticeDTOList.add(ParentResponseDTO.NoticeDTO.builder()
+                    .noticeId(notice.getId())
+                    .senderId(notice.getChild() == null? notice.getSender().getId() : notice.getChild().getId())
+                    .type(notice.getType())
+                    .time(notice.getSend_at().toString())
+                    .isAccept(notice.isAccept()).build()
+            );
         }
 
         return ParentResponseDTO.NoticeCheckDTO.builder().notices(noticeDTOList).build();
@@ -235,7 +228,7 @@ public class ParentService {
         requested.setAccept(true);
         parentNoticeRepository.save(requested);
         parentNoticeRepository.delete(requested);
-        List<ParentNotice> otherRequested = parentNoticeRepository.findAllReceiverByNotice(requested.getNotice());
+        List<ParentNotice> otherRequested = parentNoticeRepository.findAllReceiverBySender(requester);
         for(ParentNotice otherRequest : otherRequested) {
             otherRequest.setAccept(true);
             parentNoticeRepository.save(otherRequest);
@@ -243,8 +236,12 @@ public class ParentService {
         }
 
         requester.setFamily(family);
-        noticeRepository.delete(requested.getNotice());
         parentRepository.save(requester);
+    }
+
+    public void deleteNotice(Long parentId, ParentRequestDTO.DeleteNoticeDTO request) {
+        ParentNotice target = parentNoticeRepository.findById(request.getNoticeId()).get();
+        parentNoticeRepository.delete(target);
     }
 
     public void declineParentintoFamily(Long parentId, ParentRequestDTO.getParentintoFamilyDTO request) {

@@ -5,7 +5,6 @@ import com.ibridge.domain.dto.response.ChildResponseDTO;
 import com.ibridge.domain.entity.*;
 import com.ibridge.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +13,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +25,6 @@ public class ChildService {
     private final S3Service s3Service;
     private final GptService gptService;
     private final ParentRepository parentRepository;
-    private final NoticeRepository noticeRepository;
     private final ParentNoticeRepository parentNoticeRepository;
 
     public ChildResponseDTO.getQuestionDTO getHome(Long childId) {
@@ -184,18 +181,15 @@ public class ChildService {
         Family family = child.getFamily();
         List<Parent> parents = parentRepository.findAllByFamily(family);
 
-        Notice notice = Notice.builder()
-                .type(1).build();
-        notice = noticeRepository.save(notice);
-
-        for(Parent parent : parents) {
-            ParentNotice parentNotice = ParentNotice.builder()
-                    .notice(notice)
-                    .isRead(false)
+        for(Parent parent: parents) {
+            ParentNotice p = ParentNotice.builder()
+                    .child(child)
+                    .send_at(Timestamp.valueOf(LocalDateTime.now()))
+                    .type(1)
                     .receiver(parent)
-                    .send_at(Timestamp.valueOf((LocalDateTime.now())))
+                    .isRead(false)
                     .build();
-            parentNoticeRepository.save(parentNotice);
+            parentNoticeRepository.save(p);
         }
     }
 }

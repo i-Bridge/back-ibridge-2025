@@ -68,5 +68,4 @@ public class ParentRequestDTO {
     public static class editFamilyNameDTO {
         String familyName;
     }
-
 }

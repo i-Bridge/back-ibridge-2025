@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 public class StartService {
     private final ParentRepository parentRepository;
     private final FamilyRepository familyRepository;
-    private final NoticeRepository noticeRepository;
     private final ChildRepository childRepository;
     private final ParentNoticeRepository parentNoticeRepository;
     private final SubjectRepository subjectRepository;

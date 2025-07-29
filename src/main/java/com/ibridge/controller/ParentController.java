@@ -154,6 +154,14 @@ public class ParentController {
         return ApiResponse.onSuccess(null);
     }
 
+    @DeleteMapping("/notice/delete")
+    public ApiResponse deleteNotice(HttpServletRequest r, @RequestBody ParentRequestDTO.DeleteNoticeDTO request) {
+        Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
+
+        parentService.deleteNotice(parentId, request);
+        return ApiResponse.onSuccess(null);
+    }
+
     @PostMapping("/notice/decline")
     public ApiResponse declineParentintoFamily(HttpServletRequest r, @RequestBody ParentRequestDTO.getParentintoFamilyDTO request) {
         Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
