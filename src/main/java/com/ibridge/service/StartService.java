@@ -191,12 +191,7 @@ public class StartService {
 
         List<ParentNotice> parentNotices = parentNoticeRepository.findAllBySender(parent);
 
-        Set<Notice> noticesToDelete = parentNotices.stream()
-                .map(ParentNotice::getNotice)
-                .collect(Collectors.toSet());
         parentNoticeRepository.deleteAll(parentNotices);
-
-        noticeRepository.deleteAll(noticesToDelete);
     }
 
 
