@@ -53,10 +53,6 @@ public class StartService {
         if (familyOptional.isPresent()) {
             Family family = familyOptional.get();
 
-            Notice notice = Notice.builder()
-                    .type(2) //초대 알림 타입 2
-                    .build();
-            noticeRepository.save(notice);
             for (Parent p : family.getParents()) {
                 ParentNotice parentNotice = ParentNotice.builder()
                         .isAccept(false) // 기본값 미수락
@@ -64,7 +60,7 @@ public class StartService {
                         .send_at(new Timestamp(System.currentTimeMillis()))
                         .receiver(p)
                         .sender(parent)
-                        .notice(notice)
+                        .type(2)
                         .build();
 
                 parentNoticeRepository.save(parentNotice);
