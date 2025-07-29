@@ -29,6 +29,9 @@ public class ParentNotice {
     boolean isRead;
 
     @Column(nullable = false)
+    Integer type;
+
+    @Column(nullable = false)
     Timestamp send_at;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -38,5 +41,5 @@ public class ParentNotice {
     Parent sender;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    Notice notice;
+    Child child;
 }
