@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -30,5 +28,5 @@ public class Parent {
     private Family family;
 
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ParentNotice> parentNotices;
+    private List<Notice> parentNotices;
 }
