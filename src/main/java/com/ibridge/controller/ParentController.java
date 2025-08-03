@@ -45,10 +45,11 @@ public class ParentController {
     }
 
     @GetMapping("/{childId}/{subjectId}")
-    public ApiResponse<QuestionAnalysisDTO> getAnalysis(
+    public ApiResponse<QuestionAnalysisDTO> getAnalysis(HttpServletRequest r,
             @PathVariable Long childId,
             @PathVariable Long subjectId) {
-        QuestionAnalysisDTO response = questionService.getQuestionAnalysis(childId, subjectId);
+        String email = (String) r.getAttribute("email");
+        QuestionAnalysisDTO response = questionService.getQuestionAnalysis(loginService.getParentFromHeader(email), childId, subjectId);
         return ApiResponse.onSuccess(response);
     }
 
@@ -150,14 +151,6 @@ public class ParentController {
         Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
 
         parentService.addParentintoFamily(parentId, request);
-        return ApiResponse.onSuccess(null);
-    }
-
-    @DeleteMapping("/notice/delete")
-    public ApiResponse deleteNotice(HttpServletRequest r, @RequestBody ParentRequestDTO.DeleteNoticeDTO request) {
-        Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
-
-        parentService.deleteNotice(parentId, request);
         return ApiResponse.onSuccess(null);
     }
 

@@ -5,13 +5,8 @@ import com.ibridge.domain.dto.QuestionDTO;
 import com.ibridge.domain.dto.SubjectDTO;
 import com.ibridge.domain.dto.request.EditQuestionRequestDTO;
 import com.ibridge.domain.dto.response.*;
-import com.ibridge.domain.entity.Analysis;
-import com.ibridge.domain.entity.Question;
-import com.ibridge.domain.entity.Subject;
-import com.ibridge.repository.AnalysisRepository;
-import com.ibridge.repository.ChildRepository;
-import com.ibridge.repository.QuestionRepository;
-import com.ibridge.repository.SubjectRepository;
+import com.ibridge.domain.entity.*;
+import com.ibridge.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -31,11 +26,12 @@ import java.util.*;
 public class QuestionService {
     private final QuestionRepository questionRepository;
     private final SubjectRepository subjectRepository;
+    private final NoticeRepository noticeRepository;
     private final AnalysisRepository analysisRepository;
     private final Random random = new Random();
     private final ChildRepository childRepository;
 
-    public QuestionAnalysisDTO getQuestionAnalysis(Long childId, Long subjectId) {
+    public QuestionAnalysisDTO getQuestionAnalysis(Parent parent, Long childId, Long subjectId) {
         Subject subject = subjectRepository.findById(subjectId)
                 .orElseThrow(() -> new EntityNotFoundException("Subject not found: " + subjectId));
 
@@ -45,7 +41,8 @@ public class QuestionService {
 
         List<Question> questions = questionRepository.findAllBySubject(subject);
         List<QuestionDTO> questionDTOs = new ArrayList<>();
-
+        Notice notice = noticeRepository.findBySubjectAndReceiver(subject, parent);
+        noticeRepository.delete(notice);
         for (Question q : questions) {
             Analysis analysis = q.getAnalysis();
             String video = analysis != null ? analysis.getVideo() : null;
