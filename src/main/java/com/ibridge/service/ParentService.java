@@ -212,8 +212,9 @@ public class ParentService {
                     .senderId(notice.getChild() == null? notice.getSender().getId() : notice.getChild().getId())
                     .type(notice.getType())
                     .time(notice.getSend_at().toString())
-                    .subject(notice.getSubject() == null? notice.getSubject().getTitle().toString() : null)
-                    .isAccept(notice.isAccept()).build()
+                    .subject(notice.getSubject() == null? notice.getSubject().getId() : null)
+                    .isAccept(notice.isAccept())
+                    .senderName(notice.getChild() == null? notice.getSender().getName() : notice.getChild().getName()).build()
             );
         }
 
