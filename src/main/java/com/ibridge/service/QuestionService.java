@@ -35,7 +35,7 @@ public class QuestionService {
     private final Random random = new Random();
     private final ChildRepository childRepository;
 
-    public QuestionAnalysisDTO getQuestionAnalysis(Long childId, Long subjectId, LocalDate date) {
+    public QuestionAnalysisDTO getQuestionAnalysis(Long childId, Long subjectId) {
         Subject subject = subjectRepository.findById(subjectId)
                 .orElseThrow(() -> new EntityNotFoundException("Subject not found: " + subjectId));
 

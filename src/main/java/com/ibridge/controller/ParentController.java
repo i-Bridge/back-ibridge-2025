@@ -47,9 +47,8 @@ public class ParentController {
     @GetMapping("/{childId}/{subjectId}")
     public ApiResponse<QuestionAnalysisDTO> getAnalysis(
             @PathVariable Long childId,
-            @PathVariable Long subjectId,
-            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        QuestionAnalysisDTO response = questionService.getQuestionAnalysis(childId, subjectId, date);
+            @PathVariable Long subjectId) {
+        QuestionAnalysisDTO response = questionService.getQuestionAnalysis(childId, subjectId);
         return ApiResponse.onSuccess(response);
     }
 
