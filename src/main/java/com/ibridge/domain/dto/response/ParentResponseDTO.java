@@ -92,6 +92,7 @@ public class ParentResponseDTO {
         String senderName;
         String time;
         boolean isAccept;
+        String subject;
     }
 
 

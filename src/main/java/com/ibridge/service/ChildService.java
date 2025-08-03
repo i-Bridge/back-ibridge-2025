@@ -25,7 +25,7 @@ public class ChildService {
     private final S3Service s3Service;
     private final GptService gptService;
     private final ParentRepository parentRepository;
-    private final ParentNoticeRepository parentNoticeRepository;
+    private final NoticeRepository NoticeRepository;
 
     public ChildResponseDTO.getQuestionDTO getHome(Long childId) {
         List<Subject> todaySubject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
@@ -182,14 +182,15 @@ public class ChildService {
         List<Parent> parents = parentRepository.findAllByFamily(family);
 
         for(Parent parent: parents) {
-            ParentNotice p = ParentNotice.builder()
+            Notice p = Notice.builder()
                     .child(child)
                     .send_at(Timestamp.valueOf(LocalDateTime.now()))
                     .type(1)
                     .receiver(parent)
                     .isRead(false)
+                    .subject(subject)
                     .build();
-            parentNoticeRepository.save(p);
+            NoticeRepository.save(p);
         }
     }
 }

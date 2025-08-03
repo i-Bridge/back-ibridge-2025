@@ -8,14 +8,13 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.sql.Timestamp;
-import java.util.Date;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ParentNotice {
+public class Notice {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
@@ -42,4 +41,7 @@ public class ParentNotice {
 
     @ManyToOne(fetch = FetchType.LAZY)
     Child child;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    Subject subject;
 }

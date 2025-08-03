@@ -15,7 +15,6 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.sql.Array;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.*;
@@ -28,7 +27,7 @@ public class StartService {
     private final ParentRepository parentRepository;
     private final FamilyRepository familyRepository;
     private final ChildRepository childRepository;
-    private final ParentNoticeRepository parentNoticeRepository;
+    private final NoticeRepository NoticeRepository;
     private final SubjectRepository subjectRepository;
     private final QuestionRepository questionRepository;
 
@@ -53,7 +52,7 @@ public class StartService {
             Family family = familyOptional.get();
 
             for (Parent p : family.getParents()) {
-                ParentNotice parentNotice = ParentNotice.builder()
+                Notice notice = Notice.builder()
                         .isAccept(false) // 기본값 미수락
                         .isRead(false)
                         .send_at(new Timestamp(System.currentTimeMillis()))
@@ -62,7 +61,7 @@ public class StartService {
                         .type(2)
                         .build();
 
-                parentNoticeRepository.save(parentNotice);
+                NoticeRepository.save(notice);
             }
 
             return new FamilyExistDTO(true);
@@ -140,10 +139,10 @@ public class StartService {
         boolean isAccept = true;
         if (family == null) {
             isAccept = false;
-            Optional<ParentNotice> parentNotice = parentNoticeRepository.findBySenderAndType(parent);
+            Optional<Notice> Notice = NoticeRepository.findBySenderAndType(parent);
             return StartUserSelectionResponseDTO.builder()
                     .isAccepted(isAccept)
-                    .isSend(parentNotice.isPresent())
+                    .isSend(Notice.isPresent())
                     .build();
         }
         else {        // 자녀 리스트 생성
@@ -188,9 +187,9 @@ public class StartService {
     public void undoRequest(String email) {
         Parent parent = parentRepository.findParentByEmail(email);
 
-        List<ParentNotice> parentNotices = parentNoticeRepository.findAllBySender(parent);
+        List<Notice> Notices = NoticeRepository.findAllBySender(parent);
 
-        parentNoticeRepository.deleteAll(parentNotices);
+        NoticeRepository.deleteAll(Notices);
     }
 
 
