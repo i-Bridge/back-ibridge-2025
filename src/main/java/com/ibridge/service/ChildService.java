@@ -135,7 +135,7 @@ public class ChildService {
     }
 
     public void uploaded(ChildRequestDTO.UploadedDTO request) {
-        System.out.println("Video Uploaded" + request.getSubjectId());
+        System.out.println("Video Uploaded" + request.getVideo());
         List<Question> questions = questionRepository.findAllBySubject(subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject " + request.getSubjectId() + " Not Found ")));
         for(Question question : questions) {
             Analysis analysis = analysisRepository.findByQuestionId(question.getId()).orElseThrow(() -> new RuntimeException("Question " + question.getId() + " Not Found "));

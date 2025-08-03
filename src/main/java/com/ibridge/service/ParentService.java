@@ -5,6 +5,7 @@ import com.ibridge.domain.dto.response.NoticeExistDTO;
 import com.ibridge.domain.dto.response.ParentHomeResponseDTO;
 import com.ibridge.domain.dto.response.ParentResponseDTO;
 import com.ibridge.domain.dto.SubjectDTO;
+import com.ibridge.domain.dto.response.readSubjectsResponseDTO;
 import com.ibridge.domain.entity.*;
 import com.ibridge.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ public class ParentService {
     private final SubjectRepository subjectRepository;
     private final QuestionRepository questionRepository;
     private final AnalysisRepository analysisRepository;
+    private final NoticeRepository noticeRepository;
 
     public ParentHomeResponseDTO getParentHome(Long childId, LocalDate date, String email) {
         Child child = childRepository.findById(childId).orElse(null);
@@ -48,6 +50,15 @@ public class ParentService {
                 .build();
     }
 
+    public readSubjectsResponseDTO readSubjects(Parent parent, Long childId, Long year, Long month) {
+        List<Boolean> result = new ArrayList<>();
+        Child child = childRepository.findById(childId).orElse(null);
+        List<Notice> notices = noticeRepository.findAllByReceiverAndChild(parent, year, month, child);
+
+        return readSubjectsResponseDTO.builder()
+                .month(result)
+                .build();
+    }
 //현호
     public ParentResponseDTO.GetMyPageDTO getMyPage(Long parentId) {
     Parent parent = parentRepository.findById(parentId).get();

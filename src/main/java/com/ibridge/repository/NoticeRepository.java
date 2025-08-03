@@ -1,5 +1,6 @@
 package com.ibridge.repository;
 
+import com.ibridge.domain.entity.Child;
 import com.ibridge.domain.entity.Parent;
 import com.ibridge.domain.entity.Notice;
 import com.ibridge.domain.entity.Subject;
@@ -27,4 +28,7 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
     List<Notice> findAllByReceiver(Parent receiver);
 
     Notice findBySubjectAndReceiver(Subject subject, Parent receiver);
+
+    @Query("SELECT n FROM Notice n WHERE FUNCTION('YEAR', n.send_at) = :year AND FUNCTION('MONTH', n.send_at) = :month")
+    List<Notice> findAllByReceiverAndChild(Parent parent, Long year, Long month, Child child);
 }

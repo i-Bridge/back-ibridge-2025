@@ -31,6 +31,12 @@ public class ParentController {
     private final LoginService loginService;
 
     //지웅
+    @GetMapping("{childId}/readSubjects")
+    public ApiResponse<readSubjectsResponseDTO> readSubjects(HttpServletRequest r, @PathVariable Long childId, @RequestParam(value = "year") Long year, @RequestParam(value = "month") Long month) {
+        String email = (String)r.getAttribute("email");
+        readSubjectsResponseDTO response = parentService.readSubjects(loginService.getParentFromHeader(email), childId, year, month);
+        return ApiResponse.onSuccess(response);
+    }
     @GetMapping("/{childId}/home")
     public ApiResponse<ParentHomeResponseDTO> getParentHome(
             @PathVariable Long childId,
