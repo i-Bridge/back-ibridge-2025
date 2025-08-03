@@ -31,6 +31,21 @@ public class ChildService {
         List<Subject> todaySubject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
         boolean isCompleted = todaySubject.get(0).isAnswer();
 
+        if(isCompleted){
+            Subject predesigned = todaySubject.get(0);
+            if(predesigned.getQuestions().size() != 5) {
+                isCompleted = false;
+            }
+            else {
+                for(Question question : predesigned.getQuestions()) {
+                    if(question.getAnalysis() == null) {
+                        isCompleted = false;
+                        break;
+                    }
+                }
+            }
+        }
+
         return ChildResponseDTO.getQuestionDTO.builder()
                 .name(childRepository.findById(childId).orElseThrow(() -> new RuntimeException(childId + "인 child가 없습니다.")).getName())
                 .isCompleted(isCompleted).build();
@@ -149,12 +164,20 @@ public class ChildService {
         }
     }
 
-    public void answerFinished(ChildRequestDTO.FinishedDTO request) {
+    public void answerFinished(Long childId, ChildRequestDTO.FinishedDTO request) {
         System.out.println("Requesting answer is finished in mid: " + request.getSubjectId());
+        List<Subject> predesigned = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
+
         Subject subject = subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject " + request.getSubjectId() + " Not Found "));
         List<Question> questions = questionRepository.findAllBySubject(subject);
 
-        if(questions.size() == 1) {
+        if(predesigned == subject) {
+            subject.setAnswer(true);
+            subjectRepository.save(subject);
+
+            return;
+        }
+        else if(questions.size() == 1) {
             System.out.println("questions' size == 1, deleted");
             questionRepository.delete(questions.get(0));
             subjectRepository.delete(subject);

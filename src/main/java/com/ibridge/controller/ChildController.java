@@ -57,7 +57,7 @@ public class ChildController {
 
     @PostMapping("/{childId}/finished")
     public ApiResponse finished(@PathVariable Long childId, @RequestBody ChildRequestDTO.FinishedDTO request) {
-        childService.answerFinished(request);
+        childService.answerFinished(childId, request);
         return ApiResponse.onSuccess(null);
     }
 }
