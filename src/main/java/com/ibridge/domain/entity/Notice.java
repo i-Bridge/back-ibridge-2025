@@ -42,6 +42,6 @@ public class Notice {
     @ManyToOne(fetch = FetchType.LAZY)
     Child child;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     Subject subject;
 }

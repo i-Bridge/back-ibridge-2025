@@ -41,8 +41,8 @@ public class QuestionService {
 
         List<Question> questions = questionRepository.findAllBySubject(subject);
         List<QuestionDTO> questionDTOs = new ArrayList<>();
-        Notice notice = noticeRepository.findBySubjectAndReceiver(subject, parent);
-        noticeRepository.delete(notice);
+        noticeRepository.findBySubjectAndReceiver(subject, parent)
+                .ifPresent(noticeRepository::delete);
         for (Question q : questions) {
             Analysis analysis = q.getAnalysis();
             String video = analysis != null ? analysis.getVideo() : null;
