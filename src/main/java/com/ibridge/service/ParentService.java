@@ -16,9 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -51,14 +53,24 @@ public class ParentService {
     }
 
     public readSubjectsResponseDTO readSubjects(Parent parent, Long childId, Long year, Long month) {
-        List<Boolean> result = new ArrayList<>();
+        boolean[] arr = new boolean[32];
         Child child = childRepository.findById(childId).orElse(null);
         List<Notice> notices = noticeRepository.findAllByReceiverAndChild(parent, year, month, child);
-
+        for(Notice notice : notices) {
+            Timestamp sendAt = notice.getSend_at();
+            LocalDateTime localDateTime = sendAt.toLocalDateTime();
+            int day = localDateTime.getDayOfMonth();
+            arr[day] = true;
+        }
+        List<Boolean> result = new ArrayList<>();
+        for(int i = 1;i<32;i++){
+            result.add(arr[i]);
+        }
         return readSubjectsResponseDTO.builder()
                 .month(result)
                 .build();
     }
+
 //현호
     public ParentResponseDTO.GetMyPageDTO getMyPage(Long parentId) {
     Parent parent = parentRepository.findById(parentId).get();
