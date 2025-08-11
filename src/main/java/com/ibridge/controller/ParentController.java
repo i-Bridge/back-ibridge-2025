@@ -121,10 +121,15 @@ public class ParentController {
 
     @PatchMapping("/mypage/edit/familyName")
     public ApiResponse editFamilyName(HttpServletRequest r, @RequestBody ParentRequestDTO.editFamilyNameDTO request) {
-        Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
+        try {
+            Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
 
-        parentService.editFamilyName(parentId, request);
-        return ApiResponse.onSuccess(null);
+            parentService.editFamilyName(parentId, request);
+            return ApiResponse.onSuccess(null);
+        }
+        catch(Exception e) {
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
     }
 
     @PostMapping("/mypage/edit/add")

@@ -39,6 +39,7 @@ public class ParentService {
     private final QuestionRepository questionRepository;
     private final AnalysisRepository analysisRepository;
     private final NoticeRepository noticeRepository;
+    private final FamilyRepository familyRepository;
 
     public ParentHomeResponseDTO getParentHome(Long childId, LocalDate date, String email) {
         Child child = childRepository.findById(childId).orElse(null);
@@ -128,8 +129,13 @@ public class ParentService {
     public void editFamilyName(Long parentId, ParentRequestDTO.editFamilyNameDTO request) {
         Parent parent = parentRepository.findById(parentId).get();
         Family family = parent.getFamily();
+
+        List<Family> otherFamily = familyRepository.findAll();
+        for(Family other : otherFamily) {
+            if(other.getName().equals(request.getFamilyName())) throw new RuntimeException("This name is duplicated");
+        }
+
         family.setName(request.getFamilyName());
-        return;
     }
 
     public void deleteAccount(Long parentId) {
