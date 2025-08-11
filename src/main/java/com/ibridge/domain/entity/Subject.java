@@ -2,6 +2,7 @@ package com.ibridge.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -21,7 +22,12 @@ public class Subject {
     private String title;
 
     @Column(nullable = false)
+    @ColumnDefault("false")
     private boolean isAnswer;
+
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    private boolean isCompleted;
 
     @Column(nullable = false)
     private LocalDate date;
