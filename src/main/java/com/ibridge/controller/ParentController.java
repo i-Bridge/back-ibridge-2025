@@ -33,30 +33,50 @@ public class ParentController {
     //지웅
     @GetMapping("{childId}/readSubjects")
     public ApiResponse<readSubjectsResponseDTO> readSubjects(HttpServletRequest r, @PathVariable Long childId, @RequestParam(value = "year") Long year, @RequestParam(value = "month") Long month) {
-        String email = (String)r.getAttribute("email");
-        readSubjectsResponseDTO response = parentService.readSubjects(loginService.getParentFromHeader(email), childId, year, month);
-        return ApiResponse.onSuccess(response);
+        try {
+            String email = (String)r.getAttribute("email");
+            readSubjectsResponseDTO response = parentService.readSubjects(loginService.getParentFromHeader(email), childId, year, month);
+            return ApiResponse.onSuccess(response);
+        }
+        catch (Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
     }
     @GetMapping("/{childId}/home")
     public ApiResponse<ParentHomeResponseDTO> getParentHome(
             @PathVariable Long childId,
             @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             HttpServletRequest r) {
-        if (date == null) {
-            date = LocalDate.now();
+
+        try {
+            if (date == null) {
+                date = LocalDate.now();
+            }
+            String email = (String) r.getAttribute("email");
+            ParentHomeResponseDTO response = parentService.getParentHome(childId, date, email);
+            return ApiResponse.onSuccess(response);
         }
-        String email = (String) r.getAttribute("email");
-        ParentHomeResponseDTO response = parentService.getParentHome(childId, date, email);
-        return ApiResponse.onSuccess(response);
+        catch (Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
     }
 
     @GetMapping("/{childId}/{subjectId}")
     public ApiResponse<QuestionAnalysisDTO> getAnalysis(HttpServletRequest r,
             @PathVariable Long childId,
             @PathVariable Long subjectId) {
-        String email = (String) r.getAttribute("email");
-        QuestionAnalysisDTO response = questionService.getQuestionAnalysis(loginService.getParentFromHeader(email), childId, subjectId);
-        return ApiResponse.onSuccess(response);
+
+        try {
+            String email = (String) r.getAttribute("email");
+            QuestionAnalysisDTO response = questionService.getQuestionAnalysis(loginService.getParentFromHeader(email), childId, subjectId);
+            return ApiResponse.onSuccess(response);
+        }
+        catch (Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
     }
 
     @GetMapping("/{childId}/{subjectId}/{questionId}")
@@ -66,8 +86,14 @@ public class ParentController {
             @PathVariable Long questionId,
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 
-        QuestionDetailResponseDTO response = questionService.getQuestionDetail(childId, subjectId, questionId, date);
-        return ApiResponse.onSuccess(response);
+        try {
+            QuestionDetailResponseDTO response = questionService.getQuestionDetail(childId, subjectId, questionId, date);
+            return ApiResponse.onSuccess(response);
+        }
+        catch (Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
     }
 
     @PatchMapping("/{childId}/questions/edit")
@@ -76,14 +102,26 @@ public class ParentController {
             @RequestBody EditQuestionRequestDTO request,
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 
-        questionService.editQuestion(childId, request, date);
-        return ApiResponse.onSuccess(null);
+        try {
+            questionService.editQuestion(childId, request, date);
+            return ApiResponse.onSuccess(null);
+        }
+        catch (Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
     }
 
     @GetMapping("/{childId}/questions/reroll")
     public ApiResponse<SubjectResponseDTO> rerollQuestion(@PathVariable Long childId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        SubjectResponseDTO response = questionService.rerollQuestion(childId, date);
-        return ApiResponse.onSuccess(response);
+        try {
+            SubjectResponseDTO response = questionService.rerollQuestion(childId, date);
+            return ApiResponse.onSuccess(response);
+        }
+        catch (Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
     }
 
 
