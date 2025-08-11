@@ -128,6 +128,7 @@ public class ParentController {
             return ApiResponse.onSuccess(null);
         }
         catch(Exception e) {
+            System.out.println("failure return: " + e.getMessage());
             return ApiResponse.onFailure("404", e.getMessage());
         }
     }
