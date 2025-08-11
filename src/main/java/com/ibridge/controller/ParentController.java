@@ -113,10 +113,16 @@ public class ParentController {
 
     @GetMapping("/mypage/edit")
     public ApiResponse<ParentResponseDTO.GetFamilyInfoDTO> getFamilyInfo(HttpServletRequest r) {
-        Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
+        try {
+            Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
 
-        ParentResponseDTO.GetFamilyInfoDTO data = parentService.getFamilyPage(parentId);
-        return ApiResponse.onSuccess(data);
+            ParentResponseDTO.GetFamilyInfoDTO data = parentService.getFamilyPage(parentId);
+            return ApiResponse.onSuccess(data);
+        }
+        catch(Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
     }
 
     @PatchMapping("/mypage/edit/familyName")
@@ -135,46 +141,83 @@ public class ParentController {
 
     @PostMapping("/mypage/edit/add")
     public ApiResponse<ParentResponseDTO.ChildIdDTO> addChild(HttpServletRequest r, @RequestBody ParentRequestDTO.AddChildDTO addChildDTO) throws ParseException {
-        Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
+        try {
+            Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
 
-        ParentResponseDTO.ChildIdDTO data = parentService.addChild(parentId, addChildDTO);
-        return ApiResponse.onSuccess(data);
+            ParentResponseDTO.ChildIdDTO data = parentService.addChild(parentId, addChildDTO);
+            return ApiResponse.onSuccess(data);
+        }
+        catch(Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
     }
 
     @PatchMapping("/mypage/edit/{childId}")
     public ApiResponse<ParentResponseDTO.ChildIdDTO> patchChild(@RequestBody ParentRequestDTO.EditChildDTO request) throws ParseException {
-        ParentResponseDTO.ChildIdDTO data = parentService.patchChild(request);
-        return ApiResponse.onSuccess(data);
+        try {
+            ParentResponseDTO.ChildIdDTO data = parentService.patchChild(request);
+            return ApiResponse.onSuccess(data);
+        }
+        catch(Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
     }
 
     @DeleteMapping("/mypage/edit/delete")
     public ApiResponse deleteChild(@RequestBody ParentRequestDTO.DeleteChildDTO request) {
-        parentService.deleteChild(request);
-        return ApiResponse.onSuccess(null);
+        try {
+            parentService.deleteChild(request);
+            return ApiResponse.onSuccess(null);
+        }
+        catch(Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
+
     }
 
     //알림
     @GetMapping("/notice")
     public ApiResponse<ParentResponseDTO.NoticeCheckDTO> getNotice(HttpServletRequest r) {
-        Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
+        try {
+            Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
 
-        ParentResponseDTO.NoticeCheckDTO data = parentService.getNotice(parentId);
-        return ApiResponse.onSuccess(data);
+            ParentResponseDTO.NoticeCheckDTO data = parentService.getNotice(parentId);
+            return ApiResponse.onSuccess(data);
+        }
+        catch(Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
     }
 
     @PostMapping("/notice/accept")
     public ApiResponse addParentintoFamily(HttpServletRequest r, @RequestBody ParentRequestDTO.getParentintoFamilyDTO request) {
-        Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
+        try {
+            Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
 
-        parentService.addParentintoFamily(parentId, request);
-        return ApiResponse.onSuccess(null);
+            parentService.addParentintoFamily(parentId, request);
+            return ApiResponse.onSuccess(null);
+        }
+        catch(Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
     }
 
     @PostMapping("/notice/decline")
     public ApiResponse declineParentintoFamily(HttpServletRequest r, @RequestBody ParentRequestDTO.getParentintoFamilyDTO request) {
-        Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
+        try {
+            Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
 
-        parentService.declineParentintoFamily(parentId, request);
-        return ApiResponse.onSuccess(null);
+            parentService.declineParentintoFamily(parentId, request);
+            return ApiResponse.onSuccess(null);
+        }
+        catch(Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
     }
 }
