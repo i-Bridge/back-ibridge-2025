@@ -2,6 +2,7 @@ package com.ibridge.controller;
 
 import com.ibridge.domain.dto.request.ChildRequestDTO;
 import com.ibridge.domain.dto.response.ChildResponseDTO;
+import com.ibridge.domain.dto.response.StartUserSelectionResponseDTO;
 import com.ibridge.repository.ChildRepository;
 import com.ibridge.service.ChildService;
 import com.ibridge.service.S3Service;
@@ -21,43 +22,85 @@ public class ChildController {
 
     @GetMapping("/{childId}/home")
     public ApiResponse<ChildResponseDTO.getQuestionDTO> home(@PathVariable Long childId) {
-        ChildResponseDTO.getQuestionDTO data = childService.getHome(childId);
-        return ApiResponse.onSuccess(data);
+        try {
+            ChildResponseDTO.getQuestionDTO data = childService.getHome(childId);
+            return ApiResponse.onSuccess(data);
+        }
+        catch (Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
     }
 
     @GetMapping("/{childId}/predesigned")
     public ApiResponse<ChildResponseDTO.getPredesignedQuestionDTO> getPredesignedQuestion(@PathVariable Long childId) {
-        ChildResponseDTO.getPredesignedQuestionDTO data = childService.getPredesignedQuestion(childId);
-        return ApiResponse.onSuccess(data);
+        try {
+            ChildResponseDTO.getPredesignedQuestionDTO data = childService.getPredesignedQuestion(childId);
+            return ApiResponse.onSuccess(data);
+        }
+        catch (Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
     }
 
     @GetMapping("/{childId}/new")
     public ApiResponse<ChildResponseDTO.getNewQuestionDTO> getNewQuestion(@PathVariable Long childId) {
-        ChildResponseDTO.getNewQuestionDTO data = childService.getNewSubject(childId);
-        return ApiResponse.onSuccess(data);
+        try {
+            ChildResponseDTO.getNewQuestionDTO data = childService.getNewSubject(childId);
+            return ApiResponse.onSuccess(data);
+        }
+        catch (Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
     }
 
     @PostMapping("/{childId}/answer")
     public ApiResponse<ChildResponseDTO.getAI> getQuestion(@PathVariable Long childId, @RequestBody ChildRequestDTO.AnswerDTO request) {
-        ChildResponseDTO.getAI data = childService.getNextQuestion(request);
-        return ApiResponse.onSuccess(data);
+        try {
+            ChildResponseDTO.getAI data = childService.getNextQuestion(request);
+            return ApiResponse.onSuccess(data);
+        }
+        catch (Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
     }
 
     @PostMapping("/{childId}/getURL")
     public ApiResponse<ChildResponseDTO.getPresignedURLDTO> getVideoPresignedURL(@PathVariable Long childId, @RequestBody ChildRequestDTO.GetPresignedURLDTO request) {
-        ChildResponseDTO.getPresignedURLDTO data = childService.getPresignedURL(childId, request);
-        return ApiResponse.onSuccess(data);
+        try {
+            ChildResponseDTO.getPresignedURLDTO data = childService.getPresignedURL(childId, request);
+            return ApiResponse.onSuccess(data);
+        }
+        catch (Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
     }
 
     @PostMapping("/{childId}/uploaded")
     public ApiResponse s3Uploaded(@PathVariable Long childId, @RequestBody ChildRequestDTO.UploadedDTO request) {
-        childService.uploaded(request);
-        return ApiResponse.onSuccess(null);
+        try {
+            childService.uploaded(request);
+            return ApiResponse.onSuccess(null);
+        }
+        catch (Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
     }
 
     @PostMapping("/{childId}/finished")
     public ApiResponse finished(@PathVariable Long childId, @RequestBody ChildRequestDTO.FinishedDTO request) {
-        childService.answerFinished(childId, request);
-        return ApiResponse.onSuccess(null);
+        try {
+            childService.answerFinished(childId, request);
+            return ApiResponse.onSuccess(null);
+        }
+        catch (Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
     }
 }
