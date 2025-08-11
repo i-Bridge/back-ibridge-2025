@@ -29,22 +29,7 @@ public class ChildService {
 
     public ChildResponseDTO.getQuestionDTO getHome(Long childId) {
         List<Subject> todaySubject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
-        boolean isCompleted = todaySubject.get(0).isAnswer();
-
-        if(isCompleted){
-            Subject predesigned = todaySubject.get(0);
-            if(predesigned.getQuestions().size() != 5) {
-                isCompleted = false;
-            }
-            else {
-                for(Question question : predesigned.getQuestions()) {
-                    if(question.getAnalysis() == null) {
-                        isCompleted = false;
-                        break;
-                    }
-                }
-            }
-        }
+        boolean isCompleted = todaySubject.get(0).isCompleted();
 
         return ChildResponseDTO.getQuestionDTO.builder()
                 .name(childRepository.findById(childId).orElseThrow(() -> new RuntimeException(childId + "인 child가 없습니다.")).getName())
@@ -67,7 +52,8 @@ public class ChildService {
                 .child(childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + " Not Found ")))
                 .title("아이의 얘기 " + (todaySubject.size()))
                 .date(LocalDate.now())
-                .isAnswer(false).build();
+                .isAnswer(false)
+                .isCompleted(false).build();
         subjectRepository.save(newSubject);
 
         Question question = Question.builder()
@@ -82,6 +68,7 @@ public class ChildService {
     public ChildResponseDTO.getAI getNextQuestion(ChildRequestDTO.AnswerDTO request) {
         System.out.println("Requesting Next Question: " + request.getText());
         Subject targetSubject = subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject " + request.getSubjectId() + " Not Found "));
+        targetSubject.setAnswer(true);
         List<Question> questions = questionRepository.findAllBySubject(targetSubject);
         Analysis analysis = Analysis.builder()
                 .question(questions.get(questions.size() - 1))
@@ -92,7 +79,7 @@ public class ChildService {
 
         if(questions.size() == 5) {
             System.out.println("Completely Finished with " + questions.get(questions.size()- 1).getId());
-            targetSubject.setAnswer(true);
+            targetSubject.setCompleted(true);
             String conv = "";
             for(Question question : questions) {
                 conv += question.getText() + "\n" + analysisRepository.findByQuestionId(question.getId()).get().getAnswer() + "\n";
