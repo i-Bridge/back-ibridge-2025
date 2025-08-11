@@ -101,10 +101,14 @@ public class ParentController {
     //마이페이지
     @GetMapping("/mypage")
     public ApiResponse<ParentResponseDTO.GetMyPageDTO> getMyPage(HttpServletRequest r) {
-        Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
-
-        ParentResponseDTO.GetMyPageDTO parentResponseDTO = parentService.getMyPage(parentId);
-        return ApiResponse.onSuccess(parentResponseDTO);
+        try {
+            Long parentId = loginService.getParentFromHeader((String) r.getAttribute("email")).getId();
+            ParentResponseDTO.GetMyPageDTO parentResponseDTO = parentService.getMyPage(parentId);
+            return ApiResponse.onSuccess(parentResponseDTO);
+        }
+        catch(Exception e) {
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
     }
 
     @GetMapping("/mypage/edit")

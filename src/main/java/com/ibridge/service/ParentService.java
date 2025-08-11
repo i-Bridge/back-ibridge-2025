@@ -73,7 +73,7 @@ public class ParentService {
 
 //현호
     public ParentResponseDTO.GetMyPageDTO getMyPage(Long parentId) {
-    Parent parent = parentRepository.findById(parentId).get();
+    Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not Found"));
     List<Notice> Notice = NoticeRepository.findAllByParent(parent);
     boolean noticeExist = false;
     for(Notice notice : Notice) {

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class LoginService {
     private final ParentRepository parentRepository;
+
     public Parent getParentFromHeader(String email) {
         return parentRepository.findParentByEmail(email);
     }
