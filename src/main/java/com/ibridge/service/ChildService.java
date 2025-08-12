@@ -153,7 +153,7 @@ public class ChildService {
 
     public void answerFinished(Long childId, ChildRequestDTO.FinishedDTO request) {
         System.out.println("Requesting answer is finished in mid: " + request.getSubjectId());
-        List<Subject> predesigned = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
+        Subject predesigned = subjectRepository.findByChildIdAndDate(childId, LocalDate.now()).get(0);
 
         Subject subject = subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject " + request.getSubjectId() + " Not Found "));
         List<Question> questions = questionRepository.findAllBySubject(subject);
