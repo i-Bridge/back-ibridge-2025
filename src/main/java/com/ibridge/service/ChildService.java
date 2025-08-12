@@ -12,6 +12,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -157,6 +158,11 @@ public class ChildService {
 
         Subject subject = subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject " + request.getSubjectId() + " Not Found "));
         List<Question> questions = questionRepository.findAllBySubject(subject);
+        List<Analysis> analysisList = new ArrayList<>();
+        for(Question question : questions) {
+            Analysis analysis = analysisRepository.findByQuestionId(question.getId()).orElse(null);
+            if(analysis != null) analysisList.add(analysis);
+        }
 
         if(predesigned == subject) {
             subject.setAnswer(true);
@@ -170,20 +176,24 @@ public class ChildService {
             subjectRepository.delete(subject);
             return;
         }
-        questionRepository.delete(questions.get(questions.size() - 1));
-        questions.remove(questions.size() - 1);
-        subject.setAnswer(true);
+        else if(subject.isCompleted()) return;
+        else {
+            questionRepository.delete(questions.get(questions.size() - 1));
+            questions.remove(questions.size() - 1);
+            subject.setAnswer(true);
 
-        System.out.println("Questions' Size: " + questions.size());
-        String conv = "";
-        for(Question question : questions) {
-            conv += question.getText() + "\n" + analysisRepository.findByQuestionId(question.getId()).get().getAnswer() + "\n";
+            System.out.println("Questions' Size: " + questions.size());
+            String conv = "";
+            for(Question question : questions) {
+                conv += question.getText() + "\n" + analysisRepository.findByQuestionId(question.getId()).get().getAnswer() + "\n";
+            }
+            String summary = gptService.summarizeGPT(conv);
+            subject.setTitle(summary);
+            subjectRepository.save(subject);
+
+            makeNotice(subject);
+            return;
         }
-        String summary = gptService.summarizeGPT(conv);
-        subject.setTitle(summary);
-        subjectRepository.save(subject);
-
-        makeNotice(subject);
     }
 
     private void makeNotice(Subject subject) {
