@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -138,17 +139,35 @@ public class ChildService {
     }
 
     public void uploaded(ChildRequestDTO.UploadedDTO request) {
-        System.out.println("Video Uploaded" + request.getVideo());
+        System.out.println("Uploaded" + request.getFile());
         List<Question> questions = questionRepository.findAllBySubject(subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject " + request.getSubjectId() + " Not Found ")));
-        for(Question question : questions) {
-            Analysis analysis = analysisRepository.findByQuestionId(question.getId()).orElseThrow(() -> new RuntimeException("Question " + question.getId() + " Not Found "));
-            if(!analysis.isUploaded()) {
-                analysis.setVideo(request.getVideo());
-                analysis.setImage(request.getImage());
-                analysis.setUploaded(true);
-                analysisRepository.save(analysis);
+        List<String> parts = Arrays.asList(request.getFile().split("\\."));
+        String extension = parts.get(parts.size() - 1);
+
+        switch(extension) {
+            case "webm":
+                for(Question question: questions) {
+                    Analysis analysis = analysisRepository.findByQuestionId(question.getId()).orElseThrow(() -> new RuntimeException("Question " + question.getId() + " Not Found "));
+                    if(analysis.getVideo() == null) {
+                        analysis.setVideo(request.getFile());
+                        analysisRepository.save(analysis);
+                        break;
+                    }
+                }
                 break;
-            }
+
+            case "jpeg":
+                for(Question question: questions) {
+                    Analysis analysis = analysisRepository.findByQuestionId(question.getId()).orElseThrow(() -> new RuntimeException("Question " + question.getId() + " Not Found "));
+                    if(analysis.getImage() == null) {
+                        analysis.setImage(request.getFile());
+                        analysisRepository.save(analysis);
+                        break;
+                    }
+                }
+                break;
+            default:
+                throw new RuntimeException("Unsupported extension: " + extension);
         }
     }
 

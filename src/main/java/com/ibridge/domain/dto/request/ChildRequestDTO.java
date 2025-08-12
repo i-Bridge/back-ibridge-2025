@@ -30,8 +30,7 @@ public class ChildRequestDTO {
     @NoArgsConstructor
     public static class UploadedDTO {
         Long subjectId;
-        String image;
-        String video;
+        String file;
     }
 
     @Data
