@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NoticeRequestDTO {
-    Long notice;
+    Long noticeId;
 }

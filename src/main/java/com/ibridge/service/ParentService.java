@@ -73,7 +73,7 @@ public class ParentService {
                 .build();
     }
     public void openNotice(NoticeRequestDTO noticeRequestDTO) {
-        noticeRepository.deleteById(noticeRequestDTO.getNotice());
+        noticeRepository.deleteById(noticeRequestDTO.getNoticeId());
     }
 
 //현호
