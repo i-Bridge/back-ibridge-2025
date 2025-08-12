@@ -72,9 +72,8 @@ public class ParentService {
                 .month(result)
                 .build();
     }
-    public readSubjectsResponseDTO openNotice(Parent parent, Long childId, Long year, Long month, NoticeRequestDTO noticeRequestDTO) {
+    public void openNotice(NoticeRequestDTO noticeRequestDTO) {
         noticeRepository.deleteById(noticeRequestDTO.getNotice());
-        return readSubjects(parent, childId, year, month);
     }
 
 //현호

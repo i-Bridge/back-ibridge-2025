@@ -28,12 +28,11 @@ public class ParentController {
     private final LoginService loginService;
 
     //지웅
-    @PostMapping("/notice/openNotice")
-    public ApiResponse<readSubjectsResponseDTO> openNotice(HttpServletRequest r, @PathVariable Long childId, @RequestParam(value = "year") Long year, @RequestParam(value = "month") Long month, NoticeRequestDTO noticeRequestDTO){
+    @PostMapping("/openNotice")
+    public ApiResponse<?> openNotice(@RequestBody NoticeRequestDTO noticeRequestDTO){
         try{
-            String email = (String)r.getAttribute("email");
-            readSubjectsResponseDTO response = parentService.openNotice(loginService.getParentFromHeader(email), childId, year, month, noticeRequestDTO);
-            return ApiResponse.onSuccess(response);
+            parentService.openNotice(noticeRequestDTO);
+            return ApiResponse.onSuccess(null);
         }
         catch (Exception e){
             System.out.println("failure return: " + e.getMessage());
