@@ -158,23 +158,15 @@ public class ChildService {
 
         Subject subject = subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject " + request.getSubjectId() + " Not Found "));
         List<Question> questions = questionRepository.findAllBySubject(subject);
-        List<Analysis> analysisList = new ArrayList<>();
-        for(Question question : questions) {
-            Analysis analysis = analysisRepository.findByQuestionId(question.getId()).orElse(null);
-            if(analysis != null) analysisList.add(analysis);
-        }
 
         if(predesigned == subject) {
             subject.setAnswer(true);
             subjectRepository.save(subject);
-
-            return;
         }
         else if(questions.size() == 1) {
             System.out.println("questions' size == 1, deleted");
             questionRepository.delete(questions.get(0));
             subjectRepository.delete(subject);
-            return;
         }
         else if(subject.isCompleted()) return;
         else {
@@ -192,7 +184,6 @@ public class ChildService {
             subjectRepository.save(subject);
 
             makeNotice(subject);
-            return;
         }
     }
 
