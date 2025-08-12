@@ -1,5 +1,6 @@
 package com.ibridge.service;
 
+import com.ibridge.domain.dto.request.NoticeRequestDTO;
 import com.ibridge.domain.dto.request.ParentRequestDTO;
 import com.ibridge.domain.dto.response.NoticeExistDTO;
 import com.ibridge.domain.dto.response.ParentHomeResponseDTO;
@@ -55,6 +56,25 @@ public class ParentService {
 
     public readSubjectsResponseDTO readSubjects(Parent parent, Long childId, Long year, Long month) {
         boolean[] arr = new boolean[32];
+        Child child = childRepository.findById(childId).orElse(null);
+        List<Notice> notices = noticeRepository.findAllByReceiverAndChild(parent, year, month, child);
+        for(Notice notice : notices) {
+            Timestamp sendAt = notice.getSend_at();
+            LocalDateTime localDateTime = sendAt.toLocalDateTime();
+            int day = localDateTime.getDayOfMonth();
+            arr[day] = true;
+        }
+        List<Boolean> result = new ArrayList<>();
+        for(int i = 1;i<32;i++){
+            result.add(arr[i]);
+        }
+        return readSubjectsResponseDTO.builder()
+                .month(result)
+                .build();
+    }
+    public readSubjectsResponseDTO openNotice(Parent parent, Long childId, Long year, Long month, NoticeRequestDTO noticeRequestDTO) {
+        boolean[] arr = new boolean[32];
+        noticeRepository.deleteById(noticeRequestDTO.getNotice());
         Child child = childRepository.findById(childId).orElse(null);
         List<Notice> notices = noticeRepository.findAllByReceiverAndChild(parent, year, month, child);
         for(Notice notice : notices) {

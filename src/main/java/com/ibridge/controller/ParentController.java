@@ -1,9 +1,6 @@
 package com.ibridge.controller;
 
-import com.ibridge.domain.dto.request.EditQuestionRequestDTO;
-import com.ibridge.domain.dto.request.ParentRequestDTO;
-import com.ibridge.domain.dto.request.QuestionRequestDTO;
-import com.ibridge.domain.dto.request.QuestionUpdateRequestDTO;
+import com.ibridge.domain.dto.request.*;
 import com.ibridge.domain.dto.response.*;
 import com.ibridge.domain.entity.Parent;
 import com.ibridge.service.AnalysisService;
@@ -31,6 +28,18 @@ public class ParentController {
     private final LoginService loginService;
 
     //지웅
+    @PostMapping("/notice/openNotice")
+    public ApiResponse<readSubjectsResponseDTO> openNotice(HttpServletRequest r, @PathVariable Long childId, @RequestParam(value = "year") Long year, @RequestParam(value = "month") Long month, NoticeRequestDTO noticeRequestDTO){
+        try{
+            String email = (String)r.getAttribute("email");
+            readSubjectsResponseDTO response = parentService.openNotice(loginService.getParentFromHeader(email), childId, year, month, noticeRequestDTO);
+            return ApiResponse.onSuccess(response);
+        }
+        catch (Exception e){
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
+    }
     @GetMapping("{childId}/readSubjects")
     public ApiResponse<readSubjectsResponseDTO> readSubjects(HttpServletRequest r, @PathVariable Long childId, @RequestParam(value = "year") Long year, @RequestParam(value = "month") Long month) {
         try {
