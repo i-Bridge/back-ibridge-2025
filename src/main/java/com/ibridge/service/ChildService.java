@@ -139,7 +139,7 @@ public class ChildService {
     }
 
     public void uploaded(ChildRequestDTO.UploadedDTO request) {
-        System.out.println("Uploaded" + request.getFile());
+        System.out.println("Uploaded: " + request.getFile());
         List<Question> questions = questionRepository.findAllBySubject(subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject " + request.getSubjectId() + " Not Found ")));
         List<String> parts = Arrays.asList(request.getFile().split("\\."));
         String extension = parts.get(parts.size() - 1);
@@ -147,7 +147,7 @@ public class ChildService {
         switch(extension) {
             case "webm":
                 for(Question question: questions) {
-                    Analysis analysis = analysisRepository.findByQuestionId(question.getId()).orElseThrow(() -> new RuntimeException("Question " + question.getId() + " Not Found "));
+                    Analysis analysis = analysisRepository.findByQuestionId(question.getId()).orElseThrow(() -> new RuntimeException("Question " + question.getId() + " Not Found with Uploading " + request.getFile()));
                     if(analysis.getVideo() == null) {
                         analysis.setVideo(request.getFile());
                         analysisRepository.save(analysis);
