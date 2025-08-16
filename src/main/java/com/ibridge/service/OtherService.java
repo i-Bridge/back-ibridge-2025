@@ -50,7 +50,7 @@ public class OtherService {
             Subject todaySubject = Subject.builder()
                     .title(randomQuestion)
                     .child(child)
-                    .date(LocalDate.now())
+                    .date(LocalDate.now().plusDays(14))
                     .isAnswer(false).build();
             subjectRepository.save(todaySubject);
 
