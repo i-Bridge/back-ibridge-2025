@@ -182,20 +182,26 @@ public class ParentService {
             e.printStackTrace();
         }
 
-        int id = random.nextInt(subjects.size());
-        String randomQuestion = subjects.get(id);
+        for (int i = 0; i < 14; i++) {
+            LocalDate targetDate = LocalDate.now().plusDays(i);
 
-        Subject todaySubject = Subject.builder()
-                .title(randomQuestion)
-                .child(child)
-                .date(LocalDate.now())
-                .isAnswer(false).build();
-        subjectRepository.save(todaySubject);
+            int id = random.nextInt(subjects.size());
+            String randomQuestion = subjects.get(id);
 
-        Question question = Question.builder()
-                .subject(todaySubject)
-                .text(randomQuestion).build();
-        questionRepository.save(question);
+            Subject subject = Subject.builder()
+                    .title(randomQuestion)
+                    .child(child)
+                    .date(targetDate)
+                    .isAnswer(false)
+                    .build();
+            subjectRepository.save(subject);
+
+            Question question = Question.builder()
+                    .subject(subject)
+                    .text(randomQuestion)
+                    .build();
+            questionRepository.save(question);
+        }
 
         return ParentResponseDTO.ChildIdDTO.builder()
                 .childId(childRepository.save(child).getId()).build();
