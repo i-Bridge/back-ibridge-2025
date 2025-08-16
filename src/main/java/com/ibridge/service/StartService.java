@@ -100,32 +100,38 @@ public class StartService {
 
         List<Child> children = request.getChildren().stream()
                 .map(childRequest -> {
-                    String questionText = subjectsPool.get(random.nextInt(subjectsPool.size()));
-
-                    Question question = Question.builder()
-                            .text(questionText)
-                            .build();
-
-                    Subject subject = Subject.builder()
-                            .title(questionText)
-                            .isAnswer(false)
-                            .date(LocalDate.now())
-                            .questions(new ArrayList<>(List.of(question)))
-                            .build();
-
-                    question.setSubject(subject);
-
                     Child child = Child.builder()
                             .name(childRequest.getName())
                             .gender(childRequest.getGender() == 0 ? Gender.MALE : Gender.FEMALE)
                             .birth(LocalDate.parse(childRequest.getBirth()))
                             .family(family)
-                            .subjects(new ArrayList<>(List.of(subject)))
                             .build();
 
-                    subject.setChild(child);
-                    subjectRepository.save(subject);
-                    questionRepository.save(question);
+                    List<Subject> subjectList = new ArrayList<>();
+                    for (int i = 0; i < 14; i++) {
+                        String questionText = subjectsPool.get(random.nextInt(subjectsPool.size()));
+
+                        Question question = Question.builder()
+                                .text(questionText)
+                                .build();
+
+                        Subject subject = Subject.builder()
+                                .title(questionText)
+                                .isAnswer(false)
+                                .date(LocalDate.now().plusDays(i))
+                                .questions(new ArrayList<>(List.of(question)))
+                                .build();
+
+                        question.setSubject(subject);
+                        subject.setChild(child);
+
+                        subjectList.add(subject);
+
+                        subjectRepository.save(subject);
+                        questionRepository.save(question);
+                    }
+                    child.setSubjects(subjectList);
+
                     return child;
                 })
                 .collect(Collectors.toList());
