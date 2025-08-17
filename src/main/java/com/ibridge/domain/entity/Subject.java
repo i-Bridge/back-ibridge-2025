@@ -38,4 +38,7 @@ public class Subject {
 
     @OneToMany(mappedBy = "id", cascade = CascadeType.ALL)
     private List<Question> questions;
+
+    @Column
+    private String keyword;
 }
