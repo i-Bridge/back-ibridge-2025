@@ -16,7 +16,7 @@ import java.sql.Timestamp;
 @Builder
 public class Notice {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     @Column(nullable = false)
