@@ -37,7 +37,4 @@ public class Child {
 
     @Column(nullable = false)
     private Long grape;
-
-    @Column(nullable = false)
-    private Long coin;
 }
