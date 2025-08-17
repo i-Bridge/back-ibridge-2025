@@ -34,4 +34,10 @@ public class Child {
 
     @OneToMany(mappedBy = "id", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Subject> subjects;
+
+    @Column(nullable = false)
+    private Long grape;
+
+    @Column(nullable = false)
+    private Long coin;
 }
