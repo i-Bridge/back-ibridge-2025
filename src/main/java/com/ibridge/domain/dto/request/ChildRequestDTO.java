@@ -8,6 +8,14 @@ import lombok.NoArgsConstructor;
 public class ChildRequestDTO {
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PurchaseDTO {
+        Long itemId;
+    }
+
+    @Data
+    @Builder
     @AllArgsConstructor
     @NoArgsConstructor
     public static class AnswerDTO {

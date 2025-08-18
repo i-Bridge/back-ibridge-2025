@@ -32,6 +32,42 @@ public class ChildController {
         }
     }
 
+    @GetMapping("/{childId}/reward")
+    public ApiResponse<ChildResponseDTO.getRewardDTO> reward(@PathVariable Long childId) {
+        try {
+            ChildResponseDTO.getRewardDTO data = childService.getReward(childId);
+            return ApiResponse.onSuccess(data);
+        }
+        catch(Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
+    }
+
+    @GetMapping("/{childId}/store")
+    public ApiResponse<ChildResponseDTO.getStoreDTO> store(@PathVariable Long childId) {
+        try {
+            ChildResponseDTO.getStoreDTO data = childService.getStore(childId);
+            return ApiResponse.onSuccess(data);
+        }
+        catch(Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
+    }
+
+    @PostMapping("/{childId}/store/purchase")
+    public ApiResponse<ChildResponseDTO.purchaseDTO> purchase(@PathVariable Long childId, @RequestBody ChildRequestDTO.PurchaseDTO request) {
+        try {
+            ChildResponseDTO.purchaseDTO data = childService.purchase(childId, request);
+            return ApiResponse.onSuccess(data);
+        }
+        catch(Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
+    }
+
     @GetMapping("/{childId}/predesigned")
     public ApiResponse<ChildResponseDTO.getPredesignedQuestionDTO> getPredesignedQuestion(@PathVariable Long childId) {
         try {

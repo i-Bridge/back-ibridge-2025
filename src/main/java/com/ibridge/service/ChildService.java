@@ -28,7 +28,9 @@ public class ChildService {
     private final GptService gptService;
     private final ParentRepository parentRepository;
     private final NoticeRepository NoticeRepository;
+    private final StoreRepository storeRepository;
 
+    //질문 화면 관련
     public ChildResponseDTO.getQuestionDTO getHome(Long childId) {
         List<Subject> todaySubject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
         boolean isCompleted = todaySubject.get(0).isCompleted();
@@ -222,5 +224,50 @@ public class ChildService {
                     .build();
             NoticeRepository.save(p);
         }
+    }
+
+
+
+    //이외 화면
+    public ChildResponseDTO.getRewardDTO getReward(Long childId) {
+        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + " Not Found"));
+        return ChildResponseDTO.getRewardDTO.builder()
+                .grape(child.getGrape())
+                .build();
+    }
+
+    public ChildResponseDTO.getStoreDTO getStore(Long childId) {
+        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + " Not Found"));
+        List<Store> Items = storeRepository.findAll();
+        List<ChildResponseDTO.getStoreItemsDTO> items = new ArrayList<>();
+        for(Store store: Items) {
+            ChildResponseDTO.getStoreItemsDTO temp = ChildResponseDTO.getStoreItemsDTO.builder()
+                    .id(store.getId())
+                    .name(store.getName())
+                    .cost(store.getCost()).build();
+            items.add(temp);
+        }
+
+        return ChildResponseDTO.getStoreDTO.builder()
+                .grape(child.getGrape())
+                .items(items).build();
+    }
+
+    public ChildResponseDTO.purchaseDTO purchase(Long childId, ChildRequestDTO.PurchaseDTO request) {
+        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + " Not Found"));
+        Store item = storeRepository.findById(request.getItemId()).orElseThrow(() -> new RuntimeException("Store " + request.getItemId() + " Not Found"));
+
+        Long cur = child.getGrape();
+        Long cost = item.getCost() * 6;
+        if(cost > cur) {
+            throw new RuntimeException("포도송이가 부족합니다");
+        }
+
+        Long newGrapes = cur - cost;
+        child.setGrape(newGrapes);
+        childRepository.save(child);
+
+        return ChildResponseDTO.purchaseDTO.builder()
+                .grape(newGrapes).build();
     }
 }
