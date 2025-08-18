@@ -6,4 +6,6 @@ public enum PeriodType {
     public String toString() {
         return this.name();
     }
+
+    public PeriodType fromOrdinal(int ordinal) { return values()[ordinal]; }
 }

@@ -54,6 +54,8 @@ public class ChildService {
         ChildStat newStat = ChildStat.builder()
                 .child(child)
                 .type()
+                .period(LocalDate.now().toString())
+                .emotion(Emotion.)
     }
 
     public ChildResponseDTO.getPredesignedQuestionDTO getPredesignedQuestion(Long childId) {

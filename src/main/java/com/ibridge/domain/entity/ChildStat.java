@@ -19,12 +19,14 @@ public class ChildStat {
     @ManyToOne(fetch = FetchType.LAZY)
     private Child child;
 
+    @Enumerated(EnumType.ORDINAL)
     @Column(nullable = false)
     private PeriodType type;
 
     @Column(nullable = false)
     private String period;
 
+    @Enumerated(EnumType.ORDINAL)
     @Column
     private Emotion emotion;
 
