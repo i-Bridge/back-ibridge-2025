@@ -37,11 +37,15 @@ public class ChildService {
         Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException(childId + "인 child가 없습니다."));
         boolean isCompleted = todaySubject.get(0).isCompleted();
 
-        ChildStat childStat = childStatRepository.findByChildToday(child, LocalDate.now().toString()).orElse(null);
+        String today = LocalDate.now().toString();
+        ChildStat childStat = childStatRepository.findByChildToday(child, today).orElse(null);
         boolean emotion = true;
         if(childStat == null) {
             emotion = false;
         }
+
+        ChildStat monthStat = childStatRepository.findMonthStatByChildandToday(child, today).orElse(null);
+        ChildStat weekStat = childStatRepository.findWeekStatByChildandToday(child, today).orElse(null);
 
         return ChildResponseDTO.getQuestionDTO.builder()
                 .emotion(emotion)
@@ -50,14 +54,38 @@ public class ChildService {
 
     public void setEmotion(Long childId, ChildRequestDTO.setEmotionDTO request) {
         Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException(childId + "인 child가 없습니다."));
+        LocalDate today = LocalDate.now();
 
         ChildStat newStat = ChildStat.builder()
                 .child(child)
                 .type(PeriodType.fromOrdinal(0))
-                .period(LocalDate.now().toString())
+                .period(today.toString())
                 .emotion(Emotion.fromOrdinal(request.getEmotion()))
                 .answerCount(0L).build();
         childStatRepository.save(newStat);
+
+        int date = today.getDayOfMonth();
+        String yearMonth = today.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+        if(date == 1) {
+            ChildStat monthStat = ChildStat.builder()
+                    .child(child)
+                    .type(PeriodType.MONTH)
+                    .period(yearMonth)
+                    .emotion(null)
+                    .answerCount(0L).build();
+            childStatRepository.save(monthStat);
+        }
+
+        String dayName = today.getDayOfWeek().toString();
+        if(dayName == "MONDAY") {
+            ChildStat weekStat = ChildStat.builder()
+                    .child(child)
+                    .type(PeriodType.WEEK)
+                    .period(today.toString())
+                    .emotion(null)
+                    .answerCount(0L).build();
+            childStatRepository.save(weekStat);
+        }
 
         return;
     }
