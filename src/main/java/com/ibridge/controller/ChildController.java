@@ -32,6 +32,18 @@ public class ChildController {
         }
     }
 
+    @PostMapping("/{childId}/emotion")
+    public ApiResponse setEmotion(@PathVariable Long childId, @RequestBody ChildRequestDTO.setEmotionDTO request) {
+        try {
+            childService.setEmotion(childId, request);
+            return ApiResponse.onSuccess(null);
+        }
+        catch (Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
+    }
+
     @GetMapping("/{childId}/reward")
     public ApiResponse<ChildResponseDTO.getRewardDTO> reward(@PathVariable Long childId) {
         try {

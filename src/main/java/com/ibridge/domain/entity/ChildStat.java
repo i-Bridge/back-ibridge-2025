@@ -25,7 +25,7 @@ public class ChildStat {
     @Column(nullable = false)
     private String period;
 
-    @Column(nullable = false)
+    @Column
     private Emotion emotion;
 
     @Column(nullable = false)

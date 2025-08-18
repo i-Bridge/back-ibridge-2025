@@ -29,15 +29,31 @@ public class ChildService {
     private final ParentRepository parentRepository;
     private final NoticeRepository NoticeRepository;
     private final StoreRepository storeRepository;
+    private final ChildStatRepository childStatRepository;
 
     //질문 화면 관련
     public ChildResponseDTO.getQuestionDTO getHome(Long childId) {
         List<Subject> todaySubject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
+        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException(childId + "인 child가 없습니다."));
         boolean isCompleted = todaySubject.get(0).isCompleted();
 
+        ChildStat childStat = childStatRepository.findByChildToday(child, LocalDate.now().toString()).orElse(null);
+        boolean emotion = true;
+        if(childStat == null) {
+            emotion = false;
+        }
+
         return ChildResponseDTO.getQuestionDTO.builder()
-                .name(childRepository.findById(childId).orElseThrow(() -> new RuntimeException(childId + "인 child가 없습니다.")).getName())
+                .emotion(emotion)
                 .isCompleted(isCompleted).build();
+    }
+
+    public void setEmotion(Long childId, ChildRequestDTO.setEmotionDTO request) {
+        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException(childId + "인 child가 없습니다."));
+
+        ChildStat newStat = ChildStat.builder()
+                .child(child)
+                .type()
     }
 
     public ChildResponseDTO.getPredesignedQuestionDTO getPredesignedQuestion(Long childId) {
