@@ -7,5 +7,5 @@ public enum PeriodType {
         return this.name();
     }
 
-    public PeriodType fromOrdinal(int ordinal) { return values()[ordinal]; }
+    public static PeriodType fromOrdinal(int ordinal) { return values()[ordinal]; }
 }

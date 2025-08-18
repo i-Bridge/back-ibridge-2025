@@ -10,6 +10,14 @@ public class ChildRequestDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class setEmotionDTO {
+        Integer emotion;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class PurchaseDTO {
         Long itemId;
     }

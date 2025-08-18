@@ -53,9 +53,13 @@ public class ChildService {
 
         ChildStat newStat = ChildStat.builder()
                 .child(child)
-                .type()
+                .type(PeriodType.fromOrdinal(0))
                 .period(LocalDate.now().toString())
-                .emotion(Emotion.)
+                .emotion(Emotion.fromOrdinal(request.getEmotion()))
+                .answerCount(0L).build();
+        childStatRepository.save(newStat);
+
+        return;
     }
 
     public ChildResponseDTO.getPredesignedQuestionDTO getPredesignedQuestion(Long childId) {
