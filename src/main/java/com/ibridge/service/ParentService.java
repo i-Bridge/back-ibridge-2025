@@ -2,11 +2,8 @@ package com.ibridge.service;
 
 import com.ibridge.domain.dto.request.NoticeRequestDTO;
 import com.ibridge.domain.dto.request.ParentRequestDTO;
-import com.ibridge.domain.dto.response.NoticeExistDTO;
-import com.ibridge.domain.dto.response.ParentHomeResponseDTO;
-import com.ibridge.domain.dto.response.ParentResponseDTO;
+import com.ibridge.domain.dto.response.*;
 import com.ibridge.domain.dto.SubjectDTO;
-import com.ibridge.domain.dto.response.readSubjectsResponseDTO;
 import com.ibridge.domain.entity.*;
 import com.ibridge.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +38,8 @@ public class ParentService {
     private final AnalysisRepository analysisRepository;
     private final NoticeRepository noticeRepository;
     private final FamilyRepository familyRepository;
+    private final ChildStatRepository childStatRepository;
+    private final ChildPositiveBoardRepository childPositiveBoardRepository;
 
     public ParentHomeResponseDTO getParentHome(Long childId, LocalDate date, String email) {
         Child child = childRepository.findById(childId).orElse(null);
@@ -74,6 +73,31 @@ public class ParentService {
     }
     public void openNotice(NoticeRequestDTO noticeRequestDTO) {
         noticeRepository.deleteById(noticeRequestDTO.getNoticeId());
+    }
+    public AnalysisResponseDTO getAnalysis(Long childId, String periodType, String periodValue, String emotionMonth) {
+        Child child = childRepository.findById(childId).orElse(null);
+        Long cumulative = childStatRepository.findByChild(child);
+        List<Emotion> emotionList = childStatRepository.findAllByChildAndPeriod(child, emotionMonth);
+        List<Long> cumList = new ArrayList<>();
+        //periodType = day, week, month 중 하나
+        if(periodType.equals("DAY")){
+            cumList.add(childStatRepository.findAllByChildAndDay(child));
+        }
+        else if(periodType.equals("WEEK")){
+
+        }
+        else if(periodType.equals("MONTH")){
+
+        }
+        //periodValue = 달까지, 년까지, ALL 중 하나
+
+
+        return AnalysisResponseDTO.builder()
+                .cumulative(cumulative)
+                .emotions(emotionList)
+                .cumList()
+                .keywords()
+                .build();
     }
 
 //현호

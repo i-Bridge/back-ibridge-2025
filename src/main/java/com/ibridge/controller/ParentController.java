@@ -131,8 +131,17 @@ public class ParentController {
             return ApiResponse.onFailure("404", e.getMessage());
         }
     }
-
-
+    @GetMapping("/{childId}/stat")
+    public ApiResponse<AnalysisResponseDTO> getAnalysis(@PathVariable Long childId, @RequestParam("answer") String periodType, @RequestParam("keyword") String periodValue, @RequestParam("emotionMonth") String emotionMonth){
+        try{
+            AnalysisResponseDTO analysisResponseDTO = parentService.getAnalysis(childId, periodType, periodValue, emotionMonth);
+            return ApiResponse.onSuccess(analysisResponseDTO);
+        }
+        catch(Exception e){
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
+    }
 
 
 
