@@ -37,16 +37,34 @@ public class ChildService {
         Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException(childId + "인 child가 없습니다."));
         boolean isCompleted = todaySubject.get(0).isCompleted();
 
-        String today = LocalDate.now().toString();
-        ChildStat childStat = childStatRepository.findByChildToday(child, today).orElse(null);
+        LocalDate today = LocalDate.now();
+        ChildStat childStat = childStatRepository.findByChildToday(child, today.toString()).orElse(null);
         boolean emotion = true;
         if(childStat == null) {
             emotion = false;
         }
 
-        ChildStat monthStat = childStatRepository.findMonthStatByChildandToday(child, today).orElse(null);
-        ChildStat weekStat = childStatRepository.findWeekStatByChildandToday(child, today).orElse(null);
-
+        ChildStat monthStat = childStatRepository.findMonthStatByChildandToday(child, today.toString()).orElse(null);
+        if(monthStat == null) {
+            String yearMonth = today.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+            ChildStat newMonthStat = ChildStat.builder()
+                    .child(child)
+                    .type(PeriodType.MONTH)
+                    .period(yearMonth)
+                    .emotion(null)
+                    .answerCount(0L).build();
+            childStatRepository.save(newMonthStat);
+        }
+        ChildStat weekStat = childStatRepository.findWeekStatByChildandToday(child, today.toString()).orElse(null);
+        if(weekStat == null) {
+            ChildStat newWeekStat = ChildStat.builder()
+                    .child(child)
+                    .type(PeriodType.WEEK)
+                    .period(today.toString())
+                    .emotion(null)
+                    .answerCount(0L).build();
+            childStatRepository.save(newWeekStat);
+        }
         return ChildResponseDTO.getQuestionDTO.builder()
                 .emotion(emotion)
                 .isCompleted(isCompleted).build();
@@ -63,29 +81,6 @@ public class ChildService {
                 .emotion(Emotion.fromOrdinal(request.getEmotion()))
                 .answerCount(0L).build();
         childStatRepository.save(newStat);
-
-        int date = today.getDayOfMonth();
-        String yearMonth = today.format(DateTimeFormatter.ofPattern("yyyy-MM"));
-        if(date == 1) {
-            ChildStat monthStat = ChildStat.builder()
-                    .child(child)
-                    .type(PeriodType.MONTH)
-                    .period(yearMonth)
-                    .emotion(null)
-                    .answerCount(0L).build();
-            childStatRepository.save(monthStat);
-        }
-
-        String dayName = today.getDayOfWeek().toString();
-        if(dayName == "MONDAY") {
-            ChildStat weekStat = ChildStat.builder()
-                    .child(child)
-                    .type(PeriodType.WEEK)
-                    .period(today.toString())
-                    .emotion(null)
-                    .answerCount(0L).build();
-            childStatRepository.save(weekStat);
-        }
 
         return;
     }
@@ -129,6 +124,9 @@ public class ChildService {
                 .answer(request.getText())
                 .uploaded(false).build();
         analysisRepository.save(analysis);
+        
+        //stat 답변 수 추가
+        
         System.out.println("Analysis Saved: " + analysis.getId());
 
         if(questions.size() == 5) {
