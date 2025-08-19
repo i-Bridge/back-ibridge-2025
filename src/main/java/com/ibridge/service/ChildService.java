@@ -140,6 +140,9 @@ public class ChildService {
             targetSubject.setTitle(summary);
             subjectRepository.save(targetSubject);
 
+            //키워드 추출
+            //ChildPositiveBoard 저장
+            
             makeNotice(targetSubject);
 
             return ChildResponseDTO.getAI.builder()
