@@ -2,6 +2,27 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.2'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'de.aaschmid.cpd' version '3.5'
+}
+
+cpd {
+    toolVersion = '7.7.0'
+    language = 'java'
+    ignoreFailures = true
+    minimumTokenCount = 60
+    ignoreAnnotations = true
+    ignoreLiterals = true
+    ignoreIdentifiers = true
+}
+
+tasks.named('cpdCheck') {
+    reports {
+        xml.required.set(true)
+        text.required.set(true)
+        csv.required.set(false)
+    }
+    source = sourceSets.main.allJava
+    exclude '**/build/**', '**/generated/**', '**/resources/**'
 }
 
 group = 'com'
