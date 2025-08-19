@@ -14,9 +14,9 @@ import java.util.List;
 @NoArgsConstructor
 public class AnalysisResponseDTO {
     private Long cumulative;
-    private List<Integer> cumList;
-    private List<keywordDTO> keywords;
     private List<Emotion> emotions;
+    private List<Long> cumList;
+    private List<keywordDTO> keywords;
 
     @Getter
     @Builder

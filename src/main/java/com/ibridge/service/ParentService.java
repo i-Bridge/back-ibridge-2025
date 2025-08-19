@@ -7,6 +7,7 @@ import com.ibridge.domain.dto.SubjectDTO;
 import com.ibridge.domain.entity.*;
 import com.ibridge.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +18,10 @@ import java.io.InputStreamReader;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -76,27 +79,58 @@ public class ParentService {
     }
     public AnalysisResponseDTO getAnalysis(Long childId, String periodType, String periodValue, String emotionMonth) {
         Child child = childRepository.findById(childId).orElse(null);
-        Long cumulative = childStatRepository.findByChild(child);
-        List<Emotion> emotionList = childStatRepository.findAllByChildAndPeriod(child, emotionMonth);
-        List<Long> cumList = new ArrayList<>();
-        //periodType = day, week, month 중 하나
-        if(periodType.equals("DAY")){
-            cumList.add(childStatRepository.findAllByChildAndDay(child));
+        Long cumulative = childStatRepository.findSumByChildAndType(child, PeriodType.MONTH);
+        List<Emotion> emotionList = childStatRepository.findEmotionsByChildAndMonth(child, emotionMonth);
+        PeriodType typeEnum;
+        try{
+            typeEnum = PeriodType.valueOf(periodType.toUpperCase());
+        } catch(IllegalArgumentException e){
+            throw new RuntimeException("잘못된 periodType 값: " + periodType);
         }
-        else if(periodType.equals("WEEK")){
+        List<String> periodList = new ArrayList<>();
+        LocalDate now = LocalDate.now();
 
+        switch(typeEnum) {
+            case DAY:
+                for(int i = 6; i >= 0; i--) {
+                    periodList.add(now.minusDays(i).toString()); // "YYYY-MM-DD"
+                }
+                break;
+            case WEEK:
+                LocalDate thisMonday = now.with(DayOfWeek.MONDAY);
+                for(int i = 6; i >= 0; i--) {
+                    LocalDate weekStart = thisMonday.minusWeeks(i);
+                    periodList.add(weekStart.toString()); // 필요시 포맷 변환 가능
+                }
+                break;
+            case MONTH:
+                for(int i = 6; i >= 0; i--) {
+                    YearMonth ym = YearMonth.from(now).minusMonths(i);
+                    periodList.add(ym.toString()); // "YYYY-MM"
+                }
+                break;
+            default:
+                throw new RuntimeException("지원하지 않는 typeEnum: " + typeEnum);
         }
-        else if(periodType.equals("MONTH")){
 
+        List<Long> cumList = childStatRepository.findAnswerCountsByChildAndPeriodList(child, typeEnum, periodList);
+
+        List<AnalysisResponseDTO.keywordDTO> keywordList;
+        PageRequest top7 = PageRequest.of(0,7);
+        if (periodValue.matches("\\d{4}-\\d{2}")) {
+            keywordList = childPositiveBoardRepository.findKeywordsAndPositivesByMonth(child, periodValue, top7);
+
+        } else if (periodValue.matches("\\d{4}")) {
+            keywordList = childPositiveBoardRepository.findKeywordsAndPositivesByYear(child, periodValue, top7);
+
+        } else {
+            keywordList = childPositiveBoardRepository.findKeywordsAndPositivesByCumulative(child, top7);
         }
-        //periodValue = 달까지, 년까지, ALL 중 하나
-
-
         return AnalysisResponseDTO.builder()
                 .cumulative(cumulative)
                 .emotions(emotionList)
-                .cumList()
-                .keywords()
+                .cumList(cumList)
+                .keywords(keywordList)
                 .build();
     }
 
