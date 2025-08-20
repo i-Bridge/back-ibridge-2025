@@ -107,7 +107,7 @@ public class ChildController {
     @PostMapping("/{childId}/answer")
     public ApiResponse<ChildResponseDTO.getAI> getQuestion(@PathVariable Long childId, @RequestBody ChildRequestDTO.AnswerDTO request) {
         try {
-            ChildResponseDTO.getAI data = childService.getNextQuestion(request);
+            ChildResponseDTO.getAI data = childService.getNextQuestion(childId, request);
             return ApiResponse.onSuccess(data);
         }
         catch (Exception e) {

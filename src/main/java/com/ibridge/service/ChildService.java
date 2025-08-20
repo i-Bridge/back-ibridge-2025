@@ -9,12 +9,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -38,15 +40,15 @@ public class ChildService {
         boolean isCompleted = todaySubject.get(0).isCompleted();
 
         LocalDate today = LocalDate.now();
-        ChildStat childStat = childStatRepository.findByChildToday(child, today.toString()).orElse(null);
+        ChildStat childStat = childStatRepository.findDateStatByChildandToday(child, today.toString()).orElse(null);
         boolean emotion = true;
         if(childStat == null) {
             emotion = false;
         }
 
-        ChildStat monthStat = childStatRepository.findMonthStatByChildandToday(child, today.toString()).orElse(null);
+        String yearMonth = today.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+        ChildStat monthStat = childStatRepository.findMonthStatByChildandToday(child, yearMonth).orElse(null);
         if(monthStat == null) {
-            String yearMonth = today.format(DateTimeFormatter.ofPattern("yyyy-MM"));
             ChildStat newMonthStat = ChildStat.builder()
                     .child(child)
                     .type(PeriodType.MONTH)
@@ -55,12 +57,14 @@ public class ChildService {
                     .answerCount(0L).build();
             childStatRepository.save(newMonthStat);
         }
-        ChildStat weekStat = childStatRepository.findWeekStatByChildandToday(child, today.toString()).orElse(null);
+
+        LocalDate monday = LocalDate.now().with(DayOfWeek.MONDAY);
+        ChildStat weekStat = childStatRepository.findWeekStatByChildandToday(child, monday.toString()).orElse(null);
         if(weekStat == null) {
             ChildStat newWeekStat = ChildStat.builder()
                     .child(child)
                     .type(PeriodType.WEEK)
-                    .period(today.toString())
+                    .period(monday.toString())
                     .emotion(null)
                     .answerCount(0L).build();
             childStatRepository.save(newWeekStat);
@@ -114,8 +118,10 @@ public class ChildService {
                 .subjectId(newSubject.getId()).build();
     }
 
-    public ChildResponseDTO.getAI getNextQuestion(ChildRequestDTO.AnswerDTO request) {
+    public ChildResponseDTO.getAI getNextQuestion(Long childId, ChildRequestDTO.AnswerDTO request) {
         System.out.println("Requesting Next Question: " + request.getText());
+        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + " Not Found "));
+        LocalDate today = LocalDate.now();
         Subject targetSubject = subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject " + request.getSubjectId() + " Not Found "));
         targetSubject.setAnswer(true);
         List<Question> questions = questionRepository.findAllBySubject(targetSubject);
@@ -125,8 +131,29 @@ public class ChildService {
                 .uploaded(false).build();
         analysisRepository.save(analysis);
         
-        //stat 답변 수 추가
-        
+        ChildStat dateStat = childStatRepository.findDateStatByChildandToday(child, today.toString()).orElseThrow(
+                () -> new RuntimeException("Stat: " + childId + "'s Date Stat Not Found ")
+        );
+        String monday = today.with(DayOfWeek.MONDAY).toString();
+        ChildStat weekStat = childStatRepository.findWeekStatByChildandToday(child, monday).orElseThrow(
+                () -> new RuntimeException("Stat: " + childId + "'s Week Stat Not Found ")
+        );
+        String yearmonth = today.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+        ChildStat monthStat = childStatRepository.findMonthStatByChildandToday(child, yearmonth).orElseThrow(
+                () -> new RuntimeException("Stat: " + childId + "'s Month Stat Not Found ")
+        );
+
+        long dateCount = dateStat.getAnswerCount();
+        long weekCount = weekStat.getAnswerCount();
+        long monthCount = monthStat.getAnswerCount();
+
+        dateStat.setAnswerCount(dateCount + 1);
+        weekStat.setAnswerCount(weekCount + 1);
+        monthStat.setAnswerCount(monthCount + 1);
+
+        childStatRepository.save(dateStat);
+        childStatRepository.save(weekStat);
+        childStatRepository.save(monthStat);
         System.out.println("Analysis Saved: " + analysis.getId());
 
         if(questions.size() == 5) {

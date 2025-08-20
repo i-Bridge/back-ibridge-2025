@@ -14,7 +14,7 @@ import java.util.Optional;
 
 public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
     @Query("SELECT cs FROM ChildStat cs WHERE cs.child = :child and cs.type = 0 and cs.period =: today")
-    Optional<ChildStat> findByChildToday(@Param("child") Child child, @Param("today") String today);
+    Optional<ChildStat> findDateStatByChildandToday(@Param("child") Child child, @Param("today") String today);
 
     @Query("SELECT COALESCE(SUM(cs.answerCount), 0) FROM ChildStat cs WHERE cs.child = :child AND cs.type = :periodType")
     Long findSumByChildAndType(@Param("child") Child child, @Param("periodType") PeriodType periodType);
@@ -40,4 +40,19 @@ public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
             "AND cs.period IN :periodList " +
             "ORDER BY cs.period ASC")
     List<Long> findAnswerCountsByChildAndPeriodList(@Param("child") Child child, @Param("periodType") PeriodType periodType, @Param("periodList") List<String> periodList);
+
+    @Query("SELECT cs " +
+            "FROM ChildStat cs " +
+            "WHERE cs.child = :child " +
+            "AND cs.type = 2 " +
+            "AND cs.period = :today ")
+    Optional<ChildStat> findMonthStatByChildandToday(@Param("child") Child child, @Param("today") String today);
+
+    @Query("SELECT cs " +
+            "FROM ChildStat cs " +
+            "WHERE cs.child = :child " +
+            "AND cs.type = 1 " +
+            "AND cs.period = :monday ")
+    Optional<ChildStat> findWeekStatByChildandToday(@Param("child") Child child, @Param("monday") String monday);
+
 }
