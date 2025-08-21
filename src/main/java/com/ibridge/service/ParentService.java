@@ -152,7 +152,8 @@ public class ParentService {
     public AnalysisResponseDTO getKeywords(Long childId, String periodType, String periodValue) {
         Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child not found"));
         PageRequest top7 = PageRequest.of(0,7);
-        List<ChildPositiveBoard> childPositiveBoards = childPositiveBoardRepository.findByChildAndTypeAndPeriod(child, periodType, periodValue, top7);
+        PeriodType type = PeriodType.valueOf(periodType);
+        List<ChildPositiveBoard> childPositiveBoards = childPositiveBoardRepository.findByChildAndTypeAndPeriod(child, type, periodValue, top7);
         List<KeywordDTO> keywords = new ArrayList<>();
         for(ChildPositiveBoard childPositiveBoard : childPositiveBoards){
             keywords.add(KeywordDTO.builder()

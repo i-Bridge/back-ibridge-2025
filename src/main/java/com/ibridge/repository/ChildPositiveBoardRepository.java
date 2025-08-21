@@ -27,7 +27,7 @@ public interface ChildPositiveBoardRepository extends JpaRepository<ChildPositiv
             "FROM ChildPositiveBoard cb " +
             "WHERE cb.child = :child AND cb.type = :periodType AND cb.period = :periodValue " +
             "ORDER BY cb.period DESC")
-    List<ChildPositiveBoard> findByChildAndTypeAndPeriod(Child child, String periodType, String periodValue, Pageable pageable);
+    List<ChildPositiveBoard> findByChildAndTypeAndPeriod(Child child, PeriodType periodType, String periodValue, Pageable pageable);
 
     @Query("SELECT cb " +
             "FROM ChildPositiveBoard cb " +
