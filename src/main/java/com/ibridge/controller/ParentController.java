@@ -168,17 +168,17 @@ public class ParentController {
         }
     }
 
-    @GetMapping("/{childId}/stat/keyword")
-    public ApiResponse<AnalysisResponseDTO> getKeywords(@PathVariable Long childId, @RequestParam("periodType") String periodType, @RequestParam("periodValue") String periodValue){
-        try{
-            AnalysisResponseDTO analysisResponseDTO = parentService.getKeywords(childId, periodType, periodValue);
-            return ApiResponse.onSuccess(analysisResponseDTO);
-        }
-        catch(Exception e){
-            System.out.println("failure return: " + e.getMessage());
-            return ApiResponse.onFailure("404", e.getMessage());
-        }
-    }
+//    @GetMapping("/{childId}/stat/keyword")
+//    public ApiResponse<AnalysisResponseDTO> getKeywords(@PathVariable Long childId, @RequestParam("periodType") String periodType, @RequestParam("periodValue") String periodValue){
+//        try{
+//            AnalysisResponseDTO analysisResponseDTO = parentService.getKeywords(childId, periodType, periodValue);
+//            return ApiResponse.onSuccess(analysisResponseDTO);
+//        }
+//        catch(Exception e){
+//            System.out.println("failure return: " + e.getMessage());
+//            return ApiResponse.onFailure("404", e.getMessage());
+//        }
+//    }
 
 
 

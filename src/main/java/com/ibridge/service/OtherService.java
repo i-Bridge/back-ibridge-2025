@@ -1,9 +1,7 @@
 package com.ibridge.service;
 
 import com.ibridge.domain.dto.response.SubjectResponseDTO;
-import com.ibridge.domain.entity.Child;
-import com.ibridge.domain.entity.Question;
-import com.ibridge.domain.entity.Subject;
+import com.ibridge.domain.entity.*;
 import com.ibridge.repository.ChildRepository;
 import com.ibridge.repository.QuestionRepository;
 import com.ibridge.repository.SubjectRepository;
@@ -29,6 +27,7 @@ public class OtherService {
 
     public void setSubject() {
         List<Child> children = childRepository.findAll();
+        LocalDate today = LocalDate.now();
         List<String> subjects = new ArrayList<>();
         try (InputStream inputStream = QuestionService.class.getClassLoader().getResourceAsStream("SubjectList.txt")) {
             if (inputStream == null) {
@@ -44,7 +43,12 @@ public class OtherService {
             e.printStackTrace();
         }
         for (Child child : children) {
-            //stat 테이블 생성
+            ChildStat dailyStat = ChildStat.builder()
+                    .child(child)
+                    .emotion(null)
+                    .type(PeriodType.DAY)
+                    .period(today)
+                    .answerCount(0L).build();
             
             int id = random.nextInt(subjects.size());
             String randomQuestion = subjects.get(id);

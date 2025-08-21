@@ -46,7 +46,7 @@ public class ChildService {
         if(childStat == null || childStat.getEmotion() == null) {
             emotion = false;
 
-            ChildStat newDateStat = ChildStat.builder()
+            ChildStat newDateStat = childStat != null ? childStat : ChildStat.builder()
                     .child(child)
                     .type(PeriodType.DAY)
                     .period(today)
