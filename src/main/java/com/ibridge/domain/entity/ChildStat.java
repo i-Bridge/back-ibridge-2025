@@ -28,7 +28,6 @@ public class ChildStat {
     @Column(nullable = false)
     private LocalDate period;
 
-    @Enumerated(EnumType.ORDINAL)
     @Column
     private Integer emotion;
 
