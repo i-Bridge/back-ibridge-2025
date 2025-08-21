@@ -85,15 +85,14 @@ public class ParentService {
         LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();
         // 감정 목록 조회, null이면 0으로 채움 (달의 일 수만큼)
-        Map<LocalDate, Integer> emotionsFromDb = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
-
+        List<ChildStat> emotionsFromDb = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
         int daysInMonth = yearMonth.lengthOfMonth();
-        List<Integer> emotions = new ArrayList<>(daysInMonth);
-
-        for (int i = 0; i < daysInMonth; i++) {
-            LocalDate date = start.plusDays(i);
-            // 해당 날짜 값 있으면 넣고, 없으면 0
-            emotions.add(emotionsFromDb.getOrDefault(date, 0));
+        Integer[] emotions = new Integer[daysInMonth+1];
+        Arrays.fill(emotions, 0);
+        for(ChildStat childStat : emotionsFromDb) {
+            if(childStat.getEmotion() != null){
+                emotions[childStat.getPeriod().getDayOfMonth()] = childStat.getEmotion();
+            }
         }
         // 최근 7일 기간 리스트
         List<LocalDate> periodList = new ArrayList<>();
@@ -113,7 +112,7 @@ public class ParentService {
         }
         return AnalysisResponseDTO.builder()
                 .cumulative(cumulative)
-                .emotions(emotions)
+                .emotions(Arrays.asList(emotions))
                 .cumList(cumList)
                 .build();
     }
@@ -126,20 +125,18 @@ public class ParentService {
         LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();
 
-        // DB에서 날짜별 감정값을 Map으로 조회
-        Map<LocalDate, Integer> emotionsFromDb = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
-
+        List<ChildStat> emotionsFromDb = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
         int daysInMonth = yearMonth.lengthOfMonth();
-        List<Integer> emotions = new ArrayList<>(daysInMonth);
-
-        for (int i = 0; i < daysInMonth; i++) {
-            LocalDate date = start.plusDays(i);
-            // 해당 날짜 값 있으면 넣고, 없으면 0
-            emotions.add(emotionsFromDb.getOrDefault(date, 0));
+        Integer[] emotions = new Integer[daysInMonth+1];
+        Arrays.fill(emotions, 0);
+        for(ChildStat childStat : emotionsFromDb) {
+            if(childStat.getEmotion() != null){
+                emotions[childStat.getPeriod().getDayOfMonth()] = childStat.getEmotion();
+            }
         }
 
         return AnalysisResponseDTO.builder()
-                .emotions(emotions)
+                .emotions(Arrays.asList(emotions))
                 .build();
     }
 
