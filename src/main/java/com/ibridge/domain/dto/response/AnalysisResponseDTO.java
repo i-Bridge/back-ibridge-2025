@@ -24,6 +24,7 @@ public class AnalysisResponseDTO {
     @NoArgsConstructor
     public static class keywordDTO{
         private String keyword;
+        private Long count;
         private Long positiveScore;
     }
 }

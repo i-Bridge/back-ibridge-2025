@@ -77,58 +77,29 @@ public class ParentService {
     public void openNotice(NoticeRequestDTO noticeRequestDTO) {
         noticeRepository.deleteById(noticeRequestDTO.getNoticeId());
     }
-    public AnalysisResponseDTO getAnalysis(Long childId, String periodType, String periodValue, String emotionMonth) {
+    public AnalysisResponseDTO getDefaultAnalysis(Long childId, LocalDate today) {
         Child child = childRepository.findById(childId).orElse(null);
         Long cumulative = childStatRepository.findSumByChildAndType(child, PeriodType.MONTH);
-        List<Emotion> emotionList = childStatRepository.findEmotionsByChildAndMonth(child, emotionMonth);
-        PeriodType typeEnum;
-        try{
-            typeEnum = PeriodType.valueOf(periodType.toUpperCase());
-        } catch(IllegalArgumentException e){
-            throw new RuntimeException("잘못된 periodType 값: " + periodType);
-        }
+        YearMonth yearMonth = YearMonth.from(today);
+        LocalDate start = yearMonth.atDay(1);
+        LocalDate end = yearMonth.atEndOfMonth();
+        List<Emotion> emotions = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
+
         List<String> periodList = new ArrayList<>();
-        LocalDate now = LocalDate.now();
 
-        switch(typeEnum) {
-            case DAY:
-                for(int i = 6; i >= 0; i--) {
-                    periodList.add(now.minusDays(i).toString()); // "YYYY-MM-DD"
-                }
-                break;
-            case WEEK:
-                LocalDate thisMonday = now.with(DayOfWeek.MONDAY);
-                for(int i = 6; i >= 0; i--) {
-                    LocalDate weekStart = thisMonday.minusWeeks(i);
-                    periodList.add(weekStart.toString()); // 필요시 포맷 변환 가능
-                }
-                break;
-            case MONTH:
-                for(int i = 6; i >= 0; i--) {
-                    YearMonth ym = YearMonth.from(now).minusMonths(i);
-                    periodList.add(ym.toString()); // "YYYY-MM"
-                }
-                break;
-            default:
-                throw new RuntimeException("지원하지 않는 typeEnum: " + typeEnum);
+        for(int i = 6; i >= 0; i--) {
+            periodList.add(today.minusDays(i).toString()); // "YYYY-MM-DD"
         }
 
-        List<Long> cumList = childStatRepository.findAnswerCountsByChildAndPeriodList(child, typeEnum, periodList);
+        List<Long> cumList = childStatRepository.findAnswerCountsByChildAndPeriodList(child, periodList);
 
         List<AnalysisResponseDTO.keywordDTO> keywordList;
         PageRequest top7 = PageRequest.of(0,7);
-        if (periodValue.matches("\\d{4}-\\d{2}")) {
-            keywordList = childPositiveBoardRepository.findKeywordsAndPositivesByMonth(child, periodValue, top7);
+        keywordList = childPositiveBoardRepository.findKeywordsAndPositivesByMonth(child, top7);
 
-        } else if (periodValue.matches("\\d{4}")) {
-            keywordList = childPositiveBoardRepository.findKeywordsAndPositivesByYear(child, periodValue, top7);
-
-        } else {
-            keywordList = childPositiveBoardRepository.findKeywordsAndPositivesByCumulative(child, top7);
-        }
         return AnalysisResponseDTO.builder()
                 .cumulative(cumulative)
-                .emotions(emotionList)
+                .emotions(emotions)
                 .cumList(cumList)
                 .keywords(keywordList)
                 .build();

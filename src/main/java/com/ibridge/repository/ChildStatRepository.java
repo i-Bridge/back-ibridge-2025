@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.parameters.P;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,9 +24,9 @@ public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
             "FROM ChildStat cs " +
             "WHERE cs.child = :child " +
             "AND cs.type = com.ibridge.domain.entity.PeriodType.DAY " +
-            "AND cs.period LIKE CONCAT(:month, '%')" +
+            "AND cs.period BETWEEN :start and :end " +
             "ORDER BY cs.period")
-    List<Emotion> findEmotionsByChildAndMonth(@Param("child") Child child, @Param("month") String month);
+    List<Emotion> findEmotionsByChildAndMonth(@Param("child") Child child, @Param("start") LocalDate start, @Param("end") LocalDate end);
 
     @Query("SELECT cs.answerCount " +
             "FROM ChildStat cs " +
@@ -36,10 +37,9 @@ public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
     @Query("SELECT cs.answerCount " +
             "FROM ChildStat cs " +
             "WHERE cs.child = :child " +
-            "AND cs.type = :periodType " +
             "AND cs.period IN :periodList " +
             "ORDER BY cs.period ASC")
-    List<Long> findAnswerCountsByChildAndPeriodList(@Param("child") Child child, @Param("periodType") PeriodType periodType, @Param("periodList") List<String> periodList);
+    List<Long> findAnswerCountsByChildAndPeriodList(@Param("child") Child child, @Param("periodList") List<String> periodList);
 
     @Query("SELECT cs " +
             "FROM ChildStat cs " +

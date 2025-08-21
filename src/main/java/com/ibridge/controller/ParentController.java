@@ -132,9 +132,9 @@ public class ParentController {
         }
     }
     @GetMapping("/{childId}/stat")
-    public ApiResponse<AnalysisResponseDTO> getAnalysis(@PathVariable Long childId, @RequestParam("answer") String periodType, @RequestParam("keyword") String periodValue, @RequestParam("emotionMonth") String emotionMonth){
+    public ApiResponse<AnalysisResponseDTO> getAnalysis(@PathVariable Long childId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date){
         try{
-            AnalysisResponseDTO analysisResponseDTO = parentService.getAnalysis(childId, periodType, periodValue, emotionMonth);
+            AnalysisResponseDTO analysisResponseDTO = parentService.getDefaultAnalysis(childId, date);
             return ApiResponse.onSuccess(analysisResponseDTO);
         }
         catch(Exception e){

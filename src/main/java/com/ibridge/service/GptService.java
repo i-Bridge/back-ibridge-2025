@@ -184,4 +184,53 @@ public class GptService {
         }
         return "GPT 응답 없음";
     }
+
+    public String positiveGPT(String conversation){
+        try {
+            JSONObject message = new JSONObject()
+                    .put("role", "user")
+                    .put("content", conversation);
+
+            JSONObject systemMessage = new JSONObject()
+                    .put("role", "system")
+                    .put("content", "너는 아이의 답변을 듣고 다음 질문을 만들어주는 GPT야.");
+
+            JSONObject body = new JSONObject()
+                    .put("model", "ft:gpt-4.1-nano")
+                    .put("messages", List.of(systemMessage, message));
+
+            RequestBody requestBody = RequestBody.create(
+                    body.toString(),
+                    MediaType.parse("application/json")
+            );
+
+            Request request = new Request.Builder()
+                    .url(API_URL)
+                    .addHeader("Authorization", "Bearer " + OPENAI_API_KEY)
+                    .addHeader("Content-Type", "application/json")
+                    .post(requestBody)
+                    .build();
+
+            try (Response response = client.newCall(request).execute()) {
+                if (response.body() != null) {
+                    String responseBody = response.body().string();
+                    JSONObject jsonResponse = new JSONObject(responseBody);
+
+                    if (jsonResponse.has("choices")) {
+                        return jsonResponse
+                                .getJSONArray("choices")
+                                .getJSONObject(0)
+                                .getJSONObject("message")
+                                .getString("content")
+                                .trim();
+                    } else {
+                        return "OpenAI API 오류 응답: " + responseBody;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            return "GPT 응답 중 오류 발생: " + e.getMessage();
+        }
+        return "GPT 응답 없음";
+    }
 }

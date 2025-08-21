@@ -11,30 +11,12 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface ChildPositiveBoardRepository extends JpaRepository<ChildPositiveBoard, Long> {
-    @Query("SELECT new com.ibridge.domain.dto.response.AnalysisResponseDTO.keywordDTO(cb.keyword, cb.positive) " +
+    @Query("SELECT new com.ibridge.domain.dto.response.AnalysisResponseDTO.keywordDTO(cb.keyword, cb.keywordCount,cb.positive) " +
             "FROM ChildPositiveBoard cb " +
             "WHERE cb.child = :child AND cb.type = com.ibridge.domain.entity.PeriodType.MONTH " +
             "AND cb.period = :periodValue " +
             "ORDER BY cb.keywordCount DESC")
     List<AnalysisResponseDTO.keywordDTO> findKeywordsAndPositivesByMonth(
             @Param("child") Child child,
-            @Param("periodValue") String periodValue,
             Pageable pageable);
-
-    @Query("SELECT new com.ibridge.domain.dto.response.AnalysisResponseDTO.keywordDTO(cb.keyword, cb.positive) " +
-            "FROM ChildPositiveBoard cb " +
-            "WHERE cb.child = :child AND cb.type = com.ibridge.domain.entity.PeriodType.YEAR " +
-            "AND cb.period = :periodValue " +
-            "ORDER BY cb.keywordCount DESC")
-    List<AnalysisResponseDTO.keywordDTO> findKeywordsAndPositivesByYear(
-            @Param("child") Child child,
-            @Param("periodValue") String periodValue,
-            Pageable pageable);
-
-    @Query("SELECT new com.ibridge.domain.dto.response.AnalysisResponseDTO.keywordDTO(cb.keyword, cb.positive) " +
-            "FROM ChildPositiveBoard cb " +
-            "WHERE cb.child = :child " +
-            "AND cb.period = :periodValue " +
-            "ORDER BY cb.keywordCount DESC")
-    List<AnalysisResponseDTO.keywordDTO> findKeywordsAndPositivesByCumulative(Child child, Pageable pageable);
 }
