@@ -7,6 +7,7 @@ import com.ibridge.domain.dto.SubjectDTO;
 import com.ibridge.domain.entity.*;
 import com.ibridge.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
@@ -78,28 +79,23 @@ public class ParentService {
     }
 
     public AnalysisResponseDTO getDefaultAnalysis(Long childId) {
-        Child child = childRepository.findById(childId)
-                .orElseThrow(() -> new RuntimeException("Child not found"));
-
+        Child child = childRepository.findById(childId) .orElseThrow(() -> new RuntimeException("Child not found"));
         Long cumulative = childStatRepository.findSumByChildAndType(child, PeriodType.MONTH);
-
         YearMonth yearMonth = YearMonth.from(LocalDate.now());
         LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();
-
         // 감정 목록 조회, null이면 0으로 채움 (달의 일 수만큼)
-        List<Integer> emotionsFromDb = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
+        List<Map<LocalDate, Integer>> emotionsFromDb = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
         int daysInMonth = yearMonth.lengthOfMonth();
         List<Integer> emotions = new ArrayList<>(daysInMonth);
-
         for (int i = 0; i < daysInMonth; i++) {
-            if (emotionsFromDb != null && i < emotionsFromDb.size() && emotionsFromDb.get(i) != null) {
-                emotions.add(emotionsFromDb.get(i));
-            } else {
+            if (emotionsFromDb != null && (emotionsFromDb.get(0)+"").endsWith(i+"")) {
+                emotions.add(emotionsFromDb.get(i).get(1));
+            }
+            else {
                 emotions.add(0);
             }
         }
-
         // 최근 7일 기간 리스트
         List<LocalDate> periodList = new ArrayList<>();
         for (int i = 6; i >= 0; i--) {
@@ -111,12 +107,11 @@ public class ParentService {
         List<Long> cumList = new ArrayList<>(7);
         for (int i = 0; i < 7; i++) {
             if (cumFromDb != null && i < cumFromDb.size() && cumFromDb.get(i) != null) {
-                cumList.add(cumFromDb.get(i));
-            } else {
+                cumList.add(cumFromDb.get(i)); }
+            else {
                 cumList.add(0L);
             }
         }
-
         return AnalysisResponseDTO.builder()
                 .cumulative(cumulative)
                 .emotions(emotions)
@@ -124,34 +119,26 @@ public class ParentService {
                 .build();
     }
 
-
-
-
-
     public AnalysisResponseDTO getEmotions(Long childId, LocalDate today) {
-        Child child = childRepository.findById(childId)
-                .orElseThrow(() -> new RuntimeException("Child not found"));
-
-        YearMonth yearMonth = YearMonth.from(today);
-        LocalDate start = yearMonth.atDay(1);
+        Child child = childRepository.findById(childId) .orElseThrow(() -> new RuntimeException("Child not found"));
+        YearMonth yearMonth = YearMonth.from(today); LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();
-
-        List<Integer> emotionsFromDb = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
+        List<Map<LocalDate, Integer>> emotionsFromDb = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
         int daysInMonth = yearMonth.lengthOfMonth();
         List<Integer> emotions = new ArrayList<>(daysInMonth);
-
         for (int i = 0; i < daysInMonth; i++) {
-            if (emotionsFromDb != null && i < emotionsFromDb.size() && emotionsFromDb.get(i) != null) {
-                emotions.add(emotionsFromDb.get(i));
-            } else {
+            if (emotionsFromDb != null && (emotionsFromDb.get(0)+"").endsWith(i+"")) {
+                emotions.add(emotionsFromDb.get(i).get(1));
+            }
+            else {
                 emotions.add(0);
             }
         }
-
         return AnalysisResponseDTO.builder()
                 .emotions(emotions)
                 .build();
     }
+
 
 
 

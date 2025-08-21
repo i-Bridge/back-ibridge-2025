@@ -3,6 +3,7 @@ package com.ibridge.repository;
 import com.ibridge.domain.entity.Child;
 import com.ibridge.domain.entity.ChildStat;
 import com.ibridge.domain.entity.PeriodType;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,6 +11,7 @@ import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
@@ -19,13 +21,13 @@ public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
     @Query("SELECT COALESCE(SUM(cs.answerCount), 0) FROM ChildStat cs WHERE cs.child = :child AND cs.type = :periodType")
     Long findSumByChildAndType(@Param("child") Child child, @Param("periodType") PeriodType periodType);
 
-    @Query("SELECT cs.emotion " +
+    @Query("SELECT cs.period, cs.emotion " +
             "FROM ChildStat cs " +
             "WHERE cs.child = :child " +
             "AND cs.type = 0 " +
             "AND cs.period BETWEEN :start and :end " +
             "ORDER BY cs.period")
-    List<Integer> findEmotionsByChildAndMonth(@Param("child") Child child, @Param("start") LocalDate start, @Param("end") LocalDate end);
+    List<Map<LocalDate, Integer>> findEmotionsByChildAndMonth(@Param("child") Child child, @Param("start") LocalDate start, @Param("end") LocalDate end);
 
     @Query("SELECT cs.answerCount " +
             "FROM ChildStat cs " +
@@ -47,5 +49,4 @@ public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
             "AND cs.type = 1 " +
             "AND cs.period = :monday ")
     ChildStat findWeekStatByChildandToday(@Param("child") Child child, @Param("monday") LocalDate monday);
-
 }
