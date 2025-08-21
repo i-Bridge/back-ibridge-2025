@@ -99,9 +99,37 @@ public class ChildService {
     }
 
     public ChildResponseDTO.getPredesignedQuestionDTO getPredesignedQuestion(Long childId) {
-        List<Subject> todaySubject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
+        LocalDate today = LocalDate.now();
+        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + "not Found"));
+        List<Subject> todaySubject = subjectRepository.findByChildIdAndDate(childId, today);
         List<Question> questions = questionRepository.findAllBySubject(todaySubject.get(0));
         Question question = questions.get(questions.size() - 1);
+
+        if(!todaySubject.get(0).isAnswer()) {
+            ChildStat dateStat = childStatRepository.findDateStatByChildandToday(child, today.toString()).orElseThrow(
+                    () -> new RuntimeException("Stat: " + childId + "'s Date Stat Not Found ")
+            );
+            String monday = today.with(DayOfWeek.MONDAY).toString();
+            ChildStat weekStat = childStatRepository.findWeekStatByChildandToday(child, monday).orElseThrow(
+                    () -> new RuntimeException("Stat: " + childId + "'s Week Stat Not Found ")
+            );
+            String yearmonth = today.format(DateTimeFormatter.ofPattern("yyyy-MM")) + "-01";
+            ChildStat monthStat = childStatRepository.findMonthStatByChildandToday(child, yearmonth).orElseThrow(
+                    () -> new RuntimeException("Stat: " + childId + "'s Month Stat Not Found ")
+            );
+
+            long dateCount = dateStat.getAnswerCount();
+            long weekCount = weekStat.getAnswerCount();
+            long monthCount = monthStat.getAnswerCount();
+
+            dateStat.setAnswerCount(dateCount + 1);
+            weekStat.setAnswerCount(weekCount + 1);
+            monthStat.setAnswerCount(monthCount + 1);
+
+            childStatRepository.save(dateStat);
+            childStatRepository.save(weekStat);
+            childStatRepository.save(monthStat);
+        }
 
         return ChildResponseDTO.getPredesignedQuestionDTO.builder()
                 .question(question.getText())
@@ -109,6 +137,8 @@ public class ChildService {
     }
 
     public ChildResponseDTO.getNewQuestionDTO getNewSubject(Long childId) {
+        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + "not Found"));
+        LocalDate today = LocalDate.now();
         List<Subject> todaySubject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
         Subject newSubject = Subject.builder()
                 .child(childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + " Not Found ")))
@@ -118,28 +148,6 @@ public class ChildService {
                 .isCompleted(false).build();
         subjectRepository.save(newSubject);
 
-        Question question = Question.builder()
-                .subject(newSubject)
-                .text("무슨 이야기를 하고 싶어?").build();
-        questionRepository.save(question);
-
-        return ChildResponseDTO.getNewQuestionDTO.builder()
-                .subjectId(newSubject.getId()).build();
-    }
-
-    public ChildResponseDTO.getAI getNextQuestion(Long childId, ChildRequestDTO.AnswerDTO request) {
-        System.out.println("Requesting Next Question: " + request.getText());
-        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + " Not Found "));
-        LocalDate today = LocalDate.now();
-        Subject targetSubject = subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject " + request.getSubjectId() + " Not Found "));
-        targetSubject.setAnswer(true);
-        List<Question> questions = questionRepository.findAllBySubject(targetSubject);
-        Analysis analysis = Analysis.builder()
-                .question(questions.get(questions.size() - 1))
-                .answer(request.getText())
-                .uploaded(false).build();
-        analysisRepository.save(analysis);
-        
         ChildStat dateStat = childStatRepository.findDateStatByChildandToday(child, today.toString()).orElseThrow(
                 () -> new RuntimeException("Stat: " + childId + "'s Date Stat Not Found ")
         );
@@ -163,6 +171,28 @@ public class ChildService {
         childStatRepository.save(dateStat);
         childStatRepository.save(weekStat);
         childStatRepository.save(monthStat);
+
+        Question question = Question.builder()
+                .subject(newSubject)
+                .text("무슨 이야기를 하고 싶어?").build();
+        questionRepository.save(question);
+
+        return ChildResponseDTO.getNewQuestionDTO.builder()
+                .subjectId(newSubject.getId()).build();
+    }
+
+    public ChildResponseDTO.getAI getNextQuestion(Long childId, ChildRequestDTO.AnswerDTO request) {
+        System.out.println("Requesting Next Question: " + request.getText());
+        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + " Not Found "));
+        LocalDate today = LocalDate.now();
+        Subject targetSubject = subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject " + request.getSubjectId() + " Not Found "));
+        targetSubject.setAnswer(true);
+        List<Question> questions = questionRepository.findAllBySubject(targetSubject);
+        Analysis analysis = Analysis.builder()
+                .question(questions.get(questions.size() - 1))
+                .answer(request.getText())
+                .uploaded(false).build();
+        analysisRepository.save(analysis);
         System.out.println("Analysis Saved: " + analysis.getId());
 
         if(questions.size() == 5) {
@@ -180,40 +210,34 @@ public class ChildService {
             int positive = 50;
 
             String year = today.format(DateTimeFormatter.ofPattern("yyyy")) + "-01-01";
-            ChildPositiveBoard cbMonth = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, yearmonth, PeriodType.MONTH).orElse(null);
-            ChildPositiveBoard cbYear = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, year, PeriodType.YEAR).orElse(null);
-            ChildPositiveBoard cbAll = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, "0000-00-00", PeriodType.CUMULATIVE).orElse(null);
-
-            if(cbMonth == null) {
-                ChildPositiveBoard newBoard = ChildPositiveBoard.builder()
-                        .child(child)
-                        .keyword(keyword)
-                        .period(yearmonth)
-                        .keywordCount(0L)
-                        .type(PeriodType.MONTH)
-                        .positive(0L).build();
-                cbMonth = newBoard;
-            }
-            if(cbYear == null) {
-                ChildPositiveBoard newBoard = ChildPositiveBoard.builder()
-                        .child(child)
-                        .keyword(keyword)
-                        .period(year)
-                        .keywordCount(0L)
-                        .type(PeriodType.YEAR)
-                        .positive(0L).build();
-                cbYear = newBoard;
-            }
-            if(cbAll == null) {
-                ChildPositiveBoard newBoard = ChildPositiveBoard.builder()
-                        .child(child)
-                        .keyword(keyword)
-                        .period("0000-00-00")
-                        .keywordCount(0L)
-                        .type(PeriodType.CUMULATIVE)
-                        .positive(0L).build();
-                cbAll = newBoard;
-            }
+            String yearmonth = today.format(DateTimeFormatter.ofPattern("yyyy-MM")) + "-01";
+            ChildPositiveBoard cbMonth = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, yearmonth, PeriodType.MONTH).orElse(
+                    ChildPositiveBoard.builder()
+                            .child(child)
+                            .keyword(keyword)
+                            .period(yearmonth)
+                            .keywordCount(0L)
+                            .type(PeriodType.MONTH)
+                            .positive(0L).build()
+            );
+            ChildPositiveBoard cbYear = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, year, PeriodType.YEAR).orElse(
+                    ChildPositiveBoard.builder()
+                            .child(child)
+                            .keyword(keyword)
+                            .period(year)
+                            .keywordCount(0L)
+                            .type(PeriodType.YEAR)
+                            .positive(0L).build()
+            );
+            ChildPositiveBoard cbAll = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, "0000-00-00", PeriodType.CUMULATIVE).orElse(
+                    ChildPositiveBoard.builder()
+                            .child(child)
+                            .keyword(keyword)
+                            .period("0000-00-00")
+                            .keywordCount(0L)
+                            .type(PeriodType.CUMULATIVE)
+                            .positive(0L).build()
+            );
 
             long newMonthPositive = Math.round((cbMonth.getPositive() * cbMonth.getKeywordCount() + positive) / (cbMonth.getKeywordCount() + 1));
             long newYearPositive = Math.round((cbYear.getPositive() * cbYear.getKeywordCount() + positive) / (cbYear.getKeywordCount() + 1));
@@ -348,40 +372,33 @@ public class ChildService {
             int positive = 50;
 
             String year = today.format(DateTimeFormatter.ofPattern("yyyy")) + "-01-01";
-            ChildPositiveBoard cbMonth = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, yearmonth, PeriodType.MONTH).orElse(null);
-            ChildPositiveBoard cbYear = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, year, PeriodType.YEAR).orElse(null);
-            ChildPositiveBoard cbAll = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, "0000-00-00", PeriodType.CUMULATIVE).orElse(null);
-
-            if(cbMonth == null) {
-                ChildPositiveBoard newBoard = ChildPositiveBoard.builder()
-                        .child(child)
-                        .keyword(keyword)
-                        .period(yearmonth)
-                        .keywordCount(0L)
-                        .type(PeriodType.MONTH)
-                        .positive(0L).build();
-                cbMonth = newBoard;
-            }
-            if(cbYear == null) {
-                ChildPositiveBoard newBoard = ChildPositiveBoard.builder()
-                        .child(child)
-                        .keyword(keyword)
-                        .period(year)
-                        .keywordCount(0L)
-                        .type(PeriodType.YEAR)
-                        .positive(0L).build();
-                cbYear = newBoard;
-            }
-            if(cbAll == null) {
-                ChildPositiveBoard newBoard = ChildPositiveBoard.builder()
-                        .child(child)
-                        .keyword(keyword)
-                        .period("0000-00-00")
-                        .keywordCount(0L)
-                        .type(PeriodType.CUMULATIVE)
-                        .positive(0L).build();
-                cbAll = newBoard;
-            }
+            ChildPositiveBoard cbMonth = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, yearmonth, PeriodType.MONTH).orElse(
+                    ChildPositiveBoard.builder()
+                            .child(child)
+                            .keyword(keyword)
+                            .period(yearmonth)
+                            .keywordCount(0L)
+                            .type(PeriodType.MONTH)
+                            .positive(0L).build()
+            );
+            ChildPositiveBoard cbYear = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, year, PeriodType.YEAR).orElse(
+                    ChildPositiveBoard.builder()
+                            .child(child)
+                            .keyword(keyword)
+                            .period(year)
+                            .keywordCount(0L)
+                            .type(PeriodType.YEAR)
+                            .positive(0L).build()
+            );
+            ChildPositiveBoard cbAll = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, "0000-00-00", PeriodType.CUMULATIVE).orElse(
+                    ChildPositiveBoard.builder()
+                            .child(child)
+                            .keyword(keyword)
+                            .period("0000-00-00")
+                            .keywordCount(0L)
+                            .type(PeriodType.CUMULATIVE)
+                            .positive(0L).build()
+            );
 
             long newMonthPositive = Math.round((cbMonth.getPositive() * cbMonth.getKeywordCount() + positive) / (cbMonth.getKeywordCount() + 1));
             long newYearPositive = Math.round((cbYear.getPositive() * cbYear.getKeywordCount() + positive) / (cbYear.getKeywordCount() + 1));
