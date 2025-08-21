@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
-    @Query("SELECT cs FROM ChildStat cs WHERE cs.child = :child and cs.type = com.ibridge.domain.entity.PeriodType.DAY and cs.period =: today")
+    @Query("SELECT cs FROM ChildStat cs WHERE cs.child = :child and cs.type = com.ibridge.domain.entity.PeriodType.DAY and cs.period = :today")
     Optional<ChildStat> findDateStatByChildandToday(@Param("child") Child child, @Param("today") String today);
 
     @Query("SELECT COALESCE(SUM(cs.answerCount), 0) FROM ChildStat cs WHERE cs.child = :child AND cs.type = :periodType")
