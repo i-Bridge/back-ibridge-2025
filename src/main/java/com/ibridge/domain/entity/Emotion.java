@@ -1,7 +1,7 @@
 package com.ibridge.domain.entity;
 
 public enum Emotion {
-    HAPPY, SAD;
+    ZERO, ONE, TWO, THREE, FOUR, FIVE;
 
     public static Emotion fromOrdinal (int ordinal) { return values()[ordinal]; }
 }

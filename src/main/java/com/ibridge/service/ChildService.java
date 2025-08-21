@@ -87,13 +87,17 @@ public class ChildService {
         Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException(childId + "인 child가 없습니다."));
         LocalDate today = LocalDate.now();
 
-        ChildStat newStat = ChildStat.builder()
-                .child(child)
-                .type(PeriodType.fromOrdinal(0))
-                .period(today.toString())
-                .emotion(Emotion.fromOrdinal(request.getEmotion()))
-                .answerCount(0L).build();
-        childStatRepository.save(newStat);
+        ChildStat dailyStat = childStatRepository.findDateStatByChildandToday(child, today.toString()).orElse(
+                ChildStat.builder()
+                        .child(child)
+                        .type(PeriodType.fromOrdinal(0))
+                        .period(today.toString())
+                        .emotion(null)
+                        .answerCount(0L).build()
+        );
+        dailyStat.setEmotion(Emotion.fromOrdinal(request.getEmotion()));
+
+        childStatRepository.save(dailyStat);
 
         return;
     }
