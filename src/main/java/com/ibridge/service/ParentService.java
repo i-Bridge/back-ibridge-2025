@@ -87,10 +87,17 @@ public class ParentService {
         LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();
 
-        // 감정 목록 조회, null이면 0으로 채운 리스트
-        List<Integer> emotions = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
-        if (emotions == null || emotions.isEmpty()) {
-            emotions = Collections.singletonList(0);
+        // 감정 목록 조회, null이면 0으로 채움 (달의 일 수만큼)
+        List<Integer> emotionsFromDb = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
+        int daysInMonth = yearMonth.lengthOfMonth();
+        List<Integer> emotions = new ArrayList<>(daysInMonth);
+
+        for (int i = 0; i < daysInMonth; i++) {
+            if (emotionsFromDb != null && i < emotionsFromDb.size() && emotionsFromDb.get(i) != null) {
+                emotions.add(emotionsFromDb.get(i));
+            } else {
+                emotions.add(0);
+            }
         }
 
         // 최근 7일 기간 리스트
@@ -99,10 +106,15 @@ public class ParentService {
             periodList.add(LocalDate.now().minusDays(i));
         }
 
-        // cumList 조회, null이면 0으로 채운 리스트
-        List<Long> cumList = childStatRepository.findAnswerCountsByChildAndPeriodList(child, periodList);
-        if (cumList == null || cumList.isEmpty()) {
-            cumList = Collections.singletonList(0L);
+        // cumList 조회, null이면 0으로 채움
+        List<Long> cumFromDb = childStatRepository.findAnswerCountsByChildAndPeriodList(child, periodList);
+        List<Long> cumList = new ArrayList<>(7);
+        for (int i = 0; i < 7; i++) {
+            if (cumFromDb != null && i < cumFromDb.size() && cumFromDb.get(i) != null) {
+                cumList.add(cumFromDb.get(i));
+            } else {
+                cumList.add(0L);
+            }
         }
 
         return AnalysisResponseDTO.builder()
@@ -115,6 +127,7 @@ public class ParentService {
 
 
 
+
     public AnalysisResponseDTO getEmotions(Long childId, LocalDate today) {
         Child child = childRepository.findById(childId)
                 .orElseThrow(() -> new RuntimeException("Child not found"));
@@ -123,15 +136,23 @@ public class ParentService {
         LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();
 
-        List<Integer> emotions = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
-        if (emotions == null || emotions.isEmpty()) {
-            emotions = Collections.singletonList(0);
+        List<Integer> emotionsFromDb = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
+        int daysInMonth = yearMonth.lengthOfMonth();
+        List<Integer> emotions = new ArrayList<>(daysInMonth);
+
+        for (int i = 0; i < daysInMonth; i++) {
+            if (emotionsFromDb != null && i < emotionsFromDb.size() && emotionsFromDb.get(i) != null) {
+                emotions.add(emotionsFromDb.get(i));
+            } else {
+                emotions.add(0);
+            }
         }
 
         return AnalysisResponseDTO.builder()
                 .emotions(emotions)
                 .build();
     }
+
 
 
     public AnalysisResponseDTO getCumulatives(Long childId, String periodType) {
