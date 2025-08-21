@@ -16,15 +16,5 @@ public class AnalysisResponseDTO {
     private Long cumulative;
     private List<Emotion> emotions;
     private List<Long> cumList;
-    private List<keywordDTO> keywords;
-
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class keywordDTO{
-        private String keyword;
-        private Long count;
-        private Long positiveScore;
-    }
+    private List<KeywordDTO> keywords;
 }

@@ -93,7 +93,7 @@ public class ParentService {
 
         List<Long> cumList = childStatRepository.findAnswerCountsByChildAndPeriodList(child, periodList);
 
-        List<AnalysisResponseDTO.keywordDTO> keywordList;
+        List<KeywordDTO> keywordList;
         PageRequest top7 = PageRequest.of(0,7);
         keywordList = childPositiveBoardRepository.findKeywordsAndPositivesByMonth(child, top7);
 
