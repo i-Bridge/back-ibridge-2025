@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
-    @Query("SELECT cs FROM ChildStat cs WHERE cs.child = :child and cs.type = 0 and cs.period =: today")
+    @Query("SELECT cs FROM ChildStat cs WHERE cs.child = :child and cs.type = com.ibridge.domain.entity.PeriodType.DAY and cs.period =: today")
     Optional<ChildStat> findDateStatByChildandToday(@Param("child") Child child, @Param("today") String today);
 
     @Query("SELECT COALESCE(SUM(cs.answerCount), 0) FROM ChildStat cs WHERE cs.child = :child AND cs.type = :periodType")
@@ -30,12 +30,6 @@ public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
 
     @Query("SELECT cs.answerCount " +
             "FROM ChildStat cs " +
-            "WHERE cs.child = :child AND cs.type = :periodType " +
-            "ORDER BY cs.period ASC")
-    List<Long> findAnswerCountsByChildAndType(@Param("child") Child child, @Param("periodType") PeriodType periodType);
-
-    @Query("SELECT cs.answerCount " +
-            "FROM ChildStat cs " +
             "WHERE cs.child = :child " +
             "AND cs.period IN :periodList " +
             "ORDER BY cs.period ASC")
@@ -44,14 +38,14 @@ public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
     @Query("SELECT cs " +
             "FROM ChildStat cs " +
             "WHERE cs.child = :child " +
-            "AND cs.type = 2 " +
+            "AND cs.type = com.ibridge.domain.entity.PeriodType.MONTH " +
             "AND cs.period = :today ")
     Optional<ChildStat> findMonthStatByChildandToday(@Param("child") Child child, @Param("today") String today);
 
     @Query("SELECT cs " +
             "FROM ChildStat cs " +
             "WHERE cs.child = :child " +
-            "AND cs.type = 1 " +
+            "AND cs.type = com.ibridge.domain.entity.PeriodType.WEEK " +
             "AND cs.period = :monday ")
     Optional<ChildStat> findWeekStatByChildandToday(@Param("child") Child child, @Param("monday") String monday);
 

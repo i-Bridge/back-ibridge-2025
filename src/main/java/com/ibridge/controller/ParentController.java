@@ -156,6 +156,17 @@ public class ParentController {
         }
     }
 
+    @GetMapping("{childId}/stat/cumulative")
+    public ApiResponse<AnalysisResponseDTO> getCumulatives(@PathVariable Long childId, @RequestParam("periodType") String periodType){
+        try{
+            AnalysisResponseDTO analysisResponseDTO = parentService.getCumulatives(childId, periodType);
+            return ApiResponse.onSuccess(analysisResponseDTO);
+        }
+        catch(Exception e){
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
+    }
 
 
 

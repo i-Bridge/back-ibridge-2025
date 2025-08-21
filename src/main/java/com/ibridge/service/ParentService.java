@@ -80,7 +80,7 @@ public class ParentService {
     }
 
     public AnalysisResponseDTO getDefaultAnalysis(Long childId, LocalDate today) {
-        Child child = childRepository.findById(childId).orElse(null);
+        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child not found"));
         Long cumulative = childStatRepository.findSumByChildAndType(child, PeriodType.MONTH);
         YearMonth yearMonth = YearMonth.from(today);
         LocalDate start = yearMonth.atDay(1);
@@ -108,7 +108,7 @@ public class ParentService {
     }
 
     public AnalysisResponseDTO getEmotions(Long childId, LocalDate today) {
-        Child child = childRepository.findById(childId).orElse(null);
+        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child not found"));
         YearMonth yearMonth = YearMonth.from(today);
         LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();
@@ -119,7 +119,34 @@ public class ParentService {
                 .build();
     }
 
+    public AnalysisResponseDTO getCumulatives(Long childId, String periodType) {
+        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child not found"));
+        YearMonth yearMonth = YearMonth.from(LocalDate.now());
+        LocalDate start = yearMonth.atDay(1);
+        List<Long> cumulatives = new ArrayList<>();
+        switch(periodType) {
+            case "day":
+                for (int i = 6; i >= 0; i--) {
+                    cumulatives.add(childStatRepository.findDateStatByChildandToday(child, LocalDate.now().minusDays(i).toString()).get().getAnswerCount());
+                }
+                break;
 
+            case "week":
+                for (int i = 6; i >= 0; i--) {
+                    cumulatives.add(childStatRepository.findWeekStatByChildandToday(child, LocalDate.now().with(DayOfWeek.MONDAY).minusWeeks(i).toString()).get().getAnswerCount());
+                }
+                break;
+            case "month":
+                for (int i = 6; i >= 0; i--) {
+                    cumulatives.add(childStatRepository.findMonthStatByChildandToday(child, start.minusMonths(i).toString()).get().getAnswerCount());
+                }
+                break;
+        }
+
+        return AnalysisResponseDTO.builder()
+                .cumList(cumulatives)
+                .build();
+    }
 
 
 
