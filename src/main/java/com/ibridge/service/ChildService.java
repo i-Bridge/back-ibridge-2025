@@ -46,7 +46,7 @@ public class ChildService {
             emotion = false;
         }
 
-        String yearMonth = today.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+        String yearMonth = today.format(DateTimeFormatter.ofPattern("yyyy-MM")) + "-01";
         ChildStat monthStat = childStatRepository.findMonthStatByChildandToday(child, yearMonth).orElse(null);
         if(monthStat == null) {
             ChildStat newMonthStat = ChildStat.builder()
@@ -138,7 +138,7 @@ public class ChildService {
         ChildStat weekStat = childStatRepository.findWeekStatByChildandToday(child, monday).orElseThrow(
                 () -> new RuntimeException("Stat: " + childId + "'s Week Stat Not Found ")
         );
-        String yearmonth = today.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+        String yearmonth = today.format(DateTimeFormatter.ofPattern("yyyy-MM")) + "-01";
         ChildStat monthStat = childStatRepository.findMonthStatByChildandToday(child, yearmonth).orElseThrow(
                 () -> new RuntimeException("Stat: " + childId + "'s Month Stat Not Found ")
         );
