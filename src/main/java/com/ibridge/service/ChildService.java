@@ -43,41 +43,10 @@ public class ChildService {
         LocalDate today = LocalDate.now();
         ChildStat childStat = childStatRepository.findDateStatByChildandToday(child, today).orElse(null);
         boolean emotion = true;
-        if(childStat == null || childStat.getEmotion() == null) {
+        if(childStat.getEmotion() == null) {
             emotion = false;
-
-            ChildStat newDateStat = childStat != null ? childStat : ChildStat.builder()
-                    .child(child)
-                    .type(PeriodType.DAY)
-                    .period(today)
-                    .emotion(null)
-                    .answerCount(0L).build();
-            childStatRepository.save(newDateStat);
         }
 
-        LocalDate yearMonth = LocalDate.parse(today.format(DateTimeFormatter.ofPattern("yyyy-MM")) + "-01");
-        ChildStat monthStat = childStatRepository.findMonthStatByChildandToday(child, yearMonth).orElse(null);
-        if(monthStat == null) {
-            ChildStat newMonthStat = ChildStat.builder()
-                    .child(child)
-                    .type(PeriodType.MONTH)
-                    .period(yearMonth)
-                    .emotion(null)
-                    .answerCount(0L).build();
-            childStatRepository.save(newMonthStat);
-        }
-
-        LocalDate monday = LocalDate.now().with(DayOfWeek.MONDAY);
-        ChildStat weekStat = childStatRepository.findWeekStatByChildandToday(child, monday).orElse(null);
-        if(weekStat == null) {
-            ChildStat newWeekStat = ChildStat.builder()
-                    .child(child)
-                    .type(PeriodType.WEEK)
-                    .period(monday)
-                    .emotion(null)
-                    .answerCount(0L).build();
-            childStatRepository.save(newWeekStat);
-        }
         return ChildResponseDTO.getQuestionDTO.builder()
                 .emotion(emotion)
                 .isCompleted(isCompleted).build();
@@ -87,14 +56,7 @@ public class ChildService {
         Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException(childId + "인 child가 없습니다."));
         LocalDate today = LocalDate.now();
 
-        ChildStat dailyStat = childStatRepository.findDateStatByChildandToday(child, today).orElse(
-                ChildStat.builder()
-                        .child(child)
-                        .type(PeriodType.fromOrdinal(0))
-                        .period(today)
-                        .emotion(null)
-                        .answerCount(0L).build()
-        );
+        ChildStat dailyStat = childStatRepository.findDateStatByChildandToday(child, today);
         dailyStat.setEmotion(Emotion.fromOrdinal(request.getEmotion()));
 
         childStatRepository.save(dailyStat);
@@ -110,17 +72,13 @@ public class ChildService {
         Question question = questions.get(questions.size() - 1);
 
         if(!todaySubject.get(0).isAnswer()) {
-            ChildStat dateStat = childStatRepository.findDateStatByChildandToday(child, today).orElseThrow(
-                    () -> new RuntimeException("Stat: " + childId + "'s Date Stat Not Found ")
-            );
+            ChildStat dateStat = childStatRepository.findDateStatByChildandToday(child, today);
+
             LocalDate monday = today.with(DayOfWeek.MONDAY);
-            ChildStat weekStat = childStatRepository.findWeekStatByChildandToday(child, monday).orElseThrow(
-                    () -> new RuntimeException("Stat: " + childId + "'s Week Stat Not Found ")
-            );
+            ChildStat weekStat = childStatRepository.findWeekStatByChildandToday(child, monday);
+
             String yearmonth = today.format(DateTimeFormatter.ofPattern("yyyy-MM")) + "-01";
-            ChildStat monthStat = childStatRepository.findMonthStatByChildandToday(child, LocalDate.parse(yearmonth)).orElseThrow(
-                    () -> new RuntimeException("Stat: " + childId + "'s Month Stat Not Found ")
-            );
+            ChildStat monthStat = childStatRepository.findMonthStatByChildandToday(child, LocalDate.parse(yearmonth));
 
             long dateCount = dateStat.getAnswerCount();
             long weekCount = weekStat.getAnswerCount();
@@ -152,17 +110,13 @@ public class ChildService {
                 .isCompleted(false).build();
         subjectRepository.save(newSubject);
 
-        ChildStat dateStat = childStatRepository.findDateStatByChildandToday(child, today).orElseThrow(
-                () -> new RuntimeException("Stat: " + childId + "'s Date Stat Not Found ")
-        );
+        ChildStat dateStat = childStatRepository.findDateStatByChildandToday(child, today);
+
         LocalDate monday = today.with(DayOfWeek.MONDAY);
-        ChildStat weekStat = childStatRepository.findWeekStatByChildandToday(child, monday).orElseThrow(
-                () -> new RuntimeException("Stat: " + childId + "'s Week Stat Not Found ")
-        );
+        ChildStat weekStat = childStatRepository.findWeekStatByChildandToday(child, monday);
+
         LocalDate yearmonth = LocalDate.parse(today.format(DateTimeFormatter.ofPattern("yyyy-MM")) + "-01");
-        ChildStat monthStat = childStatRepository.findMonthStatByChildandToday(child, yearmonth).orElseThrow(
-                () -> new RuntimeException("Stat: " + childId + "'s Month Stat Not Found ")
-        );
+        ChildStat monthStat = childStatRepository.findMonthStatByChildandToday(child, yearmonth);
 
         long dateCount = dateStat.getAnswerCount();
         long weekCount = weekStat.getAnswerCount();

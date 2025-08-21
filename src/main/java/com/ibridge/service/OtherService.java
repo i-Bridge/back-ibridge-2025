@@ -3,6 +3,7 @@ package com.ibridge.service;
 import com.ibridge.domain.dto.response.SubjectResponseDTO;
 import com.ibridge.domain.entity.*;
 import com.ibridge.repository.ChildRepository;
+import com.ibridge.repository.ChildStatRepository;
 import com.ibridge.repository.QuestionRepository;
 import com.ibridge.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -24,6 +27,7 @@ public class OtherService {
     private final Random random = new Random();
     private final SubjectRepository subjectRepository;
     private final QuestionRepository questionRepository;
+    private final ChildStatRepository childStatRepository;
 
     public void setSubject() {
         List<Child> children = childRepository.findAll();
@@ -49,6 +53,27 @@ public class OtherService {
                     .type(PeriodType.DAY)
                     .period(today)
                     .answerCount(0L).build();
+            childStatRepository.save(dailyStat);
+
+            if(today.getDayOfWeek() == DayOfWeek.MONDAY) {
+                ChildStat weeklyStat = ChildStat.builder()
+                        .child(child)
+                        .emotion(null)
+                        .type(PeriodType.MONTH)
+                        .period(today)
+                        .answerCount(0L).build();
+                childStatRepository.save(weeklyStat);
+            }
+
+            if(today.getDayOfMonth() == 1) {
+                ChildStat monthlyStat = ChildStat.builder()
+                        .child(child)
+                        .emotion(null)
+                        .type(PeriodType.MONTH)
+                        .period(today)
+                        .build();
+                childStatRepository.save(monthlyStat);
+            }
             
             int id = random.nextInt(subjects.size());
             String randomQuestion = subjects.get(id);
