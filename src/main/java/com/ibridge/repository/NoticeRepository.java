@@ -24,7 +24,7 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
     List<Notice> findAllBySender(Parent sender);
 
     @Query("SELECT p from Notice p where p.sender = :sender and p.type = 2")
-    Optional<Notice> findBySenderAndType(Parent sender);
+    List<Notice> findBySenderAndType(Parent sender);
     List<Notice> findAllByReceiver(Parent receiver);
 
     Optional<Notice> findBySubjectAndReceiver(Subject subject, Parent receiver);

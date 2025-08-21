@@ -145,10 +145,10 @@ public class StartService {
         boolean isAccept = true;
         if (family == null) {
             isAccept = false;
-            Optional<Notice> Notice = NoticeRepository.findBySenderAndType(parent);
+            List<Notice> Notice = NoticeRepository.findBySenderAndType(parent);
             return StartUserSelectionResponseDTO.builder()
                     .isAccepted(isAccept)
-                    .isSend(Notice.isPresent())
+                    .isSend(!Notice.isEmpty())
                     .build();
         }
         else {        // 자녀 리스트 생성
