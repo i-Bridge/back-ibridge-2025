@@ -116,25 +116,35 @@ public class ParentService {
     }
 
     public AnalysisResponseDTO getCumulatives(Long childId, String periodType) {
-        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child not found"));
+        Child child = childRepository.findById(childId)
+                .orElseThrow(() -> new RuntimeException("Child not found"));
+
         YearMonth yearMonth = YearMonth.from(LocalDate.now());
         LocalDate start = yearMonth.atDay(1);
         List<Long> cumulatives = new ArrayList<>();
-        switch(periodType) {
+
+        switch (periodType) {
             case "day":
                 for (int i = 6; i >= 0; i--) {
-                    cumulatives.add(childStatRepository.findDateStatByChildandToday(child, LocalDate.now().minusDays(i)).getAnswerCount());
+                    LocalDate targetDate = LocalDate.now().minusDays(i);
+                    ChildStat stat = childStatRepository.findDateStatByChildandToday(child, targetDate);
+                    cumulatives.add(stat != null ? stat.getAnswerCount() : 0L); // null이면 0 넣기
                 }
                 break;
 
             case "week":
                 for (int i = 6; i >= 0; i--) {
-                    cumulatives.add(childStatRepository.findWeekStatByChildandToday(child, LocalDate.now().with(DayOfWeek.MONDAY).minusWeeks(i)).getAnswerCount());
+                    LocalDate monday = LocalDate.now().with(DayOfWeek.MONDAY).minusWeeks(i);
+                    ChildStat stat = childStatRepository.findWeekStatByChildandToday(child, monday);
+                    cumulatives.add(stat != null ? stat.getAnswerCount() : 0L);
                 }
                 break;
+
             case "month":
                 for (int i = 6; i >= 0; i--) {
-                    cumulatives.add(childStatRepository.findMonthStatByChildandToday(child, start.minusMonths(i)).getAnswerCount());
+                    LocalDate firstDayOfMonth = start.minusMonths(i);
+                    ChildStat stat = childStatRepository.findMonthStatByChildandToday(child, firstDayOfMonth);
+                    cumulatives.add(stat != null ? stat.getAnswerCount() : 0L);
                 }
                 break;
         }
