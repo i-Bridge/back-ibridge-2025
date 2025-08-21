@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
-    @Query("SELECT cs FROM ChildStat cs WHERE cs.child = :child and cs.type = com.ibridge.domain.entity.PeriodType.DAY and cs.period = :today")
+    @Query("SELECT cs FROM ChildStat cs WHERE cs.child = :child and cs.type = 0 and cs.period = :today")
     ChildStat findDateStatByChildandToday(@Param("child") Child child, @Param("today") LocalDate today);
 
     @Query("SELECT COALESCE(SUM(cs.answerCount), 0) FROM ChildStat cs WHERE cs.child = :child AND cs.type = :periodType")
@@ -23,7 +23,7 @@ public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
     @Query("SELECT DISTINCT cs.emotion " +
             "FROM ChildStat cs " +
             "WHERE cs.child = :child " +
-            "AND cs.type = com.ibridge.domain.entity.PeriodType.DAY " +
+            "AND cs.type = 0 " +
             "AND cs.period BETWEEN :start and :end " +
             "ORDER BY cs.period")
     List<Emotion> findEmotionsByChildAndMonth(@Param("child") Child child, @Param("start") LocalDate start, @Param("end") LocalDate end);
@@ -38,14 +38,14 @@ public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
     @Query("SELECT cs " +
             "FROM ChildStat cs " +
             "WHERE cs.child = :child " +
-            "AND cs.type = com.ibridge.domain.entity.PeriodType.MONTH " +
+            "AND cs.type = 2 " +
             "AND cs.period = :today ")
     ChildStat findMonthStatByChildandToday(@Param("child") Child child, @Param("today") LocalDate today);
 
     @Query("SELECT cs " +
             "FROM ChildStat cs " +
             "WHERE cs.child = :child " +
-            "AND cs.type = com.ibridge.domain.entity.PeriodType.WEEK " +
+            "AND cs.type = 1 " +
             "AND cs.period = :monday ")
     ChildStat findWeekStatByChildandToday(@Param("child") Child child, @Param("monday") LocalDate monday);
 
