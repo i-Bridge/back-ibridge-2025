@@ -32,6 +32,7 @@ public class ChildService {
     private final NoticeRepository NoticeRepository;
     private final StoreRepository storeRepository;
     private final ChildStatRepository childStatRepository;
+    private final ChildPositiveBoardRepository childPositiveBoardRepository;
 
     //질문 화면 관련
     public ChildResponseDTO.getQuestionDTO getHome(Long childId) {
@@ -44,6 +45,14 @@ public class ChildService {
         boolean emotion = true;
         if(childStat == null) {
             emotion = false;
+
+            ChildStat newDateStat = ChildStat.builder()
+                    .child(child)
+                    .type(PeriodType.DAY)
+                    .period(today.toString())
+                    .emotion(null)
+                    .answerCount(0L).build();
+            childStatRepository.save(newDateStat);
         }
 
         String yearMonth = today.format(DateTimeFormatter.ofPattern("yyyy-MM")) + "-01";
@@ -167,9 +176,60 @@ public class ChildService {
             targetSubject.setTitle(summary);
             subjectRepository.save(targetSubject);
 
-            //키워드 추출
-            //ChildPositiveBoard 저장
-            
+            String keyword = "temp";
+            int positive = 50;
+
+            String year = today.format(DateTimeFormatter.ofPattern("yyyy")) + "-01-01";
+            ChildPositiveBoard cbMonth = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, yearmonth, PeriodType.MONTH).orElse(null);
+            ChildPositiveBoard cbYear = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, year, PeriodType.YEAR).orElse(null);
+            ChildPositiveBoard cbAll = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, "0000-00-00", PeriodType.CUMULATIVE).orElse(null);
+
+            if(cbMonth == null) {
+                ChildPositiveBoard newBoard = ChildPositiveBoard.builder()
+                        .child(child)
+                        .keyword(keyword)
+                        .period(yearmonth)
+                        .keywordCount(0L)
+                        .type(PeriodType.MONTH)
+                        .positive(0L).build();
+                cbMonth = newBoard;
+            }
+            if(cbYear == null) {
+                ChildPositiveBoard newBoard = ChildPositiveBoard.builder()
+                        .child(child)
+                        .keyword(keyword)
+                        .period(year)
+                        .keywordCount(0L)
+                        .type(PeriodType.YEAR)
+                        .positive(0L).build();
+                cbYear = newBoard;
+            }
+            if(cbAll == null) {
+                ChildPositiveBoard newBoard = ChildPositiveBoard.builder()
+                        .child(child)
+                        .keyword(keyword)
+                        .period("0000-00-00")
+                        .keywordCount(0L)
+                        .type(PeriodType.CUMULATIVE)
+                        .positive(0L).build();
+                cbAll = newBoard;
+            }
+
+            long newMonthPositive = Math.round((cbMonth.getPositive() * cbMonth.getKeywordCount() + positive) / (cbMonth.getKeywordCount() + 1));
+            long newYearPositive = Math.round((cbYear.getPositive() * cbYear.getKeywordCount() + positive) / (cbYear.getKeywordCount() + 1));
+            long newAllPositive = Math.round((cbAll.getPositive() * cbAll.getKeywordCount() + positive) / (cbAll.getKeywordCount() + 1));
+
+            cbMonth.setKeywordCount(cbMonth.getKeywordCount() + 1);
+            cbMonth.setPositive(newYearPositive);
+            cbYear.setKeywordCount(cbYear.getKeywordCount() + 1);
+            cbYear.setPositive(newMonthPositive);
+            cbAll.setKeywordCount(cbAll.getKeywordCount() + 1);
+            cbAll.setPositive(newAllPositive);
+
+            childPositiveBoardRepository.save(cbMonth);
+            childPositiveBoardRepository.save(cbYear);
+            childPositiveBoardRepository.save(cbAll);
+
             makeNotice(targetSubject);
 
             return ChildResponseDTO.getAI.builder()
@@ -279,6 +339,8 @@ public class ChildService {
                 conv += question.getText() + "\n" + analysisRepository.findByQuestionId(question.getId()).get().getAnswer() + "\n";
             }
             String summary = gptService.summarizeGPT(conv);
+
+
             subject.setTitle(summary);
             subjectRepository.save(subject);
 
