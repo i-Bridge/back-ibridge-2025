@@ -123,18 +123,18 @@ public class ParentService {
         switch(periodType) {
             case "day":
                 for (int i = 6; i >= 0; i--) {
-                    cumulatives.add(childStatRepository.findDateStatByChildandToday(child, LocalDate.now().minusDays(i)).get().getAnswerCount());
+                    cumulatives.add(childStatRepository.findDateStatByChildandToday(child, LocalDate.now().minusDays(i)).getAnswerCount());
                 }
                 break;
 
             case "week":
                 for (int i = 6; i >= 0; i--) {
-                    cumulatives.add(childStatRepository.findWeekStatByChildandToday(child, LocalDate.now().with(DayOfWeek.MONDAY).minusWeeks(i)).get().getAnswerCount());
+                    cumulatives.add(childStatRepository.findWeekStatByChildandToday(child, LocalDate.now().with(DayOfWeek.MONDAY).minusWeeks(i)).getAnswerCount());
                 }
                 break;
             case "month":
                 for (int i = 6; i >= 0; i--) {
-                    cumulatives.add(childStatRepository.findMonthStatByChildandToday(child, start.minusMonths(i)).get().getAnswerCount());
+                    cumulatives.add(childStatRepository.findMonthStatByChildandToday(child, start.minusMonths(i)).getAnswerCount());
                 }
                 break;
         }

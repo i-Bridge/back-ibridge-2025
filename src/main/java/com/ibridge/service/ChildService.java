@@ -41,7 +41,7 @@ public class ChildService {
         boolean isCompleted = todaySubject.get(0).isCompleted();
 
         LocalDate today = LocalDate.now();
-        ChildStat childStat = childStatRepository.findDateStatByChildandToday(child, today).orElse(null);
+        ChildStat childStat = childStatRepository.findDateStatByChildandToday(child, today);
         boolean emotion = true;
         if(childStat.getEmotion() == null) {
             emotion = false;
