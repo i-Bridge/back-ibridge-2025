@@ -20,4 +20,10 @@ public interface ChildPositiveBoardRepository extends JpaRepository<ChildPositiv
     List<KeywordDTO> findKeywordsAndPositivesByMonth(
             @Param("child") Child child,
             Pageable pageable);
+
+    @Query("SELECT cb " +
+            "FROM ChildPositiveBoard cb " +
+            "WHERE cb.child = :child AND cb.type = :periodType AND cb.period = :periodValue " +
+            "ORDER BY cb.period DESC")
+    List<ChildPositiveBoard> findByChildAndTypeAndPeriod(Child child, String periodType, String periodValue, Pageable pageable);
 }

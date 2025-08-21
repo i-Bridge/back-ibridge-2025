@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.security.Key;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -145,6 +146,23 @@ public class ParentService {
 
         return AnalysisResponseDTO.builder()
                 .cumList(cumulatives)
+                .build();
+    }
+
+    public AnalysisResponseDTO getKeywords(Long childId, String periodType, String periodValue) {
+        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child not found"));
+        PageRequest top7 = PageRequest.of(0,7);
+        List<ChildPositiveBoard> childPositiveBoards = childPositiveBoardRepository.findByChildAndTypeAndPeriod(child, periodType, periodValue, top7);
+        List<KeywordDTO> keywords = new ArrayList<>();
+        for(ChildPositiveBoard childPositiveBoard : childPositiveBoards){
+            keywords.add(KeywordDTO.builder()
+                            .keyword(childPositiveBoard.getKeyword())
+                            .count(childPositiveBoard.getKeywordCount())
+                            .positiveScore(childPositiveBoard.getPositive())
+                            .build());
+        }
+        return AnalysisResponseDTO.builder()
+                .keywords(keywords)
                 .build();
     }
 
