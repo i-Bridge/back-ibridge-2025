@@ -57,7 +57,7 @@ public class ChildService {
         LocalDate today = LocalDate.now();
 
         ChildStat dailyStat = childStatRepository.findDateStatByChildandToday(child, today);
-        dailyStat.setEmotion(Emotion.fromOrdinal(request.getEmotion()));
+        dailyStat.setEmotion(request.getEmotion());
 
         childStatRepository.save(dailyStat);
 

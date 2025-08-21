@@ -1,6 +1,5 @@
 package com.ibridge.domain.dto.response;
 
-import com.ibridge.domain.entity.Emotion;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 public class AnalysisResponseDTO {
     private Long cumulative;
-    private List<Emotion> emotions;
+    private List<Integer> emotions;
     private List<Long> cumList;
     private List<KeywordDTO> keywords;
 }

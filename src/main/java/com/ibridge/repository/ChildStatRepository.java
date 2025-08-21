@@ -20,13 +20,13 @@ public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
     @Query("SELECT COALESCE(SUM(cs.answerCount), 0) FROM ChildStat cs WHERE cs.child = :child AND cs.type = :periodType")
     Long findSumByChildAndType(@Param("child") Child child, @Param("periodType") PeriodType periodType);
 
-    @Query("SELECT DISTINCT cs.emotion " +
+    @Query("SELECT cs.emotion " +
             "FROM ChildStat cs " +
             "WHERE cs.child = :child " +
             "AND cs.type = 0 " +
             "AND cs.period BETWEEN :start and :end " +
             "ORDER BY cs.period")
-    List<Emotion> findEmotionsByChildAndMonth(@Param("child") Child child, @Param("start") LocalDate start, @Param("end") LocalDate end);
+    List<Integer> findEmotionsByChildAndMonth(@Param("child") Child child, @Param("start") LocalDate start, @Param("end") LocalDate end);
 
     @Query("SELECT cs.answerCount " +
             "FROM ChildStat cs " +

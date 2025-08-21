@@ -30,7 +30,7 @@ public class ChildStat {
 
     @Enumerated(EnumType.ORDINAL)
     @Column
-    private Emotion emotion;
+    private Integer emotion;
 
     @Column(nullable = false)
     private Long answerCount;

@@ -23,10 +23,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -81,20 +78,32 @@ public class ParentService {
     }
 
     public AnalysisResponseDTO getDefaultAnalysis(Long childId) {
-        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child not found"));
+        Child child = childRepository.findById(childId)
+                .orElseThrow(() -> new RuntimeException("Child not found"));
+
         Long cumulative = childStatRepository.findSumByChildAndType(child, PeriodType.MONTH);
+
         YearMonth yearMonth = YearMonth.from(LocalDate.now());
         LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();
-        List<Emotion> emotions = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
 
-        List<LocalDate> periodList = new ArrayList<>();
-
-        for(int i = 6; i >= 0; i--) {
-            periodList.add(LocalDate.now().minusDays(i)); // "YYYY-MM-DD"
+        // 감정 목록 조회, null이면 0으로 채운 리스트
+        List<Integer> emotions = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
+        if (emotions == null || emotions.isEmpty()) {
+            emotions = Collections.singletonList(0);
         }
 
+        // 최근 7일 기간 리스트
+        List<LocalDate> periodList = new ArrayList<>();
+        for (int i = 6; i >= 0; i--) {
+            periodList.add(LocalDate.now().minusDays(i));
+        }
+
+        // cumList 조회, null이면 0으로 채운 리스트
         List<Long> cumList = childStatRepository.findAnswerCountsByChildAndPeriodList(child, periodList);
+        if (cumList == null || cumList.isEmpty()) {
+            cumList = Collections.singletonList(0L);
+        }
 
         return AnalysisResponseDTO.builder()
                 .cumulative(cumulative)
@@ -103,17 +112,27 @@ public class ParentService {
                 .build();
     }
 
+
+
+
     public AnalysisResponseDTO getEmotions(Long childId, LocalDate today) {
-        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child not found"));
+        Child child = childRepository.findById(childId)
+                .orElseThrow(() -> new RuntimeException("Child not found"));
+
         YearMonth yearMonth = YearMonth.from(today);
         LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();
-        List<Emotion> emotions = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
+
+        List<Integer> emotions = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
+        if (emotions == null || emotions.isEmpty()) {
+            emotions = Collections.singletonList(0);
+        }
 
         return AnalysisResponseDTO.builder()
                 .emotions(emotions)
                 .build();
     }
+
 
     public AnalysisResponseDTO getCumulatives(Long childId, String periodType) {
         Child child = childRepository.findById(childId)
@@ -128,8 +147,7 @@ public class ParentService {
                 for (int i = 6; i >= 0; i--) {
                     LocalDate targetDate = LocalDate.now().minusDays(i);
                     ChildStat stat = childStatRepository.findDateStatByChildandToday(child, targetDate);
-                    cumulatives.add(stat != null ? stat.getAnswerCount() : 0L); // null이면 0 넣기
-                    System.out.println(stat +" " + (stat.getAnswerCount() != null ? stat.getAnswerCount().toString() : "0"));
+                    cumulatives.add(stat != null && stat.getAnswerCount() != null ? stat.getAnswerCount() : 0L);
                 }
                 break;
 
@@ -137,7 +155,7 @@ public class ParentService {
                 for (int i = 6; i >= 0; i--) {
                     LocalDate monday = LocalDate.now().with(DayOfWeek.MONDAY).minusWeeks(i);
                     ChildStat stat = childStatRepository.findWeekStatByChildandToday(child, monday);
-                    cumulatives.add(stat != null ? stat.getAnswerCount() : 0L);
+                    cumulatives.add(stat != null && stat.getAnswerCount() != null ? stat.getAnswerCount() : 0L);
                 }
                 break;
 
@@ -145,12 +163,9 @@ public class ParentService {
                 for (int i = 6; i >= 0; i--) {
                     LocalDate firstDayOfMonth = start.minusMonths(i);
                     ChildStat stat = childStatRepository.findMonthStatByChildandToday(child, firstDayOfMonth);
-                    cumulatives.add(stat != null ? stat.getAnswerCount() : 0L);
+                    cumulatives.add(stat != null && stat.getAnswerCount() != null ? stat.getAnswerCount() : 0L);
                 }
                 break;
-        }
-        for(Long c : cumulatives){
-            System.out.println(c);
         }
         return AnalysisResponseDTO.builder()
                 .cumList(cumulatives)
