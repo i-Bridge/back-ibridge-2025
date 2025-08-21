@@ -44,6 +44,8 @@ public class OtherService {
             e.printStackTrace();
         }
         for (Child child : children) {
+            //stat 테이블 생성
+            
             int id = random.nextInt(subjects.size());
             String randomQuestion = subjects.get(id);
 

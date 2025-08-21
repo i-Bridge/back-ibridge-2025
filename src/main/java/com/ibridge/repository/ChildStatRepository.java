@@ -15,7 +15,7 @@ import java.util.Optional;
 
 public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
     @Query("SELECT cs FROM ChildStat cs WHERE cs.child = :child and cs.type = com.ibridge.domain.entity.PeriodType.DAY and cs.period = :today")
-    Optional<ChildStat> findDateStatByChildandToday(@Param("child") Child child, @Param("today") String today);
+    Optional<ChildStat> findDateStatByChildandToday(@Param("child") Child child, @Param("today") LocalDate today);
 
     @Query("SELECT COALESCE(SUM(cs.answerCount), 0) FROM ChildStat cs WHERE cs.child = :child AND cs.type = :periodType")
     Long findSumByChildAndType(@Param("child") Child child, @Param("periodType") PeriodType periodType);
@@ -33,20 +33,20 @@ public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
             "WHERE cs.child = :child " +
             "AND cs.period IN :periodList " +
             "ORDER BY cs.period ASC")
-    List<Long> findAnswerCountsByChildAndPeriodList(@Param("child") Child child, @Param("periodList") List<String> periodList);
+    List<Long> findAnswerCountsByChildAndPeriodList(@Param("child") Child child, @Param("periodList") List<LocalDate> periodList);
 
     @Query("SELECT cs " +
             "FROM ChildStat cs " +
             "WHERE cs.child = :child " +
             "AND cs.type = com.ibridge.domain.entity.PeriodType.MONTH " +
             "AND cs.period = :today ")
-    Optional<ChildStat> findMonthStatByChildandToday(@Param("child") Child child, @Param("today") String today);
+    Optional<ChildStat> findMonthStatByChildandToday(@Param("child") Child child, @Param("today") LocalDate today);
 
     @Query("SELECT cs " +
             "FROM ChildStat cs " +
             "WHERE cs.child = :child " +
             "AND cs.type = com.ibridge.domain.entity.PeriodType.WEEK " +
             "AND cs.period = :monday ")
-    Optional<ChildStat> findWeekStatByChildandToday(@Param("child") Child child, @Param("monday") String monday);
+    Optional<ChildStat> findWeekStatByChildandToday(@Param("child") Child child, @Param("monday") LocalDate monday);
 
 }
