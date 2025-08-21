@@ -43,7 +43,7 @@ public class ChildService {
         LocalDate today = LocalDate.now();
         ChildStat childStat = childStatRepository.findDateStatByChildandToday(child, today.toString()).orElse(null);
         boolean emotion = true;
-        if(childStat == null) {
+        if(childStat == null || childStat.getEmotion() == null) {
             emotion = false;
 
             ChildStat newDateStat = ChildStat.builder()
