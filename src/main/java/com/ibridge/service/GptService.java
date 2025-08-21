@@ -186,18 +186,23 @@ public class GptService {
     }
 
     public String positiveGPT(String conversation){
+        String prompt = """
+            다음 대화 내용을 분석해서 긍정/부정 비율을 퍼센트로 계산하고,
+            출력은 반드시 JSON 형식으로 해줘.
+            예: {"긍정":85, "부정":15}
+            
+            [대화 내용 시작]
+            %s
+            [대화 내용 끝]
+            """.formatted(conversation);
         try {
             JSONObject message = new JSONObject()
                     .put("role", "user")
-                    .put("content", conversation);
-
-            JSONObject systemMessage = new JSONObject()
-                    .put("role", "system")
-                    .put("content", "너는 아이의 답변을 듣고 다음 질문을 만들어주는 GPT야.");
+                    .put("content", prompt);
 
             JSONObject body = new JSONObject()
-                    .put("model", "ft:gpt-4.1-nano")
-                    .put("messages", List.of(systemMessage, message));
+                    .put("model", "gpt-4.1-nano")
+                    .put("messages", List.of(message));
 
             RequestBody requestBody = RequestBody.create(
                     body.toString(),
