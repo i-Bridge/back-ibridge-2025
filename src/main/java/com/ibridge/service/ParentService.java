@@ -129,6 +129,7 @@ public class ParentService {
                     LocalDate targetDate = LocalDate.now().minusDays(i);
                     ChildStat stat = childStatRepository.findDateStatByChildandToday(child, targetDate);
                     cumulatives.add(stat != null ? stat.getAnswerCount() : 0L); // null이면 0 넣기
+                    System.out.println(stat +" " + (stat.getAnswerCount() != null ? stat.getAnswerCount().toString() : "0"));
                 }
                 break;
 
@@ -148,7 +149,9 @@ public class ParentService {
                 }
                 break;
         }
-
+        for(Long c : cumulatives){
+            System.out.println(c);
+        }
         return AnalysisResponseDTO.builder()
                 .cumList(cumulatives)
                 .build();
