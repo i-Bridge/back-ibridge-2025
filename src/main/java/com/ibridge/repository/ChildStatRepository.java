@@ -27,7 +27,7 @@ public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
             "AND cs.type = 0 " +
             "AND cs.period BETWEEN :start and :end " +
             "ORDER BY cs.period")
-    List<Map<LocalDate, Integer>> findEmotionsByChildAndMonth(@Param("child") Child child, @Param("start") LocalDate start, @Param("end") LocalDate end);
+    Map<LocalDate, Integer> findEmotionsByChildAndMonth(@Param("child") Child child, @Param("start") LocalDate start, @Param("end") LocalDate end);
 
     @Query("SELECT cs.answerCount " +
             "FROM ChildStat cs " +

@@ -80,21 +80,20 @@ public class ParentService {
 
     public AnalysisResponseDTO getDefaultAnalysis(Long childId) {
         Child child = childRepository.findById(childId) .orElseThrow(() -> new RuntimeException("Child not found"));
-        Long cumulative = childStatRepository.findSumByChildAndType(child, PeriodType.MONTH);
+        Long cumulative = childStatRepository.findSumByChildAndType(child, PeriodType.CUMULATIVE);
         YearMonth yearMonth = YearMonth.from(LocalDate.now());
         LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();
         // 감정 목록 조회, null이면 0으로 채움 (달의 일 수만큼)
-        List<Map<LocalDate, Integer>> emotionsFromDb = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
+        Map<LocalDate, Integer> emotionsFromDb = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
+
         int daysInMonth = yearMonth.lengthOfMonth();
         List<Integer> emotions = new ArrayList<>(daysInMonth);
+
         for (int i = 0; i < daysInMonth; i++) {
-            if (emotionsFromDb != null && (emotionsFromDb.get(0)+"").endsWith(i+"")) {
-                emotions.add(emotionsFromDb.get(i).get(1));
-            }
-            else {
-                emotions.add(0);
-            }
+            LocalDate date = start.plusDays(i);
+            // 해당 날짜 값 있으면 넣고, 없으면 0
+            emotions.add(emotionsFromDb.getOrDefault(date, 0));
         }
         // 최근 7일 기간 리스트
         List<LocalDate> periodList = new ArrayList<>();
@@ -120,24 +119,30 @@ public class ParentService {
     }
 
     public AnalysisResponseDTO getEmotions(Long childId, LocalDate today) {
-        Child child = childRepository.findById(childId) .orElseThrow(() -> new RuntimeException("Child not found"));
-        YearMonth yearMonth = YearMonth.from(today); LocalDate start = yearMonth.atDay(1);
+        Child child = childRepository.findById(childId)
+                .orElseThrow(() -> new RuntimeException("Child not found"));
+
+        YearMonth yearMonth = YearMonth.from(today);
+        LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();
-        List<Map<LocalDate, Integer>> emotionsFromDb = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
+
+        // DB에서 날짜별 감정값을 Map으로 조회
+        Map<LocalDate, Integer> emotionsFromDb = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
+
         int daysInMonth = yearMonth.lengthOfMonth();
         List<Integer> emotions = new ArrayList<>(daysInMonth);
+
         for (int i = 0; i < daysInMonth; i++) {
-            if (emotionsFromDb != null && (emotionsFromDb.get(0)+"").endsWith(i+"")) {
-                emotions.add(emotionsFromDb.get(i).get(1));
-            }
-            else {
-                emotions.add(0);
-            }
+            LocalDate date = start.plusDays(i);
+            // 해당 날짜 값 있으면 넣고, 없으면 0
+            emotions.add(emotionsFromDb.getOrDefault(date, 0));
         }
+
         return AnalysisResponseDTO.builder()
                 .emotions(emotions)
                 .build();
     }
+
 
 
 
