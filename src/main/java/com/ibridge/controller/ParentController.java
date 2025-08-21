@@ -133,9 +133,9 @@ public class ParentController {
     }
 
     @GetMapping("/{childId}/stat")
-    public ApiResponse<AnalysisResponseDTO> getAnalysis(@PathVariable Long childId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date){
+    public ApiResponse<AnalysisResponseDTO> getAnalysis(@PathVariable Long childId){
         try{
-            AnalysisResponseDTO analysisResponseDTO = parentService.getDefaultAnalysis(childId, date);
+            AnalysisResponseDTO analysisResponseDTO = parentService.getDefaultAnalysis(childId);
             return ApiResponse.onSuccess(analysisResponseDTO);
         }
         catch(Exception e){

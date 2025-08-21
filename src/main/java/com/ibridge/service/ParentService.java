@@ -80,10 +80,10 @@ public class ParentService {
         noticeRepository.deleteById(noticeRequestDTO.getNoticeId());
     }
 
-    public AnalysisResponseDTO getDefaultAnalysis(Long childId, LocalDate today) {
+    public AnalysisResponseDTO getDefaultAnalysis(Long childId) {
         Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child not found"));
         Long cumulative = childStatRepository.findSumByChildAndType(child, PeriodType.MONTH);
-        YearMonth yearMonth = YearMonth.from(today);
+        YearMonth yearMonth = YearMonth.from(LocalDate.now());
         LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();
         List<Emotion> emotions = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
@@ -91,7 +91,7 @@ public class ParentService {
         List<String> periodList = new ArrayList<>();
 
         for(int i = 6; i >= 0; i--) {
-            periodList.add(today.minusDays(i).toString()); // "YYYY-MM-DD"
+            periodList.add(LocalDate.now().minusDays(i).toString()); // "YYYY-MM-DD"
         }
 
         List<Long> cumList = childStatRepository.findAnswerCountsByChildAndPeriodList(child, periodList);
