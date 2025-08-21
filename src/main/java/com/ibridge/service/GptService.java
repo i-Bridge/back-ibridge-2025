@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -185,16 +185,17 @@ public class GptService {
         return "GPT 응답 없음";
     }
 
-    public String positiveGPT(String conversation){
+    public Map<String, Integer> positiveGPT(String conversation){
         String prompt = """
-            다음 대화 내용을 분석해서 긍정/부정 비율을 퍼센트로 계산하고,
-            출력은 반드시 JSON 형식으로 해줘.
-            예: {"긍정":85, "부정":15}
-            
-            [대화 내용 시작]
-            %s
-            [대화 내용 끝]
-            """.formatted(conversation);
+        다음 대화 내용을 분석해서 긍정/부정 비율을 퍼센트로 계산하고,
+        출력은 반드시 JSON 형식으로 해주세요.
+        예: {"긍정": 85, "부정": 15}
+
+        [대화 내용 시작]
+        %s
+        [대화 내용 끝]
+        """.formatted(conversation);
+
         try {
             JSONObject message = new JSONObject()
                     .put("role", "user")
@@ -222,20 +223,31 @@ public class GptService {
                     JSONObject jsonResponse = new JSONObject(responseBody);
 
                     if (jsonResponse.has("choices")) {
-                        return jsonResponse
+                        String content = jsonResponse
                                 .getJSONArray("choices")
                                 .getJSONObject(0)
                                 .getJSONObject("message")
                                 .getString("content")
                                 .trim();
+
+                        // Map<String, Integer>로 변환
+                        JSONObject resultJson = new JSONObject(content);
+                        Map<String, Integer> resultMap = new HashMap<>();
+                        Iterator<String> keys = resultJson.keys();
+                        while (keys.hasNext()) {
+                            String key = keys.next();
+                            resultMap.put(key, resultJson.getInt(key));
+                        }
+
+                        return resultMap;
                     } else {
-                        return "OpenAI API 오류 응답: " + responseBody;
+                        throw new RuntimeException("OpenAI API 오류 응답: " + responseBody);
                     }
                 }
             }
         } catch (Exception e) {
-            return "GPT 응답 중 오류 발생: " + e.getMessage();
+            throw new RuntimeException("GPT 응답 중 오류 발생: " + e.getMessage(), e);
         }
-        return "GPT 응답 없음";
+        return Collections.emptyMap();
     }
 }

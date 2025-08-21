@@ -4,6 +4,7 @@ import com.ibridge.domain.dto.response.AnalysisResponseDTO;
 import com.ibridge.domain.dto.response.KeywordDTO;
 import com.ibridge.domain.entity.Child;
 import com.ibridge.domain.entity.ChildPositiveBoard;
+import com.ibridge.domain.entity.PeriodType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -25,5 +26,5 @@ public interface ChildPositiveBoardRepository extends JpaRepository<ChildPositiv
             "FROM ChildPositiveBoard cb " +
             "WHERE cb.child = :child AND cb.type = :periodType AND cb.period = :periodValue " +
             "ORDER BY cb.period DESC")
-    List<ChildPositiveBoard> findByChildAndTypeAndPeriod(Child child, String periodType, String periodValue, Pageable pageable);
+    List<ChildPositiveBoard> findByChildAndTypeAndPeriod(Child child, PeriodType periodType, String periodValue, Pageable pageable);
 }
