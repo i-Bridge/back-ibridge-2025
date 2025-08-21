@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -77,6 +78,7 @@ public class ParentService {
     public void openNotice(NoticeRequestDTO noticeRequestDTO) {
         noticeRepository.deleteById(noticeRequestDTO.getNoticeId());
     }
+
     public AnalysisResponseDTO getDefaultAnalysis(Long childId, LocalDate today) {
         Child child = childRepository.findById(childId).orElse(null);
         Long cumulative = childStatRepository.findSumByChildAndType(child, PeriodType.MONTH);
@@ -104,6 +106,25 @@ public class ParentService {
                 .keywords(keywordList)
                 .build();
     }
+
+    public AnalysisResponseDTO getEmotions(Long childId, LocalDate today) {
+        Child child = childRepository.findById(childId).orElse(null);
+        YearMonth yearMonth = YearMonth.from(today);
+        LocalDate start = yearMonth.atDay(1);
+        LocalDate end = yearMonth.atEndOfMonth();
+        List<Emotion> emotions = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
+
+        return AnalysisResponseDTO.builder()
+                .emotions(emotions)
+                .build();
+    }
+
+
+
+
+
+
+
 
 //현호
     public ParentResponseDTO.GetMyPageDTO getMyPage(Long parentId) {

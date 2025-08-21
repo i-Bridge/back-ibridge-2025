@@ -131,10 +131,23 @@ public class ParentController {
             return ApiResponse.onFailure("404", e.getMessage());
         }
     }
+
     @GetMapping("/{childId}/stat")
     public ApiResponse<AnalysisResponseDTO> getAnalysis(@PathVariable Long childId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date){
         try{
             AnalysisResponseDTO analysisResponseDTO = parentService.getDefaultAnalysis(childId, date);
+            return ApiResponse.onSuccess(analysisResponseDTO);
+        }
+        catch(Exception e){
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
+    }
+
+    @GetMapping("{childId}/stat/emotion")
+    public ApiResponse<AnalysisResponseDTO> getEmotions(@PathVariable Long childId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date){
+        try{
+            AnalysisResponseDTO analysisResponseDTO = parentService.getEmotions(childId, date);
             return ApiResponse.onSuccess(analysisResponseDTO);
         }
         catch(Exception e){
