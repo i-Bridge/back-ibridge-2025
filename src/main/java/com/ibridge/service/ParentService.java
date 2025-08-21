@@ -80,7 +80,7 @@ public class ParentService {
 
     public AnalysisResponseDTO getDefaultAnalysis(Long childId) {
         Child child = childRepository.findById(childId) .orElseThrow(() -> new RuntimeException("Child not found"));
-        Long cumulative = childStatRepository.findSumByChildAndType(child, PeriodType.CUMULATIVE);
+        Long cumulative = childStatRepository.findSumByChildAndType(child, PeriodType.MONTH);
         YearMonth yearMonth = YearMonth.from(LocalDate.now());
         LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();
