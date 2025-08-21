@@ -2,7 +2,6 @@ package com.ibridge.repository;
 
 import com.ibridge.domain.entity.Child;
 import com.ibridge.domain.entity.ChildStat;
-import com.ibridge.domain.entity.Emotion;
 import com.ibridge.domain.entity.PeriodType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
