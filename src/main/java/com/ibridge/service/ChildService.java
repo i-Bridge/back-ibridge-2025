@@ -210,53 +210,53 @@ public class ChildService {
             targetSubject.setTitle(summary);
             subjectRepository.save(targetSubject);
 
-            String keyword = "temp";
-            int positive = 50;
-
-            String year = today.format(DateTimeFormatter.ofPattern("yyyy")) + "-01-01";
-            String yearmonth = today.format(DateTimeFormatter.ofPattern("yyyy-MM")) + "-01";
-            ChildPositiveBoard cbMonth = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, yearmonth, PeriodType.MONTH).orElse(
-                    ChildPositiveBoard.builder()
-                            .child(child)
-                            .keyword(keyword)
-                            .period(yearmonth)
-                            .keywordCount(0L)
-                            .type(PeriodType.MONTH)
-                            .positive(0L).build()
-            );
-            ChildPositiveBoard cbYear = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, year, PeriodType.YEAR).orElse(
-                    ChildPositiveBoard.builder()
-                            .child(child)
-                            .keyword(keyword)
-                            .period(year)
-                            .keywordCount(0L)
-                            .type(PeriodType.YEAR)
-                            .positive(0L).build()
-            );
-            ChildPositiveBoard cbAll = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, "0000-00-00", PeriodType.CUMULATIVE).orElse(
-                    ChildPositiveBoard.builder()
-                            .child(child)
-                            .keyword(keyword)
-                            .period("0000-00-00")
-                            .keywordCount(0L)
-                            .type(PeriodType.CUMULATIVE)
-                            .positive(0L).build()
-            );
-
-            long newMonthPositive = Math.round((cbMonth.getPositive() * cbMonth.getKeywordCount() + positive) / (cbMonth.getKeywordCount() + 1));
-            long newYearPositive = Math.round((cbYear.getPositive() * cbYear.getKeywordCount() + positive) / (cbYear.getKeywordCount() + 1));
-            long newAllPositive = Math.round((cbAll.getPositive() * cbAll.getKeywordCount() + positive) / (cbAll.getKeywordCount() + 1));
-
-            cbMonth.setKeywordCount(cbMonth.getKeywordCount() + 1);
-            cbMonth.setPositive(newYearPositive);
-            cbYear.setKeywordCount(cbYear.getKeywordCount() + 1);
-            cbYear.setPositive(newMonthPositive);
-            cbAll.setKeywordCount(cbAll.getKeywordCount() + 1);
-            cbAll.setPositive(newAllPositive);
-
-            childPositiveBoardRepository.save(cbMonth);
-            childPositiveBoardRepository.save(cbYear);
-            childPositiveBoardRepository.save(cbAll);
+//            String keyword = "temp";
+//            int positive = 50;
+//
+//            String year = today.format(DateTimeFormatter.ofPattern("yyyy")) + "-01-01";
+//            String yearmonth = today.format(DateTimeFormatter.ofPattern("yyyy-MM")) + "-01";
+//            ChildPositiveBoard cbMonth = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, yearmonth, PeriodType.MONTH).orElse(
+//                    ChildPositiveBoard.builder()
+//                            .child(child)
+//                            .keyword(keyword)
+//                            .period(yearmonth)
+//                            .keywordCount(0L)
+//                            .type(PeriodType.MONTH)
+//                            .positive(0L).build()
+//            );
+//            ChildPositiveBoard cbYear = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, year, PeriodType.YEAR).orElse(
+//                    ChildPositiveBoard.builder()
+//                            .child(child)
+//                            .keyword(keyword)
+//                            .period(year)
+//                            .keywordCount(0L)
+//                            .type(PeriodType.YEAR)
+//                            .positive(0L).build()
+//            );
+//            ChildPositiveBoard cbAll = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, "0000-00-00", PeriodType.CUMULATIVE).orElse(
+//                    ChildPositiveBoard.builder()
+//                            .child(child)
+//                            .keyword(keyword)
+//                            .period("0000-00-00")
+//                            .keywordCount(0L)
+//                            .type(PeriodType.CUMULATIVE)
+//                            .positive(0L).build()
+//            );
+//
+//            long newMonthPositive = Math.round((cbMonth.getPositive() * cbMonth.getKeywordCount() + positive) / (cbMonth.getKeywordCount() + 1));
+//            long newYearPositive = Math.round((cbYear.getPositive() * cbYear.getKeywordCount() + positive) / (cbYear.getKeywordCount() + 1));
+//            long newAllPositive = Math.round((cbAll.getPositive() * cbAll.getKeywordCount() + positive) / (cbAll.getKeywordCount() + 1));
+//
+//            cbMonth.setKeywordCount(cbMonth.getKeywordCount() + 1);
+//            cbMonth.setPositive(newYearPositive);
+//            cbYear.setKeywordCount(cbYear.getKeywordCount() + 1);
+//            cbYear.setPositive(newMonthPositive);
+//            cbAll.setKeywordCount(cbAll.getKeywordCount() + 1);
+//            cbAll.setPositive(newAllPositive);
+//
+//            childPositiveBoardRepository.save(cbMonth);
+//            childPositiveBoardRepository.save(cbYear);
+//            childPositiveBoardRepository.save(cbAll);
 
             makeNotice(targetSubject);
 
@@ -372,52 +372,52 @@ public class ChildService {
             }
             String summary = gptService.summarizeGPT(conv);
 
-            String keyword = "temp";
-            int positive = 50;
-
-            String year = today.format(DateTimeFormatter.ofPattern("yyyy")) + "-01-01";
-            ChildPositiveBoard cbMonth = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, yearmonth, PeriodType.MONTH).orElse(
-                    ChildPositiveBoard.builder()
-                            .child(child)
-                            .keyword(keyword)
-                            .period(yearmonth)
-                            .keywordCount(0L)
-                            .type(PeriodType.MONTH)
-                            .positive(0L).build()
-            );
-            ChildPositiveBoard cbYear = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, year, PeriodType.YEAR).orElse(
-                    ChildPositiveBoard.builder()
-                            .child(child)
-                            .keyword(keyword)
-                            .period(year)
-                            .keywordCount(0L)
-                            .type(PeriodType.YEAR)
-                            .positive(0L).build()
-            );
-            ChildPositiveBoard cbAll = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, "0000-00-00", PeriodType.CUMULATIVE).orElse(
-                    ChildPositiveBoard.builder()
-                            .child(child)
-                            .keyword(keyword)
-                            .period("0000-00-00")
-                            .keywordCount(0L)
-                            .type(PeriodType.CUMULATIVE)
-                            .positive(0L).build()
-            );
-
-            long newMonthPositive = Math.round((cbMonth.getPositive() * cbMonth.getKeywordCount() + positive) / (cbMonth.getKeywordCount() + 1));
-            long newYearPositive = Math.round((cbYear.getPositive() * cbYear.getKeywordCount() + positive) / (cbYear.getKeywordCount() + 1));
-            long newAllPositive = Math.round((cbAll.getPositive() * cbAll.getKeywordCount() + positive) / (cbAll.getKeywordCount() + 1));
-
-            cbMonth.setKeywordCount(cbMonth.getKeywordCount() + 1);
-            cbMonth.setPositive(newYearPositive);
-            cbYear.setKeywordCount(cbYear.getKeywordCount() + 1);
-            cbYear.setPositive(newMonthPositive);
-            cbAll.setKeywordCount(cbAll.getKeywordCount() + 1);
-            cbAll.setPositive(newAllPositive);
-
-            childPositiveBoardRepository.save(cbMonth);
-            childPositiveBoardRepository.save(cbYear);
-            childPositiveBoardRepository.save(cbAll);
+//            String keyword = "temp";
+//            int positive = 50;
+//
+//            String year = today.format(DateTimeFormatter.ofPattern("yyyy")) + "-01-01";
+//            ChildPositiveBoard cbMonth = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, yearmonth, PeriodType.MONTH).orElse(
+//                    ChildPositiveBoard.builder()
+//                            .child(child)
+//                            .keyword(keyword)
+//                            .period(yearmonth)
+//                            .keywordCount(0L)
+//                            .type(PeriodType.MONTH)
+//                            .positive(0L).build()
+//            );
+//            ChildPositiveBoard cbYear = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, year, PeriodType.YEAR).orElse(
+//                    ChildPositiveBoard.builder()
+//                            .child(child)
+//                            .keyword(keyword)
+//                            .period(year)
+//                            .keywordCount(0L)
+//                            .type(PeriodType.YEAR)
+//                            .positive(0L).build()
+//            );
+//            ChildPositiveBoard cbAll = childPositiveBoardRepository.findByKeywordandChildwithDatewithType(keyword, child, "0000-00-00", PeriodType.CUMULATIVE).orElse(
+//                    ChildPositiveBoard.builder()
+//                            .child(child)
+//                            .keyword(keyword)
+//                            .period("0000-00-00")
+//                            .keywordCount(0L)
+//                            .type(PeriodType.CUMULATIVE)
+//                            .positive(0L).build()
+//            );
+//
+//            long newMonthPositive = Math.round((cbMonth.getPositive() * cbMonth.getKeywordCount() + positive) / (cbMonth.getKeywordCount() + 1));
+//            long newYearPositive = Math.round((cbYear.getPositive() * cbYear.getKeywordCount() + positive) / (cbYear.getKeywordCount() + 1));
+//            long newAllPositive = Math.round((cbAll.getPositive() * cbAll.getKeywordCount() + positive) / (cbAll.getKeywordCount() + 1));
+//
+//            cbMonth.setKeywordCount(cbMonth.getKeywordCount() + 1);
+//            cbMonth.setPositive(newYearPositive);
+//            cbYear.setKeywordCount(cbYear.getKeywordCount() + 1);
+//            cbYear.setPositive(newMonthPositive);
+//            cbAll.setKeywordCount(cbAll.getKeywordCount() + 1);
+//            cbAll.setPositive(newAllPositive);
+//
+//            childPositiveBoardRepository.save(cbMonth);
+//            childPositiveBoardRepository.save(cbYear);
+//            childPositiveBoardRepository.save(cbAll);
 
             subject.setTitle(summary);
             subjectRepository.save(subject);

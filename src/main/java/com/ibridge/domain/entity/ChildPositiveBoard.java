@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -23,7 +25,7 @@ public class ChildPositiveBoard {
     private PeriodType type;
 
     @Column(nullable = false)
-    private String period;
+    private LocalDate period;
 
     @Column(nullable = false)
     private String keyword;

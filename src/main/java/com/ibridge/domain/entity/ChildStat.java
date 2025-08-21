@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -24,7 +26,7 @@ public class ChildStat {
     private PeriodType type;
 
     @Column(nullable = false)
-    private String period;
+    private LocalDate period;
 
     @Enumerated(EnumType.ORDINAL)
     @Column

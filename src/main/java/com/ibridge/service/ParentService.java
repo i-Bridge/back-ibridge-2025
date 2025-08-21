@@ -96,15 +96,10 @@ public class ParentService {
 
         List<Long> cumList = childStatRepository.findAnswerCountsByChildAndPeriodList(child, periodList);
 
-        List<KeywordDTO> keywordList;
-        PageRequest top7 = PageRequest.of(0,7);
-        keywordList = childPositiveBoardRepository.findKeywordsAndPositivesByMonth(child, top7);
-
         return AnalysisResponseDTO.builder()
                 .cumulative(cumulative)
                 .emotions(emotions)
                 .cumList(cumList)
-                .keywords(keywordList)
                 .build();
     }
 
@@ -149,23 +144,23 @@ public class ParentService {
                 .build();
     }
 
-    public AnalysisResponseDTO getKeywords(Long childId, String periodType, String periodValue) {
-        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child not found"));
-        PageRequest top7 = PageRequest.of(0,7);
-        PeriodType type = PeriodType.valueOf(periodType);
-        List<ChildPositiveBoard> childPositiveBoards = childPositiveBoardRepository.findByChildAndTypeAndPeriod(child, type, periodValue, top7);
-        List<KeywordDTO> keywords = new ArrayList<>();
-        for(ChildPositiveBoard childPositiveBoard : childPositiveBoards){
-            keywords.add(KeywordDTO.builder()
-                            .keyword(childPositiveBoard.getKeyword())
-                            .count(childPositiveBoard.getKeywordCount())
-                            .positiveScore(childPositiveBoard.getPositive())
-                            .build());
-        }
-        return AnalysisResponseDTO.builder()
-                .keywords(keywords)
-                .build();
-    }
+//    public AnalysisResponseDTO getKeywords(Long childId, String periodType, String periodValue) {
+//        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child not found"));
+//        PageRequest top7 = PageRequest.of(0,7);
+//        PeriodType type = PeriodType.valueOf(periodType);
+//        List<ChildPositiveBoard> childPositiveBoards = childPositiveBoardRepository.findByChildAndTypeAndPeriod(child, type, periodValue, top7);
+//        List<KeywordDTO> keywords = new ArrayList<>();
+//        for(ChildPositiveBoard childPositiveBoard : childPositiveBoards){
+//            keywords.add(KeywordDTO.builder()
+//                            .keyword(childPositiveBoard.getKeyword())
+//                            .count(childPositiveBoard.getKeywordCount())
+//                            .positiveScore(childPositiveBoard.getPositive())
+//                            .build());
+//        }
+//        return AnalysisResponseDTO.builder()
+//                .keywords(keywords)
+//                .build();
+//    }
 
 
 
