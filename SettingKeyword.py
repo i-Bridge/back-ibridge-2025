@@ -1,6 +1,5 @@
 # 필요한 라이브러리 설치
 # pip install sentence-transformers scikit-learn openai matplotlib sqlalchemy pymysql pandas
-
 from sentence_transformers import SentenceTransformer
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
@@ -10,6 +9,7 @@ from sqlalchemy import create_engine, text
 import pandas as pd
 import os
 
+openai.api_key = os.getenv("OPENAI_KEY")
 # -------------------------
 # DB 연결 (SQLAlchemy 사용)
 # -------------------------
