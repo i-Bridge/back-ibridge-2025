@@ -59,7 +59,7 @@ public class OtherService {
                 ChildStat weeklyStat = ChildStat.builder()
                         .child(child)
                         .emotion(null)
-                        .type(PeriodType.MONTH)
+                        .type(PeriodType.WEEK)
                         .period(today)
                         .answerCount(0L).build();
                 childStatRepository.save(weeklyStat);
