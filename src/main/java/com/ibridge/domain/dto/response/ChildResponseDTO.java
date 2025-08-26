@@ -13,6 +13,7 @@ public class ChildResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class getQuestionDTO {
+        Long grape;
         boolean emotion;
         boolean isCompleted;
     }

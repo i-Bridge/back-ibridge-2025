@@ -48,6 +48,7 @@ public class ChildService {
         }
 
         return ChildResponseDTO.getQuestionDTO.builder()
+                .grape(child.getGrape())
                 .emotion(emotion)
                 .isCompleted(isCompleted).build();
     }
