@@ -85,4 +85,12 @@ public class ChildResponseDTO {
     public static class getPresignedURLDTO {
         String url;
     }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class finishedDTO{
+        Long grape;
+    }
 }

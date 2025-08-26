@@ -293,9 +293,12 @@ public class ChildService {
         }
     }
 
-    public void answerFinished(Long childId, ChildRequestDTO.FinishedDTO request) {
+    public ChildResponseDTO.finishedDTO answerFinished(Long childId, ChildRequestDTO.FinishedDTO request) {
         Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + " Not Found "));
-        child.setGrape(child.getGrape() + 1);
+        Long before = child.getGrape();
+        ChildResponseDTO.finishedDTO data = ChildResponseDTO.finishedDTO.builder()
+                    .grape(before + 1).build();
+        child.setGrape(before + 1);
         childRepository.save(child);
 
         LocalDate today = LocalDate.now();
@@ -316,7 +319,9 @@ public class ChildService {
             questionRepository.delete(questions.get(0));
             subjectRepository.delete(subject);
         }
-        else if(subject.isCompleted()) return;
+        else if(subject.isCompleted()) {
+            System.out.println("subject is completed");
+        }
         else {
             questionRepository.delete(questions.get(questions.size() - 1));
             questions.remove(questions.size() - 1);
@@ -381,6 +386,8 @@ public class ChildService {
 
             makeNotice(subject);
         }
+
+        return data;
     }
 
     private void makeNotice(Subject subject) {

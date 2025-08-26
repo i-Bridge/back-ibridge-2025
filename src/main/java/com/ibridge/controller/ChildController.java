@@ -44,7 +44,7 @@ public class ChildController {
         }
     }
 
-    @GetMapping("/{childId}/reward")
+    @GetMapping("/{childId}/grape")
     public ApiResponse<ChildResponseDTO.getRewardDTO> reward(@PathVariable Long childId) {
         try {
             ChildResponseDTO.getRewardDTO data = childService.getReward(childId);
@@ -141,10 +141,10 @@ public class ChildController {
     }
 
     @PostMapping("/{childId}/finished")
-    public ApiResponse finished(@PathVariable Long childId, @RequestBody ChildRequestDTO.FinishedDTO request) {
+    public ApiResponse<ChildResponseDTO.finishedDTO> finished(@PathVariable Long childId, @RequestBody ChildRequestDTO.FinishedDTO request) {
         try {
-            childService.answerFinished(childId, request);
-            return ApiResponse.onSuccess(null);
+            ChildResponseDTO.finishedDTO data = childService.answerFinished(childId, request);
+            return ApiResponse.onSuccess(data);
         }
         catch (Exception e) {
             System.out.println("failure return: " + e.getMessage());
