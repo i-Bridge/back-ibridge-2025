@@ -295,6 +295,9 @@ public class ChildService {
 
     public void answerFinished(Long childId, ChildRequestDTO.FinishedDTO request) {
         Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + " Not Found "));
+        child.setGrape(child.getGrape() + 1);
+        childRepository.save(child);
+
         LocalDate today = LocalDate.now();
         String yearmonth = today.format(DateTimeFormatter.ofPattern("yyyy-MM")) + "-01";
 
