@@ -29,14 +29,19 @@ public class GptService {
         try {
             JSONObject message = new JSONObject()
                     .put("role", "user")
-                    .put("content", question);
+                    .put("content", "대화 내용: \"" + question + "\"\n후속 질문 한 개만 만들어줘.");
+
 
             JSONObject systemMessage = new JSONObject()
                     .put("role", "system")
-                    .put("content", "너는 아이의 답변을 듣고 다음 질문을 만들어주는 GPT야.");
-
+                    .put("content", """
+                        너는 4~8세 아이와 대화하는 친근한 선생님이야.
+                        아이가 말한 내용에 대해 공감하는 말 하나와 후속 질문 하나만 만들어야 해.
+                        공감과 질문 외에는 어떤 말도 하지 마.
+                        항상 친근하고 간단하게 질문을 만들어.
+                        """);
             JSONObject body = new JSONObject()
-                    .put("model", "ft:gpt-4.1-nano-2025-04-14:personal::Bt3Mv0jl")
+                    .put("model", "gpt-5-mini")
                     .put("messages", List.of(systemMessage, message));
 
             RequestBody requestBody = RequestBody.create(

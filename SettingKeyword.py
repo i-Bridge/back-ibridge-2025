@@ -4,7 +4,6 @@ from sentence_transformers import SentenceTransformer
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 import openai
-import matplotlib.pyplot as plt
 from sqlalchemy import create_engine, text
 import pandas as pd
 import os
