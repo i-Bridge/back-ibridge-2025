@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -27,6 +28,8 @@ public class GptService {
 
     public String askGpt(String question) {
         try {
+            System.out.print("gpt 응답 시작 : " + LocalDate.now());
+
             JSONObject message = new JSONObject()
                     .put("role", "user")
                     .put("content", "대화 내용: \"" + question + "\"\n후속 질문 한 개만 만들어줘.");
@@ -62,6 +65,7 @@ public class GptService {
                     JSONObject jsonResponse = new JSONObject(responseBody);
 
                     if (jsonResponse.has("choices")) {
+                        System.out.print("gpt 응답 종료 : " + LocalDate.now());
                         return jsonResponse
                                 .getJSONArray("choices")
                                 .getJSONObject(0)
