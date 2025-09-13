@@ -36,4 +36,9 @@ public interface ChildPositiveBoardRepository extends JpaRepository<ChildPositiv
             "AND cb.period = :period " +
             "AND cb.keyword = :keyword")
     Optional<ChildPositiveBoard> findByKeywordandChildwithDatewithType(String keyword, Child child, String period, PeriodType periodType);
+
+    @Query("SELECT new com.ibridge.domain.dto.response.KeywordDTO(c.keyword, c.keywordCount, c.positive) " +
+            "FROM ChildPositiveBoard c " +
+            "WHERE c.child.id = :childId")
+    List<KeywordDTO> findkeywordsByChild(Long childId);
 }
