@@ -109,8 +109,7 @@ public class ParentService {
                 cumList.add(0L);
             }
         }
-        List<KeywordDTO> keywordDTOs = new ArrayList<>();
-        keywordDTOs = childPositiveBoardRepository.findkeywordsByChild(childId);
+        List<KeywordDTO> keywordDTOs = childPositiveBoardRepository.findkeywordsByChild(childId);
 
         return AnalysisResponseDTO.builder()
                 .keywords(keywordDTOs)
