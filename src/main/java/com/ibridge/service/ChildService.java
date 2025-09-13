@@ -241,7 +241,7 @@ public class ChildService {
 
     //s3 저장 경로 양식 : {childId}/{subjectId}/{yyyymmdd_hhmmss}.webm / {childId}/{subjectId}/{yyyymmdd_hhmmss}.jpeg
     public ChildResponseDTO.getPresignedURLDTO getPresignedURL(Long childId, ChildRequestDTO.GetPresignedURLDTO request) {
-        System.out.println("Requesting PresignedURL: " + request.getSubjectId());
+        System.out.println("Requesting PresignedURL for Subject" + request.getSubjectId());
         LocalDateTime sended = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
         String formattedSended = sended.format(formatter);
@@ -257,6 +257,8 @@ public class ChildService {
             objectKey += ".jpeg";
         }
 
+        String url = s3Service.generatePresignedUrl(objectKey, contentType, 600);
+        System.out.println("Presigned URL: " + url);
         return ChildResponseDTO.getPresignedURLDTO.builder()
                 .url(s3Service.generatePresignedUrl(objectKey, contentType, 600)).build();
     }
