@@ -13,10 +13,8 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -157,10 +155,18 @@ public class ChildService {
         if(questions.size() == 5) {
             System.out.println("Completely Finished with " + questions.get(questions.size()- 1).getId());
             targetSubject.setCompleted(true);
-            String conv = "";
-            for(Question question : questions) {
-                conv += question.getText() + "\n" + analysisRepository.findByQuestionId(question.getId()).get().getAnswer() + "\n";
+
+            List<Long> qIds = questions.stream().map(Question::getId).toList();
+            List<Analysis> analyses = analysisRepository.findAllByQuestionIdIn(qIds);
+            Map<Long, String> answerByQid = analyses.stream()
+                    .collect(Collectors.toMap(a -> a.getQuestion().getId(), Analysis::getAnswer));
+
+            StringBuilder sb = new StringBuilder(1024);
+            for (Question q : questions) {
+                sb.append(q.getText()).append('\n')
+                        .append(answerByQid.get(q.getId())).append('\n');
             }
+            String conv = sb.toString();
             String summary = gptService.summarizeGPT(conv);
             targetSubject.setTitle(summary);
             subjectRepository.save(targetSubject);
