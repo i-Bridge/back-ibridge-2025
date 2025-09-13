@@ -11,7 +11,7 @@ import java.time.Duration;
 
 @Service
 public class S3Service {
-    private final String bucketName = "ibridge-10150107";
+    private final String bucketName = "ibridge-s3";
     private final Region region = Region.AP_NORTHEAST_2;
     private final S3Presigner presigner;
 
