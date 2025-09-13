@@ -2,6 +2,7 @@ package com.ibridge.service;
 
 import lombok.RequiredArgsConstructor;
 import okhttp3.*;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -259,4 +260,86 @@ public class GptService {
         }
         return Collections.emptyMap();
     }
+
+    public Map<String, List<String>> categorizeSubjects(List<String> subjects) {
+        String prompt = """
+            다음 주제들을 의미적으로 비슷한 것끼리 카테고리별로 묶어주세요.
+            카테고리 이름은 GPT가 자유롭게 생성하되, 반드시 JSON 형식으로만 출력해야 합니다.
+            다른 설명, 해설, 문장은 절대 포함하지 마세요.
+            
+            출력 예시:
+            {
+              "가족 활동": ["아이가 아빠와 쇼핑을 갔던 대화", "아이가 엄마와 놀이공원을 갔던 대화"],
+              "학교 활동": ["아이가 친구와 학교에서 놀던 대화"]
+            }
+            
+            [주제 목록 시작]
+            %s
+            [주제 목록 끝]
+            """.formatted(String.join(", ", subjects));
+
+        try {
+            JSONObject message = new JSONObject()
+                    .put("role", "user")
+                    .put("content", prompt);
+
+            JSONObject body = new JSONObject()
+                    .put("model", "gpt-5-mini")
+                    .put("messages", List.of(message));
+
+            RequestBody requestBody = RequestBody.create(
+                    body.toString(),
+                    MediaType.parse("application/json")
+            );
+
+            Request request = new Request.Builder()
+                    .url(API_URL)
+                    .addHeader("Authorization", "Bearer " + OPENAI_API_KEY)
+                    .addHeader("Content-Type", "application/json")
+                    .post(requestBody)
+                    .build();
+
+            try (Response response = client.newCall(request).execute()) {
+                if (response.body() != null) {
+                    String responseBody = response.body().string();
+                    JSONObject jsonResponse = new JSONObject(responseBody);
+
+                    if (jsonResponse.has("choices")) {
+                        String content = jsonResponse
+                                .getJSONArray("choices")
+                                .getJSONObject(0)
+                                .getJSONObject("message")
+                                .getString("content")
+                                .trim();
+
+                        // JSON 파싱
+                        JSONObject resultJson = new JSONObject(content);
+                        Map<String, List<String>> resultMap = new HashMap<>();
+
+                        Iterator<String> keys = resultJson.keys();
+                        while (keys.hasNext()) {
+                            String key = keys.next();
+                            List<String> values = new ArrayList<>();
+
+                            JSONArray arr = resultJson.getJSONArray(key);
+                            for (int i = 0; i < arr.length(); i++) {
+                                values.add(arr.getString(i));
+                            }
+
+                            resultMap.put(key, values);
+                        }
+
+                        return resultMap;
+                    } else {
+                        throw new RuntimeException("OpenAI API 오류 응답: " + responseBody);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("GPT 응답 중 오류 발생: " + e.getMessage(), e);
+        }
+        return Collections.emptyMap();
+    }
+
+
 }
