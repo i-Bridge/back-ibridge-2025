@@ -97,7 +97,7 @@ public class GptService {
                         );
 
             JSONObject body = new JSONObject()
-                    .put("model", "gpt-4.1-nano")
+                    .put("model", "gpt-5-mini")
                     .put("messages", List.of(message));
 
             RequestBody requestBody = RequestBody.create(
@@ -156,7 +156,7 @@ public class GptService {
                     .put("content", prompt);
 
             JSONObject body = new JSONObject()
-                    .put("model", "gpt-4.1-nano")
+                    .put("model", "gpt-5-mini")
                     .put("messages", List.of(message));
 
             RequestBody requestBody = RequestBody.create(
@@ -211,7 +211,7 @@ public class GptService {
                     .put("content", prompt);
 
             JSONObject body = new JSONObject()
-                    .put("model", "gpt-4.1-nano")
+                    .put("model", "gpt-5-mini")
                     .put("messages", List.of(message));
 
             RequestBody requestBody = RequestBody.create(
