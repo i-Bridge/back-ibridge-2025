@@ -30,7 +30,7 @@ public class GptService {
 
     public String askGpt(String question) {
         try {
-            System.out.print("gpt 응답 시작 : " + LocalDateTime.now());
+            System.out.println("gpt 응답 시작 : " + LocalDateTime.now());
 
             JSONObject message = new JSONObject()
                     .put("role", "user")
@@ -67,7 +67,7 @@ public class GptService {
                     JSONObject jsonResponse = new JSONObject(responseBody);
 
                     if (jsonResponse.has("choices")) {
-                        System.out.print("\ngpt 응답 종료 : " + LocalDateTime.now());
+                        System.out.println("gpt 응답 종료 : " + LocalDateTime.now());
                         return jsonResponse
                                 .getJSONArray("choices")
                                 .getJSONObject(0)
