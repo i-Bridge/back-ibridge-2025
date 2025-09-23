@@ -414,6 +414,18 @@ public class ChildService {
                     .subject(subject)
                     .build();
             NoticeRepository.save(p);
+
+            if(child.getGrape() % 6 == 0) {
+                Notice completeNotice = Notice.builder()
+                        .child(child)
+                        .send_at(Timestamp.valueOf(LocalDateTime.now()))
+                        .type(3)
+                        .receiver(parent)
+                        .isRead(false)
+                        .subject(subject)
+                        .build();
+                NoticeRepository.save(completeNotice);
+            }
         }
     }
 
