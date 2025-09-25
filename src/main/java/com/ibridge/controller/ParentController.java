@@ -168,7 +168,17 @@ public class ParentController {
         }
     }
 
-
+    @GetMapping("{childId}/stat/{keyword}")
+    public ApiResponse<CategorySubjectDTO> getSubjects(@PathVariable Long childId, @PathVariable String keyword){
+        try{
+            CategorySubjectDTO categorySubjectDTO  = parentService.getSubjects(childId, keyword);
+            return ApiResponse.onSuccess(categorySubjectDTO);
+        }
+        catch(Exception e){
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
+    }
 
 
 
