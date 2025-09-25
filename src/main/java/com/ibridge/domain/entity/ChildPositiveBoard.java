@@ -22,9 +22,6 @@ public class ChildPositiveBoard {
     private Child child;
 
     @Column(nullable = false)
-    private PeriodType type;
-
-    @Column(nullable = false)
     private LocalDate period;
 
     @Column(nullable = false)

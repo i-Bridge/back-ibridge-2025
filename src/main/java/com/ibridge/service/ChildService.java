@@ -27,7 +27,7 @@ public class ChildService {
     private final S3Service s3Service;
     private final GptService gptService;
     private final ParentRepository parentRepository;
-    private final NoticeRepository NoticeRepository;
+    private final NoticeRepository noticeRepository;
     private final StoreRepository storeRepository;
     private final ChildStatRepository childStatRepository;
     private final ChildPositiveBoardRepository childPositiveBoardRepository;
@@ -266,7 +266,7 @@ public class ChildService {
         String url = s3Service.generatePresignedUrl(objectKey, contentType, 600);
         System.out.println("Presigned URL: " + url);
         return ChildResponseDTO.getPresignedURLDTO.builder()
-                .url(s3Service.generatePresignedUrl(objectKey, contentType, 600)).build();
+                .url(url).build();
     }
 
     public void uploaded(ChildRequestDTO.UploadedDTO request) {
@@ -304,11 +304,35 @@ public class ChildService {
 
     public ChildResponseDTO.finishedDTO answerFinished(Long childId, ChildRequestDTO.FinishedDTO request) {
         Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + " Not Found "));
+
+        //포도송이 추가
         Long before = child.getGrape();
         ChildResponseDTO.finishedDTO data = ChildResponseDTO.finishedDTO.builder()
                     .grape(before + 1).build();
         child.setGrape(before + 1);
         childRepository.save(child);
+
+        //군집화 진행
+        int subjectCount = subjectRepository.countByChild(child);
+        if(subjectCount % 15 == 0 && subjectCount != 0) {
+            int clustering = subjectCount >= 60 ? 60 : subjectCount;
+            //클러스터링 진행
+            List<Subject> clusteringSubjectList = subjectRepository.findClusteringSubjectbyChild(child, clustering);
+            Map<String, List<String>> categorized = gptService.categorizeSubjects(clusteringSubjectList.stream()
+                    .map(Subject::getTitle) // Subject 객체에서 title만 뽑기
+                    .collect(Collectors.toList()));
+
+            for(Parent p : parentRepository.findAllByFamily(child.getFamily())) {
+                Notice notice = Notice.builder()
+                        .child(child)
+                        .send_at(Timestamp.valueOf(LocalDateTime.now()))
+                        .type(4)
+                        .receiver(p)
+                        .isRead(false)
+                        .build();
+                noticeRepository.save(notice);
+            }
+        }
 
         LocalDate today = LocalDate.now();
         String yearmonth = today.format(DateTimeFormatter.ofPattern("yyyy-MM")) + "-01";
@@ -413,7 +437,19 @@ public class ChildService {
                     .isRead(false)
                     .subject(subject)
                     .build();
-            NoticeRepository.save(p);
+            noticeRepository.save(p);
+
+            if(child.getGrape() % 6 == 0) {
+                Notice completeNotice = Notice.builder()
+                        .child(child)
+                        .send_at(Timestamp.valueOf(LocalDateTime.now()))
+                        .type(3)
+                        .receiver(parent)
+                        .isRead(false)
+                        .subject(subject)
+                        .build();
+                noticeRepository.save(completeNotice);
+            }
         }
     }
 
