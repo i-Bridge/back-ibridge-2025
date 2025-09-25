@@ -9,6 +9,7 @@ import com.ibridge.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -180,6 +181,16 @@ public class ParentService {
         }
         return AnalysisResponseDTO.builder()
                 .cumList(cumulatives)
+                .build();
+    }
+
+    public CategorySubjectDTO getSubjects(Long childId, String keyword) {
+        Optional<Child> child = childRepository.findById(childId);
+        Pageable top60 = PageRequest.of(0,60);
+        List<SubjectDTO> subjects = subjectRepository.findRecentSubjectDTOs(child.get(), keyword, top60);
+
+        return CategorySubjectDTO.builder()
+                .subjects(subjects)
                 .build();
     }
 
@@ -417,4 +428,6 @@ public class ParentService {
         Notice requested = NoticeRepository.findByReceiverandSendertoJoinFamily(parent, sender);
         NoticeRepository.delete(requested);
     }
+
+
 }
