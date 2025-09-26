@@ -196,7 +196,7 @@ public class ChildRefactoringService {
          */
 
         //1, 4
-        if(subject == predesigned || (subject != predesigned && questions.size() > 1)) {
+        if((subject == predesigned && questions.size() == 5) || (subject != predesigned && questions.size() > 1)) {
             //주제 완료 처리
             subject.setCompleted(true);
             subject.setAnswer(true);
@@ -242,22 +242,20 @@ public class ChildRefactoringService {
             if(subjectCount % 15 == 0) {
                 clustering(child, subjectRepository.findClusteringSubjectbyChild(child, Math.min(subjectCount, 60)));
             }
-
-            return ChildResponseDTO.finishedDTO.builder()
-                    .grape(child.getGrape()).build();
         }
         //추가 질문 종료
         else {
             //2
             if(subject == predesigned) subject.setAnswer(true);
+            //3
             else {
                 questionRepository.delete(questions.get(0));
                 subjectRepository.delete(subject);
             }
-
-            return ChildResponseDTO.finishedDTO.builder()
-                    .grape(child.getGrape()).build();
         }
+
+        return ChildResponseDTO.finishedDTO.builder()
+                .grape(child.getGrape()).build();
     }
 
     //답변 완료 후, 알람 생성 시 호출
