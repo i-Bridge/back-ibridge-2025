@@ -30,6 +30,7 @@ public class StartService {
     private final NoticeRepository NoticeRepository;
     private final SubjectRepository subjectRepository;
     private final QuestionRepository questionRepository;
+    private final ChildStatRepository childStatRepository;
 
     public StartResponseDTO signIn(String email, String name) {
         boolean isFirst = !parentRepository.existsByEmail(email);
@@ -132,10 +133,16 @@ public class StartService {
                     }
                     child.setSubjects(subjectList);
 
+                    ChildStat childStat = ChildStat.builder()
+                            .child(child)
+                            .type(PeriodType.CUMULATIVE)
+                            .period(LocalDate.now())
+                            .emotion(null)
+                            .answerCount(0L)
+                            .build();
                     return child;
                 })
                 .collect(Collectors.toList());
-
         childRepository.saveAll(children);
     }
 

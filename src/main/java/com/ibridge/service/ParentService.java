@@ -84,6 +84,8 @@ public class ParentService {
         YearMonth yearMonth = YearMonth.from(LocalDate.now());
         LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();
+        //누적 응담 수
+        ChildStat cs = childStatRepository.findByType(child).orElseThrow(() -> new RuntimeException("ChildStat not found"));
         // 감정 목록 조회, null이면 0으로 채움 (달의 일 수만큼)
         List<ChildStat> emotionsFromDb = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
         int daysInMonth = yearMonth.lengthOfMonth();
@@ -113,6 +115,8 @@ public class ParentService {
         List<KeywordDTO> keywordDTOs = childPositiveBoardRepository.findkeywordsByChild(childId);
 
         return AnalysisResponseDTO.builder()
+                .signupDate(cs.getPeriod())
+                .cumulative(cs.getAnswerCount())
                 .keywords(keywordDTOs)
                 .emotions(Arrays.asList(emotions))
                 .cumList(cumList)
