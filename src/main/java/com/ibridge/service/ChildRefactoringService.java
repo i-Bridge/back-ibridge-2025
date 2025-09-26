@@ -101,42 +101,15 @@ public class ChildRefactoringService {
                     .append(analysisRepository.findByQuestionId(question.getId()).get().getAnswer()).append('\n');
         }
         String conv = sb.toString();
+        String ai = "";
 
-        switch (questions.size()) {
-            // 대답 완료
-            case 5:
-                //완료 처리
-                subject.setCompleted(true);
 
-                //요약 후 subject 이름 변경
-                String summary = gptService.summarizeGPT(conv);
-                subject.setTitle(summary);
+        if(questions.size() == 5) ai = gptService.closingGPT(conv);
+        else ai = gptService.askGpt(conv);
 
-                //긍부정 평가
-                Map<String, Integer> positiveRate = gptService.positiveGPT(conv);
-                int positive = positiveRate.get("positive");
-                subject.setPositive(positive);
-
-                subjectRepository.save(subject);
-
-                makeNotice(subject);
-
-                return ChildResponseDTO.getAI.builder()
-                        .ai(gptService.closingGPT(conv))
-                        .isFinished(true).build();
-
-            // 대답 완료 이전
-            default:
-                String ai = gptService.askGpt(conv);
-                Question newQuestion = Question.builder()
-                        .subject(subject)
-                        .text(ai).build();
-                questionRepository.save(newQuestion);
-
-                return ChildResponseDTO.getAI.builder()
-                        .ai(ai)
-                        .isFinished(false).build();
-        }
+        return ChildResponseDTO.getAI.builder()
+                .ai(ai)
+                .isFinished(questions.size() == 5).build();
     }
 
     public ChildResponseDTO.getPresignedURLDTO getPresignedURL(Long childId, ChildRequestDTO.GetPresignedURLDTO request) {
@@ -189,14 +162,96 @@ public class ChildRefactoringService {
     public ChildResponseDTO.finishedDTO answerFinished(Long childId, ChildRequestDTO.FinishedDTO request) {
         Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child not found"));
         Subject subject = subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject not found"));
+        Subject predesigned = subjectRepository.findByChildIdAndDate(childId, LocalDate.now()).get(0);
+        List<Question> questions = questionRepository.findAllBySubject(subject);
 
+        /* 경우의 수
+        1. 지정 질문 (완료)
+            - isComplete : true
+            - isAnswer : true
+            - 요약본으로 제목 수정
+            - 긍부정 비율 저장
+            - 포도 추가
+            - Stat 저장
+            - 답변 완료 알림 전송
+            - 군집화 여부 전송
 
-        //1. 대답 X, 주제 삭제
-        //2. 기본 지정 질문은 이어서 가능하도록
-        //2-2. 기본 지정 질문은 삭제 X
-        //3. 추가 질문은 마무리
+        2. 지정 질문 (미완성)
+            - isAnswer : true
 
-        return null;
+        3. 추가 질문 (대답 X)
+            - 삭제
+
+        4. 추가 질문 (2개 이상의 질문, 완료)
+            - isComplete : true
+            - isAnswer : true
+            - 요약본으로 제목 수정
+            - 긍부정 비율 저장
+            - 포도 추가
+            - Stat 저장
+            - 답변 완료 알림 전송
+            - 군집화 여부 전송
+         */
+
+        //1, 4
+        if(subject == predesigned || (subject != predesigned && questions.size() > 1)) {
+            //주제 완료 처리
+            subject.setCompleted(true);
+            subject.setAnswer(true);
+
+            StringBuilder sb = new StringBuilder(1024);
+            for (Question q : questions) {
+                sb.append(q.getText()).append('\n')
+                        .append(analysisRepository.findByQuestionId(q.getId()).get().getAnswer()).append('\n');
+            }
+            String conv = sb.toString();
+            String summary = gptService.summarizeGPT(conv);
+            subject.setTitle(summary);
+
+            int positiveRate = gptService.positiveGPT(conv).get("긍정");
+            subject.setPositive(positiveRate);
+
+            subjectRepository.save(subject);
+
+            //DB 처리
+            child.setGrape(child.getGrape() + 1);
+            childRepository.save(child);
+
+            ChildStat dailyStat = childStatRepository.findDateStatByChildandToday(child, LocalDate.now());
+            ChildStat weeklyStat = childStatRepository.findWeekStatByChildandToday(child, LocalDate.now());
+            ChildStat monthlyStat = childStatRepository.findMonthStatByChildandToday(child, LocalDate.now());
+
+            dailyStat.setAnswerCount(dailyStat.getAnswerCount() + 1);
+            weeklyStat.setAnswerCount(weeklyStat.getAnswerCount() + 1);
+            monthlyStat.setAnswerCount(monthlyStat.getAnswerCount() + 1);
+
+            childStatRepository.save(dailyStat);
+            childStatRepository.save(weeklyStat);
+            childStatRepository.save(monthlyStat);
+
+            makeNotice(subject);
+
+            //군집화 진행 여부 확인 및 진행
+            int subjectCount = subjectRepository.countByChild(child);
+            if(subjectCount % 15 == 0) {
+                clustering(child, subjectRepository.findClusteringSubjectbyChild(child, Math.min(subjectCount, 60)));
+            }
+
+            return ChildResponseDTO.finishedDTO.builder()
+                    .grape(child.getGrape()).build();
+        }
+        //추가 질문 종료
+        else {
+            //2
+            if(subject == predesigned) subject.setAnswer(true);
+            else {
+                questionRepository.delete(questions.get(0));
+                subjectRepository.delete(subject);
+            }
+
+            return ChildResponseDTO.finishedDTO.builder()
+                    .grape(child.getGrape()).build();
+        }
     }
 
     //답변 완료 후, 알람 생성 시 호출
@@ -226,6 +281,10 @@ public class ChildRefactoringService {
                 noticeRepository.save(grapeNotice);        
             }
         }
+    }
+
+    private void clustering(Child child, List<Subject> subjectList) {
+        //
     }
 
 
