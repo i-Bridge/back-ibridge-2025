@@ -32,6 +32,7 @@ public class ChildRefactoringService {
     private final S3Service s3Service;
     private final ParentRepository parentRepository;
     private final NoticeRepository noticeRepository;
+    private final ChildPositiveBoardRepository childPositiveBoardRepository;
 
     //질문 화면 관련
     public ChildResponseDTO.getQuestionDTO getHome(Long childId) {
@@ -119,7 +120,7 @@ public class ChildRefactoringService {
         String contentType = request.getType().equals("video") ? "video/webm" : (request.getType().equals("image") ? "image/jpeg" : "");
         String extension = contentType.equals("video/webm") ? "webm" : (contentType.equals("image/jpeg") ? "jpeg" : "");
         String objectKey = childId + "/" + request.getSubjectId() + "/" + time + "." + extension;
-        if(contentType.isEmpty() || extension.isEmpty()) throw new RuntimeException("contentType or objectKey is wrong : " + request.getType());
+        if(contentType.isEmpty() || extension.isEmpty()) throw new RuntimeException("contentType or objectKey is wrong : " + contentType + " " + extension);
 
         String presignedURL = s3Service.generatePresignedUrl(objectKey, contentType, 600);
         return ChildResponseDTO.getPresignedURLDTO.builder()
@@ -288,7 +289,11 @@ public class ChildRefactoringService {
     }
 
     private void clustering(Child child, List<Subject> subjectList) {
-        //
+        //기존 저장된 내용 삭제
+        List<ChildPositiveBoard> before = childPositiveBoardRepository.findAllByChild(child);
+        childPositiveBoardRepository.deleteAll(before);
+        
+        //군집화 진행
     }
 
 
