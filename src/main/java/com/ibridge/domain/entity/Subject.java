@@ -32,6 +32,9 @@ public class Subject {
     @Column(nullable = false)
     private LocalDate date;
 
+    @Column
+    private int positive;
+
     @ManyToOne
     @JoinColumn(name = "child")
     private Child child;
