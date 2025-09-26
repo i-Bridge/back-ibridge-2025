@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -218,8 +220,12 @@ public class ChildRefactoringService {
             childRepository.save(child);
 
             ChildStat dailyStat = childStatRepository.findDateStatByChildandToday(child, LocalDate.now());
-            ChildStat weeklyStat = childStatRepository.findWeekStatByChildandToday(child, LocalDate.now());
-            ChildStat monthlyStat = childStatRepository.findMonthStatByChildandToday(child, LocalDate.now());
+            ChildStat weeklyStat = childStatRepository.findWeekStatByChildandToday(child,
+                    LocalDate.now().with(DayOfWeek.MONDAY)
+            );
+            ChildStat monthlyStat = childStatRepository.findMonthStatByChildandToday(child,
+                    LocalDate.parse(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM")) + "-01")
+            );
 
             dailyStat.setAnswerCount(dailyStat.getAnswerCount() + 1);
             weeklyStat.setAnswerCount(weeklyStat.getAnswerCount() + 1);
