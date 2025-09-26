@@ -1,5 +1,6 @@
 package com.ibridge.service;
 
+import com.ibridge.domain.entity.Subject;
 import lombok.RequiredArgsConstructor;
 import okhttp3.*;
 import org.json.JSONArray;
@@ -262,22 +263,30 @@ public class GptService {
         return Collections.emptyMap();
     }
 
-    public Map<String, List<String>> categorizeSubjects(List<String> subjects) {
+    public Map<String, List<Long>> categorizeSubjects(List<Subject> subjects) {
+        // Subject title만 추출해서 GPT에게 전달
+        Map<String, Long> titleToIdMap = new HashMap<>();
+        List<String> titles = new ArrayList<>();
+        for (Subject subject : subjects) {
+            titles.add(subject.getTitle());
+            titleToIdMap.put(subject.getTitle(), subject.getId());
+        }
+
         String prompt = """
-            다음 주제들을 의미적으로 비슷한 것끼리 카테고리별로 묶어주세요.
-            카테고리 이름은 GPT가 자유롭게 생성하되, 반드시 JSON 형식으로만 출력해야 합니다.
-            다른 설명, 해설, 문장은 절대 포함하지 마세요.
-            
-            출력 예시:
-            {
-              "가족 활동": ["아이가 아빠와 쇼핑을 갔던 대화", "아이가 엄마와 놀이공원을 갔던 대화"],
-              "학교 활동": ["아이가 친구와 학교에서 놀던 대화"]
-            }
-            
-            [주제 목록 시작]
-            %s
-            [주제 목록 끝]
-            """.formatted(String.join(", ", subjects));
+        다음 주제들을 의미적으로 비슷한 것끼리 카테고리별로 묶어주세요.
+        카테고리 이름은 GPT가 자유롭게 생성하되, 반드시 JSON 형식으로만 출력해야 합니다.
+        다른 설명, 해설, 문장은 절대 포함하지 마세요.
+        
+        출력 예시:
+        {
+          "가족 활동": ["아이가 아빠와 쇼핑을 갔던 대화", "아이가 엄마와 놀이공원을 갔던 대화"],
+          "학교 활동": ["아이가 친구와 학교에서 놀던 대화"]
+        }
+        
+        [주제 목록 시작]
+        %s
+        [주제 목록 끝]
+        """.formatted(String.join(", ", titles));
 
         try {
             JSONObject message = new JSONObject()
@@ -315,16 +324,20 @@ public class GptService {
 
                         // JSON 파싱
                         JSONObject resultJson = new JSONObject(content);
-                        Map<String, List<String>> resultMap = new HashMap<>();
+                        Map<String, List<Long>> resultMap = new HashMap<>();
 
                         Iterator<String> keys = resultJson.keys();
                         while (keys.hasNext()) {
                             String key = keys.next();
-                            List<String> values = new ArrayList<>();
+                            List<Long> values = new ArrayList<>();
 
                             JSONArray arr = resultJson.getJSONArray(key);
                             for (int i = 0; i < arr.length(); i++) {
-                                values.add(arr.getString(i));
+                                String subjectTitle = arr.getString(i);
+                                Long subjectId = titleToIdMap.get(subjectTitle);
+                                if (subjectId != null) {
+                                    values.add(subjectId);
+                                }
                             }
 
                             resultMap.put(key, values);
