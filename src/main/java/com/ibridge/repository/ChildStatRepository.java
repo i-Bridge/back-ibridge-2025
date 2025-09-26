@@ -58,4 +58,6 @@ public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
 
     @Query("SELECT cs FROM ChildStat cs WHERE cs.child = :child")
     List<ChildStat> findAllByChild(Child child);
+
+    List<ChildStat> findByChildAndPeriodBetween(Child child, LocalDate start, LocalDate end);
 }

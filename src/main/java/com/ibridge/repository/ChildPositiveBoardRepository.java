@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,4 +45,9 @@ public interface ChildPositiveBoardRepository extends JpaRepository<ChildPositiv
 
     @Query("SELECT cp FROM ChildPositiveBoard cp WHERE cp.child = :child")
     List<ChildPositiveBoard> findAllByChild(Child child);
+
+    @Query("SELECT cp FROM ChildPositiveBoard cp WHERE cp.child = :child ORDER BY cp.keywordCount LIMIT 1")
+    ChildPositiveBoard findTopByChild(Child child);
+
+    List<ChildPositiveBoard> findByChildAndPeriodBetween(Child child, LocalDate startDate, LocalDate endDate);
 }
