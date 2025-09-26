@@ -224,7 +224,7 @@ public class ChildRefactoringService {
                     LocalDate.now().with(DayOfWeek.MONDAY)
             );
             ChildStat monthlyStat = childStatRepository.findMonthStatByChildandToday(child,
-                    LocalDate.parse(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM")) + "-01")
+                    LocalDate.now().withDayOfMonth(1)
             );
 
             dailyStat.setAnswerCount(dailyStat.getAnswerCount() + 1);
