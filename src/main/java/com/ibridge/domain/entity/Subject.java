@@ -33,7 +33,7 @@ public class Subject {
     private LocalDate date;
 
     @Column
-    private int positive;
+    private Integer positive;
 
     @ManyToOne
     @JoinColumn(name = "child")
