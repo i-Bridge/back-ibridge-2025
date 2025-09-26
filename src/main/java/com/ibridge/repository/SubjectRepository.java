@@ -21,7 +21,7 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
     @Query("SELECT s FROM Subject s WHERE s.child = :child")
     List<Subject> findAllByChild(Child child);
 
-    @Query("SELECT new com.ibridge.domain.dto.SubjectDTO(s.id, s.title) " +
+    @Query("SELECT new com.ibridge.domain.dto.SubjectDTO(s.id, s.title, true) " +
             "FROM Subject s " +
             "WHERE s.child = :child AND s.keyword = :keyword " +
             "ORDER BY s.date DESC, s.id DESC")

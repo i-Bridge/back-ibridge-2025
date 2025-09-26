@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -12,6 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AnalysisResponseDTO {
+    private LocalDate signupDate;
+    private Long cumulative;
     private List<Integer> emotions;
     private List<Long> cumList;
     private List<KeywordDTO> keywords;
