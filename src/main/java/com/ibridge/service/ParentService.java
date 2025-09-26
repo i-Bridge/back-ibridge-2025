@@ -59,6 +59,8 @@ public class ParentService {
 
     public readSubjectsResponseDTO readSubjects(Parent parent, Long childId, Long year, Long month) {
         boolean[] arr = new boolean[32];
+        LocalDate startDate = LocalDate.of(year.intValue(), month.intValue(), 1);
+        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
         Child child = childRepository.findById(childId).orElse(null);
         List<Notice> notices = noticeRepository.findAllByReceiverAndChild(parent, year, month, child);
         for(Notice notice : notices) {
@@ -71,7 +73,38 @@ public class ParentService {
         for(int i = 1;i<32;i++){
             result.add(arr[i]);
         }
+        ChildStat cs = childStatRepository.findByType(child).orElse(null);
+        ChildPositiveBoard cpb = childPositiveBoardRepository.findTopByChild(child);
+
+        List<ChildPositiveBoard> boards = childPositiveBoardRepository.findByChildAndPeriodBetween(child, startDate, endDate);
+        String highestPositiveCategory = null;
+        String highestNegativeCategory = null;
+
+        if (!boards.isEmpty()) {
+            ChildPositiveBoard maxPositiveBoard = boards.stream()
+                    .max(Comparator.comparingDouble(b -> (double) b.getPositive() / b.getKeywordCount()))
+                    .orElse(null);
+            highestPositiveCategory = maxPositiveBoard != null ? maxPositiveBoard.getKeyword() : null;
+
+            ChildPositiveBoard maxNegativeBoard = boards.stream()
+                    .max(Comparator.comparingDouble(b -> 1.0 - (double) b.getPositive() / b.getKeywordCount()))
+                    .orElse(null);
+            highestNegativeCategory = maxNegativeBoard != null ? maxNegativeBoard.getKeyword() : null;
+        }
+
+        List<ChildStat> stats = childStatRepository.findByChildAndPeriodBetween(child, startDate, endDate);
+        Integer mostSelectedEmotion = stats.stream()
+                .collect(Collectors.groupingBy(ChildStat::getEmotion, Collectors.counting()))
+                .entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
         return readSubjectsResponseDTO.builder()
+                .cumulativeAnswerCount(Integer.parseInt(cs.getAnswerCount()+""))
+                .mostTalkedCategory(cpb.getKeyword())
+                .positiveCategory(highestPositiveCategory)
+                .negativeCategory(highestNegativeCategory)
+                .emotion(mostSelectedEmotion)
                 .month(result)
                 .build();
     }
