@@ -345,6 +345,7 @@ public class ParentService {
                 .birth(LocalDate.parse(request.getBirthday()))
                 .gender(Gender.values()[request.getGender()]).build();
 
+        //주제 및 질문 설정
         List<String> subjects = new ArrayList<>();
         try (InputStream inputStream = QuestionService.class.getClassLoader().getResourceAsStream("SubjectList.txt")) {
             if (inputStream == null) {
@@ -381,6 +382,35 @@ public class ParentService {
             questionRepository.save(question);
         }
 
+        //ChildStat 설정
+        ChildStat dailyStat = ChildStat.builder()
+                .child(child)
+                .period(LocalDate.now())
+                .answerCount(0L)
+                .type(PeriodType.DAY)
+                .emotion(null).build();
+        ChildStat weeklyStat = ChildStat.builder()
+                .child(child)
+                .period(LocalDate.now().with(DayOfWeek.MONDAY))
+                .answerCount(0L)
+                .type(PeriodType.WEEK)
+                .emotion(null).build();
+        ChildStat monthlyStat = ChildStat.builder()
+                .child(child)
+                .period(LocalDate.now().withDayOfMonth(1))
+                .type(PeriodType.MONTH)
+                .emotion(null).build();
+        ChildStat totalStat = ChildStat.builder()
+                .child(child)
+                .period(LocalDate.now())
+                .type(PeriodType.CUMULATIVE)
+                .emotion(null).build();
+
+        childStatRepository.save(dailyStat);
+        childStatRepository.save(weeklyStat);
+        childStatRepository.save(monthlyStat);
+        childStatRepository.save(totalStat);
+
         return ParentResponseDTO.ChildIdDTO.builder()
                 .childId(childRepository.save(child).getId()).build();
     }
@@ -408,6 +438,9 @@ public class ParentService {
             }
             subjectRepository.delete(subject);
         }
+
+        List<ChildStat> childStatList = childStatRepository.findAllByChild(child);
+        childStatRepository.deleteAll(childStatList);
         childRepository.delete(child);
     }
 
