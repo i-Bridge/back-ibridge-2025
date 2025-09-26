@@ -145,6 +145,7 @@ public class ChildService {
                         break;
                     }
                 }
+                break;
             case "jpeg":
                 for(Question question : questions) {
                     Analysis analysis = analysisRepository.findByQuestionId(question.getId()).orElseThrow(() -> new RuntimeException("Analysis not found"));
@@ -156,6 +157,7 @@ public class ChildService {
                         break;
                     }
                 }
+                break;
             default:
                 throw new RuntimeException("Unsupported extension: " + extension);
         }
