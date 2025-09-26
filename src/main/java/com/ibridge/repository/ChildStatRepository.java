@@ -49,4 +49,7 @@ public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
             "AND cs.type = 1 " +
             "AND cs.period = :monday ")
     ChildStat findWeekStatByChildandToday(@Param("child") Child child, @Param("monday") LocalDate monday);
+
+    @Query("SELECT cs FROM ChildStat cs WHERE cs.child = :child AND cs.type = com.ibridge.domain.entity.PeriodType.CUMULATIVE")
+    Optional<ChildStat> findByType(@Param("child") Child child);
 }
