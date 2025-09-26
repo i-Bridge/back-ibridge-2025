@@ -55,4 +55,7 @@ public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
   
     @Query("SELECT cs FROM ChildStat cs WHERE cs.child = :child AND cs.type = com.ibridge.domain.entity.PeriodType.CUMULATIVE")
     Optional<ChildStat> findByType(@Param("child") Child child);
+
+    @Query("SELECT cs FROM ChildStat cs WHERE cs.child = :child")
+    List<ChildStat> findAllByChild(Child child);
 }
