@@ -30,9 +30,9 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
                                            Pageable pageable);
 
 
-    @Query("SELECT count(s) FROM Subject s WHERE s.child = :child and s.isAnswer = true")
+    @Query("SELECT count(s) FROM Subject s WHERE s.child = :child and s.isCompleted = true")
     int countByChild(Child child);
 
-    @Query("SELECT s FROM Subject s WHERE s.child = :child and s.isAnswer = true ORDER BY s.date LIMIT :count")
+    @Query("SELECT s FROM Subject s WHERE s.child = :child and s.isCompleted = true ORDER BY s.date LIMIT :count")
     List<Subject> findClusteringSubjectbyChild(Child child, int count);
 }

@@ -41,4 +41,7 @@ public interface ChildPositiveBoardRepository extends JpaRepository<ChildPositiv
             "FROM ChildPositiveBoard c " +
             "WHERE c.child.id = :childId")
     List<KeywordDTO> findkeywordsByChild(Long childId);
+
+    @Query("SELECT cp FROM ChildPositiveBoard cp WHERE cp.child = :child")
+    List<ChildPositiveBoard> findAllByChild(Child child);
 }
