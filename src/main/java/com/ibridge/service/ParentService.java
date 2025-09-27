@@ -422,10 +422,12 @@ public class ParentService {
         ChildStat monthlyStat = ChildStat.builder()
                 .child(child)
                 .period(LocalDate.now().withDayOfMonth(1))
+                .answerCount(0L)
                 .type(PeriodType.MONTH)
                 .emotion(null).build();
         ChildStat totalStat = ChildStat.builder()
                 .child(child)
+                .answerCount(0L)
                 .period(LocalDate.now())
                 .type(PeriodType.CUMULATIVE)
                 .emotion(null).build();
