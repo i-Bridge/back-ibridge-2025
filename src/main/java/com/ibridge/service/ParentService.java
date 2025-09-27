@@ -46,52 +46,71 @@ public class ParentService {
     private final ChildPositiveBoardRepository childPositiveBoardRepository;
 
     public ParentHomeResponseDTO getParentHome(Long childId, LocalDate date, String email) {
-        Child child = childRepository.findById(childId).orElse(null);
+        Child child = childRepository.findById(childId)
+                .orElseThrow(() -> new RuntimeException("해당 자녀를 찾을 수 없습니다: " + childId));
+
         List<SubjectDTO> subjects = subjectRepository.findByChildIdAndDate(childId, date).stream()
                 .map(subject -> new SubjectDTO(subject.getId(), subject.getTitle(), subject.isAnswer()))
                 .collect(Collectors.toList());
 
         LocalDate startDate = LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue(), 1);
         LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+        List<ChildStat> stats = childStatRepository.findByChildAndPeriodBetween(child, startDate, endDate);
+        // 누적 ChildStat
         ChildStat cs = childStatRepository.findByType(child).orElse(null);
+
+        // 오늘 ChildStat
+        ChildStat csToday = childStatRepository.findByChildAndPeriod(child, LocalDate.now());
+
+        // ChildPositiveBoard
         ChildPositiveBoard cpb = childPositiveBoardRepository.findTopByChild(child);
 
         List<ChildPositiveBoard> boards = childPositiveBoardRepository.findByChildAndPeriodBetween(child, startDate, endDate);
+
         String highestPositiveCategory = null;
         String highestNegativeCategory = null;
 
         if (!boards.isEmpty()) {
             ChildPositiveBoard maxPositiveBoard = boards.stream()
+                    .filter(b -> b.getKeyword() != null && b.getKeywordCount() != 0)
                     .max(Comparator.comparingDouble(b -> (double) b.getPositive() / b.getKeywordCount()))
                     .orElse(null);
             highestPositiveCategory = maxPositiveBoard != null ? maxPositiveBoard.getKeyword() : null;
 
             ChildPositiveBoard maxNegativeBoard = boards.stream()
+                    .filter(b -> b.getKeyword() != null && b.getKeywordCount() != 0)
                     .max(Comparator.comparingDouble(b -> 1.0 - (double) b.getPositive() / b.getKeywordCount()))
                     .orElse(null);
             highestNegativeCategory = maxNegativeBoard != null ? maxNegativeBoard.getKeyword() : null;
         }
-        ChildStat csToday = childStatRepository.findByChildAndPeriod(child, LocalDate.now());
-        List<ChildStat> stats = childStatRepository.findByChildAndPeriodBetween(child, startDate, endDate);
+
+        // 가장 많이 선택한 감정
         Integer mostSelectedEmotion = stats.stream()
+                .filter(s -> s.getEmotion() != null)
                 .collect(Collectors.groupingBy(ChildStat::getEmotion, Collectors.counting()))
                 .entrySet().stream()
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
                 .orElse(null);
-        Long grape = cs.getAnswerCount()/6-(cs.getAnswerCount()- csToday.getAnswerCount())/6;
+
+        // 포도송이 계산 시 cs, csToday null 체크
+        long grape = 0;
+        if (cs != null && csToday != null) {
+            grape = cs.getAnswerCount() / 6 - (cs.getAnswerCount() - csToday.getAnswerCount()) / 6;
+        }
 
         return ParentHomeResponseDTO.builder()
-                .newGrape(Integer.parseInt(grape+""))
+                .newGrape((int) grape)
                 .name(child.getName())
-                .cumulativeAnswerCount(Integer.parseInt(cs.getAnswerCount()+""))
-                .mostTalkedCategory(cpb.getKeyword())
-                .positiveCategory(highestPositiveCategory)
-                .negativeCategory(highestNegativeCategory)
+                .cumulativeAnswerCount(cs != null ? cs.getAnswerCount().intValue() : 0)
+                .mostTalkedCategory(cpb != null && cpb.getKeyword() != null ? cpb.getKeyword() : "없음")
+                .positiveCategory(highestPositiveCategory != null ? highestPositiveCategory : "없음")
+                .negativeCategory(highestNegativeCategory != null ? highestNegativeCategory : "없음")
                 .emotion(mostSelectedEmotion)
                 .subjects(subjects)
                 .build();
     }
+
 
     public readSubjectsResponseDTO readSubjects(Parent parent, Long childId, Long year, Long month) {
         boolean[] arr = new boolean[32];
