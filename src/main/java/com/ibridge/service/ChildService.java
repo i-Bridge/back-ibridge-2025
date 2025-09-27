@@ -250,8 +250,7 @@ public class ChildService {
         else {
             //2
             if(subject == predesigned) subject.setAnswer(true);
-            //3
-            else {
+            else { //3
                 questionRepository.delete(questions.get(0));
                 subjectRepository.delete(subject);
             }
