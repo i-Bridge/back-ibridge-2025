@@ -105,7 +105,13 @@ public class ChildService {
 
 
         if(questions.size() == 5) ai = gptService.closingGPT(conv);
-        else ai = gptService.askGpt(conv);
+        else  {
+            ai = gptService.askGpt(conv);
+            Question question = Question.builder()
+                    .subject(subject)
+                    .text(ai).build();
+            questionRepository.save(question);
+        }
 
         return ChildResponseDTO.getAI.builder()
                 .ai(ai)
@@ -196,7 +202,7 @@ public class ChildService {
          */
 
         //1, 4
-        if((subject == predesigned && questions.size() == 5) || (subject != predesigned && questions.size() > 1)) {
+        if((subject == predesigned && questions.size() == 5) || (subject != predesigned && questions.size() >= 2)) {
             //주제 완료 처리
             subject.setCompleted(true);
             subject.setAnswer(true);
