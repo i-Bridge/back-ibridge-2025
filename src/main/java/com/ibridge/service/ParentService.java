@@ -307,7 +307,7 @@ public class ParentService {
     }
 
     public ParentResponseDTO.GetFamilyInfoDTO getFamilyPage(Long parentId) {
-        Parent parent = parentRepository.findById(parentId).get();
+        Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent " + parentId + "Not Found"));
         Family family = parent.getFamily();
 
         List<ParentResponseDTO.ParentInfoDTO> parentInfoDTOList = new ArrayList<>();
