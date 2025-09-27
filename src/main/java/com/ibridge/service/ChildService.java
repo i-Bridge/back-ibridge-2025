@@ -203,6 +203,7 @@ public class ChildService {
 
         //1, 4
         if((subject == predesigned && questions.size() == 5) || (subject != predesigned && questions.size() >= 2)) {
+            System.out.println("finished : 1 or 4");
             //주제 완료 처리
             subject.setCompleted(true);
             subject.setAnswer(true);
@@ -257,6 +258,7 @@ public class ChildService {
             //2
             if(subject == predesigned) subject.setAnswer(true);
             else { //3
+                System.out.println("finished: 3");
                 questionRepository.delete(questions.get(0));
                 subjectRepository.delete(subject);
             }
