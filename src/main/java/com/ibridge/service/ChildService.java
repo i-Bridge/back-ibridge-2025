@@ -290,10 +290,6 @@ public class ChildService {
     }
 
     private void clustering(Child child, List<Subject> subjectList) {
-        //기존 저장된 내용 삭제
-        List<ChildPositiveBoard> before = childPositiveBoardRepository.findAllByChild(child);
-        childPositiveBoardRepository.deleteAll(before);
-        
         //군집화 진행
         Map<String, List<Long>> categorized = gptService.categorizeSubjects(subjectList);
         for (Map.Entry<String, List<Long>> entry : categorized.entrySet()) {
@@ -306,12 +302,12 @@ public class ChildService {
             for (Subject subject : subjects) {
                 subject.setKeyword(keyword);
 
-                Optional<ChildPositiveBoard> childPositiveBoard = childPositiveBoardRepository.findByChildAndKeyword(child, keyword);
+                Optional<ChildPositiveBoard> childPositiveBoard = childPositiveBoardRepository.findByChildAndKeyword(child, keyword, LocalDate.now());
                 if(childPositiveBoard.isPresent()) {
-                    childPositiveBoard.get().setKeywordCount(childPositiveBoard.get().getKeywordCount() + 1);
-
                     Long newPositive = childPositiveBoard.get().getPositive() * childPositiveBoard.get().getKeywordCount() + subject.getPositive();
-                    childPositiveBoard.get().setPositive(newPositive);
+                    childPositiveBoard.get().setPositive(newPositive / (childPositiveBoard.get().getKeywordCount() + 1));
+
+                    childPositiveBoard.get().setKeywordCount(childPositiveBoard.get().getKeywordCount() + 1);
 
                     childPositiveBoardRepository.save(childPositiveBoard.get());
                 }
