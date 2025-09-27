@@ -60,4 +60,7 @@ public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
     List<ChildStat> findAllByChild(Child child);
 
     List<ChildStat> findByChildAndPeriodBetween(Child child, LocalDate start, LocalDate end);
+
+    @Query("select cs from ChildStat cs where cs.child = :child AND cs.period = : now AND cs.type = com.ibridge.domain.entity.PeriodType.DAY")
+    ChildStat findByChildAndPeriod(Child child, LocalDate now);
 }

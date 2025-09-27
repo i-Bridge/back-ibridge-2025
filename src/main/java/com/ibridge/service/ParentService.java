@@ -51,28 +51,8 @@ public class ParentService {
                 .map(subject -> new SubjectDTO(subject.getId(), subject.getTitle(), subject.isAnswer()))
                 .collect(Collectors.toList());
 
-        return ParentHomeResponseDTO.builder()
-                .subjects(subjects)
-                .name(child.getName())
-                .build();
-    }
-
-    public readSubjectsResponseDTO readSubjects(Parent parent, Long childId, Long year, Long month) {
-        boolean[] arr = new boolean[32];
-        LocalDate startDate = LocalDate.of(year.intValue(), month.intValue(), 1);
+        LocalDate startDate = LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue(), 1);
         LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
-        Child child = childRepository.findById(childId).orElse(null);
-        List<Notice> notices = noticeRepository.findAllByReceiverAndChild(parent, year, month, child);
-        for(Notice notice : notices) {
-            Timestamp sendAt = notice.getSend_at();
-            LocalDateTime localDateTime = sendAt.toLocalDateTime();
-            int day = localDateTime.getDayOfMonth();
-            arr[day] = true;
-        }
-        List<Boolean> result = new ArrayList<>();
-        for(int i = 1;i<32;i++){
-            result.add(arr[i]);
-        }
         ChildStat cs = childStatRepository.findByType(child).orElse(null);
         ChildPositiveBoard cpb = childPositiveBoardRepository.findTopByChild(child);
 
@@ -91,7 +71,7 @@ public class ParentService {
                     .orElse(null);
             highestNegativeCategory = maxNegativeBoard != null ? maxNegativeBoard.getKeyword() : null;
         }
-
+        ChildStat csToday = childStatRepository.findByChildAndPeriod(child, LocalDate.now());
         List<ChildStat> stats = childStatRepository.findByChildAndPeriodBetween(child, startDate, endDate);
         Integer mostSelectedEmotion = stats.stream()
                 .collect(Collectors.groupingBy(ChildStat::getEmotion, Collectors.counting()))
@@ -99,13 +79,36 @@ public class ParentService {
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
                 .orElse(null);
-        return readSubjectsResponseDTO.builder()
+        Long grape = cs.getAnswerCount()/6-(cs.getAnswerCount()- csToday.getAnswerCount())/6;
+
+        return ParentHomeResponseDTO.builder()
+                .newGrape(Integer.parseInt(grape+""))
                 .name(child.getName())
                 .cumulativeAnswerCount(Integer.parseInt(cs.getAnswerCount()+""))
                 .mostTalkedCategory(cpb.getKeyword())
                 .positiveCategory(highestPositiveCategory)
                 .negativeCategory(highestNegativeCategory)
                 .emotion(mostSelectedEmotion)
+                .subjects(subjects)
+                .build();
+    }
+
+    public readSubjectsResponseDTO readSubjects(Parent parent, Long childId, Long year, Long month) {
+        boolean[] arr = new boolean[32];
+        Child child = childRepository.findById(childId).orElse(null);
+        List<Notice> notices = noticeRepository.findAllByReceiverAndChild(parent, year, month, child);
+        for(Notice notice : notices) {
+            Timestamp sendAt = notice.getSend_at();
+            LocalDateTime localDateTime = sendAt.toLocalDateTime();
+            int day = localDateTime.getDayOfMonth();
+            arr[day] = true;
+        }
+        List<Boolean> result = new ArrayList<>();
+        for(int i = 1;i<32;i++) {
+            result.add(arr[i]);
+        }
+
+        return readSubjectsResponseDTO.builder()
                 .month(result)
                 .build();
     }
