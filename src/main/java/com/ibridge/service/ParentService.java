@@ -437,8 +437,8 @@ public class ParentService {
         for(Subject subject : subjectList) {
             List<Question> questions = questionRepository.findAllBySubject(subject);
             for(Question question : questions) {
-                Analysis analysis = analysisRepository.findByQuestionId(question.getId()).get();
-                analysisRepository.delete(analysis);
+                Optional<Analysis> analysis = analysisRepository.findByQuestionId(question.getId());
+                if(analysis.isPresent()) analysisRepository.delete(analysis.get());
                 questionRepository.delete(question);
             }
             subjectRepository.delete(subject);
