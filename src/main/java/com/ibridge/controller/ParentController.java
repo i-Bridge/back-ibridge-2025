@@ -309,4 +309,17 @@ public class ParentController {
             return ApiResponse.onFailure("404", e.getMessage());
         }
     }
+
+    @PostMapping("/notice/readAll")
+    public ApiResponse readAll(HttpServletRequest r) {
+        try {
+            Parent parent = loginService.getParentFromHeader((String) r.getAttribute("email"));
+
+            parentService.readAll(parent);
+        }
+        catch (Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
+    }
 }

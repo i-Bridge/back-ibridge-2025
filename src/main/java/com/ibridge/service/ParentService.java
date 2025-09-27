@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import software.amazon.awssdk.services.s3.endpoints.internal.Not;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -525,5 +526,8 @@ public class ParentService {
         NoticeRepository.delete(requested);
     }
 
-
+    public void readAll(Parent parent) {
+        List<Notice> notices = NoticeRepository.findAllByParent(parent);
+        NoticeRepository.deleteAll(notices);
+    }
 }
