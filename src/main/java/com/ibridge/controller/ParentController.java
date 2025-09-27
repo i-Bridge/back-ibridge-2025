@@ -316,6 +316,7 @@ public class ParentController {
             Parent parent = loginService.getParentFromHeader((String) r.getAttribute("email"));
 
             parentService.readAll(parent);
+            return ApiResponse.onSuccess(null);
         }
         catch (Exception e) {
             System.out.println("failure return: " + e.getMessage());

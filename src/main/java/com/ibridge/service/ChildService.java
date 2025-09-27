@@ -190,7 +190,7 @@ public class ChildService {
         3. 추가 질문 (대답 X)
             - 삭제
 
-        4. 추가 질문 (2개 이상의 질문, 완료)
+        4. 추가 질문 (2개 이상 5개 이하의 질문, 완료 처리)
             - isComplete : true
             - isAnswer : true
             - 요약본으로 제목 수정
@@ -199,66 +199,22 @@ public class ChildService {
             - Stat 저장
             - 답변 완료 알림 전송
             - 군집화 여부 전송
+        5. 추가 질문 (5개의 질문, 완료)
          */
 
-        //1, 4
-        if((subject == predesigned && questions.size() == 5) || (subject != predesigned && questions.size() >= 2)) {
-            System.out.println("finished : 1 or 4");
-            //주제 완료 처리
-            subject.setCompleted(true);
-            subject.setAnswer(true);
+        //1, 5
+        if(questions.size() == 5) finishSubject(subject, child);
+        else if(subject != predesigned) {
+            Question lastQuestion = questions.get(questions.size() - 1);
+            questionRepository.delete(lastQuestion);
 
-            StringBuilder sb = new StringBuilder(1024);
-            for (Question q : questions) {
-                sb.append(q.getText()).append('\n')
-                        .append(analysisRepository.findByQuestionId(q.getId()).get().getAnswer()).append('\n');
-            }
-            String conv = sb.toString();
-            String summary = gptService.summarizeGPT(conv);
-            subject.setTitle(summary);
-
-            int positiveRate = gptService.positiveGPT(conv).get("긍정");
-            subject.setPositive(positiveRate);
-
-            subjectRepository.save(subject);
-
-            //DB 처리
-            child.setGrape(child.getGrape() + 1);
-            childRepository.save(child);
-
-            ChildStat dailyStat = childStatRepository.findDateStatByChildandToday(child, LocalDate.now());
-            ChildStat weeklyStat = childStatRepository.findWeekStatByChildandToday(child,
-                    LocalDate.now().with(DayOfWeek.MONDAY)
-            );
-            ChildStat monthlyStat = childStatRepository.findMonthStatByChildandToday(child,
-                    LocalDate.now().withDayOfMonth(1)
-            );
-            ChildStat totalStat = childStatRepository.findTotalStatByChild(child);
-
-            dailyStat.setAnswerCount(dailyStat.getAnswerCount() + 1);
-            weeklyStat.setAnswerCount(weeklyStat.getAnswerCount() + 1);
-            monthlyStat.setAnswerCount(monthlyStat.getAnswerCount() + 1);
-            totalStat.setAnswerCount(totalStat.getAnswerCount() + 1);
-
-            childStatRepository.save(dailyStat);
-            childStatRepository.save(weeklyStat);
-            childStatRepository.save(monthlyStat);
-            childStatRepository.save(totalStat);
-
-            makeNotice(subject);
-
-            //군집화 진행 여부 확인 및 진행
-            int subjectCount = subjectRepository.countByChild(child);
-            if(subjectCount % 15 == 0) {
-                clustering(child, subjectRepository.findClusteringSubjectbyChild(child, Math.min(subjectCount, 60)));
-            }
+            finishSubject(subject, child);
         }
         //추가 질문 종료
         else {
             //2
             if(subject == predesigned) subject.setAnswer(true);
             else { //3
-                System.out.println("finished: 3");
                 questionRepository.delete(questions.get(0));
                 subjectRepository.delete(subject);
             }
@@ -266,6 +222,57 @@ public class ChildService {
 
         return ChildResponseDTO.finishedDTO.builder()
                 .grape(child.getGrape()).build();
+    }
+
+    private void finishSubject(Subject subject, Child child) {
+        //주제 완료 처리
+        subject.setCompleted(true);
+        subject.setAnswer(true);
+
+        StringBuilder sb = new StringBuilder(1024);
+        for (Question q : questionRepository.findAllBySubject(subject)) {
+            sb.append(q.getText()).append('\n')
+                    .append(analysisRepository.findByQuestionId(q.getId()).get().getAnswer()).append('\n');
+        }
+        String conv = sb.toString();
+        String summary = gptService.summarizeGPT(conv);
+        subject.setTitle(summary);
+
+        int positiveRate = gptService.positiveGPT(conv).get("긍정");
+        subject.setPositive(positiveRate);
+
+        subjectRepository.save(subject);
+
+        //DB 처리
+        child.setGrape(child.getGrape() + 1);
+        childRepository.save(child);
+
+        ChildStat dailyStat = childStatRepository.findDateStatByChildandToday(child, LocalDate.now());
+        ChildStat weeklyStat = childStatRepository.findWeekStatByChildandToday(child,
+                LocalDate.now().with(DayOfWeek.MONDAY)
+        );
+        ChildStat monthlyStat = childStatRepository.findMonthStatByChildandToday(child,
+                LocalDate.now().withDayOfMonth(1)
+        );
+        ChildStat totalStat = childStatRepository.findTotalStatByChild(child);
+
+        dailyStat.setAnswerCount(dailyStat.getAnswerCount() + 1);
+        weeklyStat.setAnswerCount(weeklyStat.getAnswerCount() + 1);
+        monthlyStat.setAnswerCount(monthlyStat.getAnswerCount() + 1);
+        totalStat.setAnswerCount(totalStat.getAnswerCount() + 1);
+
+        childStatRepository.save(dailyStat);
+        childStatRepository.save(weeklyStat);
+        childStatRepository.save(monthlyStat);
+        childStatRepository.save(totalStat);
+
+        makeNotice(subject);
+
+        //군집화 진행 여부 확인 및 진행
+        int subjectCount = subjectRepository.countByChild(child);
+        if(subjectCount % 15 == 0) {
+            clustering(child, subjectRepository.findClusteringSubjectbyChild(child, Math.min(subjectCount, 60)));
+        }
     }
 
     //답변 완료 후, 알람 생성 시 호출
