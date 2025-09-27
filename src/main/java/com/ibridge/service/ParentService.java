@@ -100,6 +100,7 @@ public class ParentService {
                 .map(Map.Entry::getKey)
                 .orElse(null);
         return readSubjectsResponseDTO.builder()
+                .name(child.getName())
                 .cumulativeAnswerCount(Integer.parseInt(cs.getAnswerCount()+""))
                 .mostTalkedCategory(cpb.getKeyword())
                 .positiveCategory(highestPositiveCategory)
@@ -148,6 +149,7 @@ public class ParentService {
         List<KeywordDTO> keywordDTOs = childPositiveBoardRepository.findkeywordsByChild(childId);
 
         return AnalysisResponseDTO.builder()
+                .name(child.getName())
                 .signupDate(cs.getPeriod())
                 .cumulative(cs.getAnswerCount())
                 .keywords(keywordDTOs)

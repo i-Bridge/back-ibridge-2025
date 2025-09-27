@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AnalysisResponseDTO {
+    private String name;
     private LocalDate signupDate;
     private Long cumulative;
     private List<Integer> emotions;
