@@ -85,6 +85,21 @@ public class ParentController {
         }
     }
 
+    @GetMapping("/{childId}/banner")
+    public ApiResponse<BannerDTO> getBanner(HttpServletRequest r,
+                                                 @PathVariable Long childId) {
+
+        try {
+            String email = (String) r.getAttribute("email");
+            BannerDTO response = parentService.getBanner(childId);
+            return ApiResponse.onSuccess(response);
+        }
+        catch (Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
+    }
+
     @GetMapping("/{childId}/{subjectId}")
     public ApiResponse<QuestionAnalysisDTO> getAnalysis(HttpServletRequest r,
             @PathVariable Long childId,
