@@ -8,8 +8,10 @@ import com.ibridge.domain.entity.*;
 import com.ibridge.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cglib.core.Local;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,13 +48,17 @@ public class ParentService {
     private final ChildStatRepository childStatRepository;
     private final ChildPositiveBoardRepository childPositiveBoardRepository;
 
-    public ParentHomeResponseDTO getParentHome(Long childId, LocalDate date, String email) {
+    public ParentHomeResponseDTO getParentHome(Long childId, Pageable pageable, String email) {
         Child child = childRepository.findById(childId)
                 .orElseThrow(() -> new RuntimeException("해당 자녀를 찾을 수 없습니다: " + childId));
 
-        List<SubjectDTO> subjects = subjectRepository.findByChildIdAndDate(childId, date).stream()
-                .map(subject -> new SubjectDTO(subject.getId(), subject.getTitle(), subject.isAnswer()))
-                .collect(Collectors.toList());
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "date")
+        );
+        Page<SubjectDTO> subjects = subjectRepository.findByChildId(childId, sortedPageable)
+                .map(subject -> new SubjectDTO(subject.getId(), subject.getTitle(), subject.isAnswer(), subject.getDate()));
 
         LocalDate startDate = LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue(), 1);
         LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
@@ -101,13 +107,6 @@ public class ParentService {
         }
 
         return ParentHomeResponseDTO.builder()
-                .newGrape((int) grape)
-                .name(child.getName())
-                .cumulativeAnswerCount(cs != null ? cs.getAnswerCount().intValue() : 0)
-                .mostTalkedCategory(cpb != null && cpb.getKeyword() != null ? cpb.getKeyword() : "없음")
-                .positiveCategory(highestPositiveCategory != null ? highestPositiveCategory : "없음")
-                .negativeCategory(highestNegativeCategory != null ? highestNegativeCategory : "없음")
-                .emotion(mostSelectedEmotion)
                 .subjects(subjects)
                 .build();
     }

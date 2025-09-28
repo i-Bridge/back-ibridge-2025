@@ -12,6 +12,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.bind.DefaultValue;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,15 +56,12 @@ public class ParentController {
     @GetMapping("/{childId}/home")
     public ApiResponse<ParentHomeResponseDTO> getParentHome(
             @PathVariable Long childId,
-            @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @PageableDefault(page = 0, size = 7) Pageable pageable,
             HttpServletRequest r) {
 
         try {
-            if (date == null) {
-                date = LocalDate.now();
-            }
             String email = (String) r.getAttribute("email");
-            ParentHomeResponseDTO response = parentService.getParentHome(childId, date, email);
+            ParentHomeResponseDTO response = parentService.getParentHome(childId, pageable, email);
             return ApiResponse.onSuccess(response);
         }
         catch (Exception e) {
