@@ -368,7 +368,11 @@ public class ParentService {
                 .family(family)
                 .name(request.getName())
                 .birth(LocalDate.parse(request.getBirthday()))
-                .gender(Gender.values()[request.getGender()]).build();
+                .gender(Gender.values()[request.getGender()])
+                .grape(0L).build();
+        Long childId = childRepository.save(child).getId();
+
+
 
         //주제 및 질문 설정
         List<String> subjects = new ArrayList<>();
@@ -439,7 +443,7 @@ public class ParentService {
         childStatRepository.save(totalStat);
 
         return ParentResponseDTO.ChildIdDTO.builder()
-                .childId(childRepository.save(child).getId()).build();
+                .childId(childId).build();
     }
 
     public ParentResponseDTO.ChildIdDTO patchChild(ParentRequestDTO.EditChildDTO request) throws ParseException {
