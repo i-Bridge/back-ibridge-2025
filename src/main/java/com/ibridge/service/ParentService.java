@@ -57,9 +57,21 @@ public class ParentService {
                 pageable.getPageSize(),
                 Sort.by(Sort.Direction.DESC, "date")
         );
-        Page<SubjectDTO> subjects = subjectRepository.findByChildId(childId, sortedPageable)
-                .map(subject -> new SubjectDTO(subject.getId(), subject.getTitle(), subject.isAnswer(), subject.getDate()));
 
+        Page<SubjectDTO> subjects = subjectRepository.findByChildId(childId, sortedPageable)
+                .map(subject -> {
+                    String image = analysisRepository.findBySubjectId(subject.getId())
+                            .map(Analysis::getImage)
+                            .orElse(null);
+
+                    return new SubjectDTO(
+                            subject.getId(),
+                            subject.getTitle(),
+                            subject.isAnswer(),
+                            subject.getDate(),
+                            image
+                    );
+                });
         return ParentHomeResponseDTO.builder()
                 .subjects(subjects)
                 .build();
