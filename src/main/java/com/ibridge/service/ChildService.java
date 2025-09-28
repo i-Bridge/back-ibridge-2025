@@ -204,7 +204,7 @@ public class ChildService {
 
         //1, 5
         if(questions.size() == 5) finishSubject(subject, child);
-        else if(subject != predesigned) {
+        else if(subject != predesigned && questions.size() >= 2) {
             Question lastQuestion = questions.get(questions.size() - 1);
             questionRepository.delete(lastQuestion);
 
