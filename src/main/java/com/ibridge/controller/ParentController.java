@@ -70,6 +70,21 @@ public class ParentController {
         }
     }
 
+    @GetMapping("/{childId}/scheduled")
+    public ApiResponse<ScheduledDTO> getAnalysis(HttpServletRequest r,
+                                                        @PathVariable Long childId) {
+
+        try {
+            String email = (String) r.getAttribute("email");
+            ScheduledDTO response = questionService.getScheduled(childId);
+            return ApiResponse.onSuccess(response);
+        }
+        catch (Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
+    }
+
     @GetMapping("/{childId}/{subjectId}")
     public ApiResponse<QuestionAnalysisDTO> getAnalysis(HttpServletRequest r,
             @PathVariable Long childId,

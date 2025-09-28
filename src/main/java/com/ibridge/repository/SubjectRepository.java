@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SubjectRepository extends JpaRepository<Subject, Long> {
-    @Query("SELECT s FROM Subject s where s.child.id = :childId")
+    @Query("SELECT s FROM Subject s where s.child.id = :childId and s.isCompleted = true")
     Page<Subject> findByChildId(Long childId, Pageable pageable);
 
     Optional<Subject> findById(Long subjectId);
@@ -22,7 +22,7 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
     @Query("SELECT s FROM Subject s WHERE s.child = :child")
     List<Subject> findAllByChild(Child child);
 
-    @Query("SELECT new com.ibridge.domain.dto.SubjectDTO(s.id, s.title, true) " +
+    @Query("SELECT new com.ibridge.domain.dto.SubjectDTO(s.id, s.title, true, s.date) " +
             "FROM Subject s " +
             "WHERE s.child = :child AND s.keyword = :keyword " +
             "ORDER BY s.date DESC, s.id DESC")
@@ -36,4 +36,10 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
 
     @Query("SELECT s FROM Subject s WHERE s.child = :child and s.isCompleted = true ORDER BY s.date LIMIT :count")
     List<Subject> findClusteringSubjectbyChild(Child child, int count);
+
+    @Query("SELECT s FROM Subject s WHERE s.child.id = :childId and s.date = :date")
+    List<Subject> findByChildIdAndDate(Long childId, LocalDate date);
+
+    @Query("SELECT s FROM Subject s WHERE s.child.id = :childId AND s.date >= :date and s.isCompleted = false")
+    List<SubjectDTO> findSubjectsByChildIdAndDate(Long childId, LocalDate date);
 }
