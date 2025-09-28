@@ -3,6 +3,7 @@ package com.ibridge.repository;
 import com.ibridge.domain.dto.SubjectDTO;
 import com.ibridge.domain.entity.Child;
 import com.ibridge.domain.entity.Subject;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,8 +14,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SubjectRepository extends JpaRepository<Subject, Long> {
-    @Query("SELECT s FROM Subject s where s.child.id = :childId and s.date = :date ORDER BY s.id")
-    List<Subject> findByChildIdAndDate(Long childId, LocalDate date);
+    @Query("SELECT s FROM Subject s where s.child.id = :childId")
+    Page<Subject> findByChildId(Long childId, Pageable pageable);
 
     Optional<Subject> findById(Long subjectId);
 
