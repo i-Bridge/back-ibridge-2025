@@ -31,4 +31,7 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
 
     @Query("SELECT n FROM Notice n WHERE n.receiver = :parent AND n.child = :child AND FUNCTION('YEAR', n.send_at) = :year AND FUNCTION('MONTH', n.send_at) = :month AND n.isRead = false ORDER BY n.send_at")
     List<Notice> findAllByReceiverAndChild(Parent parent, Long year, Long month, Child child);
+
+    @Query("SELECT n FROM Notice n WHERE n.child = :child")
+    List<Notice> findAllByChild(Child child);
 }

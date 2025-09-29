@@ -36,7 +36,6 @@ public class ParentService {
     private final ParentRepository parentRepository;
     private final ChildRepository childRepository;
     private final FamilyRepository famliyRepository;
-    private final NoticeRepository NoticeRepository;
     private final Random random = new Random();
     private final SubjectRepository subjectRepository;
     private final QuestionRepository questionRepository;
@@ -282,7 +281,7 @@ public class ParentService {
 //현호
     public ParentResponseDTO.GetMyPageDTO getMyPage(Long parentId) {
     Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not Found"));
-    List<Notice> Notice = NoticeRepository.findAllByParent(parent);
+    List<Notice> Notice = noticeRepository.findAllByParent(parent);
     boolean noticeExist = false;
     for(Notice notice : Notice) {
         if(!notice.isRead()){
@@ -459,12 +458,15 @@ public class ParentService {
 
     public void deleteChild(ParentRequestDTO.DeleteChildDTO request) {
         Child child = childRepository.findById(request.getChildId()).orElseThrow(() -> new RuntimeException("Child not found"));
+        List<Notice> noticeList = noticeRepository.findAllByChild(child);
+        noticeRepository.deleteAll(noticeList);
+
         List<Subject> subjectList = subjectRepository.findAllByChild(child);
         for(Subject subject : subjectList) {
             List<Question> questions = questionRepository.findAllBySubject(subject);
             for(Question question : questions) {
                 Optional<Analysis> analysis = analysisRepository.findByQuestionId(question.getId());
-                if(analysis.isPresent()) analysisRepository.delete(analysis.get());
+                analysis.ifPresent(analysisRepository::delete);
                 questionRepository.delete(question);
             }
             subjectRepository.delete(subject);
@@ -473,6 +475,8 @@ public class ParentService {
         List<ChildStat> childStatList = childStatRepository.findAllByChild(child);
         childStatRepository.deleteAll(childStatList);
         childRepository.delete(child);
+
+
     }
 
 
@@ -482,11 +486,11 @@ public class ParentService {
         Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
 
         List<ParentResponseDTO.NoticeDTO> noticeDTOList = new ArrayList<>();
-        List<Notice> noticesForParent = NoticeRepository.findAllByParent(parent);
+        List<Notice> noticesForParent = noticeRepository.findAllByParent(parent);
 
         for(Notice notice : noticesForParent) {
             notice.setRead(true);
-            NoticeRepository.save(notice);
+            noticeRepository.save(notice);
 
             noticeDTOList.add(ParentResponseDTO.NoticeDTO.builder()
                     .noticeId(notice.getId())
@@ -507,15 +511,15 @@ public class ParentService {
         Family family = parent.getFamily();
         Parent requester = parentRepository.findById(request.getParentId()).orElseThrow(() -> new RuntimeException("Sender not found"));
 
-        Notice requested = NoticeRepository.findByReceiverandSendertoJoinFamily(parent, requester);
+        Notice requested = noticeRepository.findByReceiverandSendertoJoinFamily(parent, requester);
         requested.setAccept(true);
-        NoticeRepository.save(requested);
-        NoticeRepository.delete(requested);
-        List<Notice> otherRequested = NoticeRepository.findAllReceiverBySender(requester);
+        noticeRepository.save(requested);
+        noticeRepository.delete(requested);
+        List<Notice> otherRequested = noticeRepository.findAllReceiverBySender(requester);
         for(Notice otherRequest : otherRequested) {
             otherRequest.setAccept(true);
-            NoticeRepository.save(otherRequest);
-            NoticeRepository.delete(otherRequest);
+            noticeRepository.save(otherRequest);
+            noticeRepository.delete(otherRequest);
         }
 
         requester.setFamily(family);
@@ -526,12 +530,12 @@ public class ParentService {
         Parent parent = parentRepository.findById(parentId).orElseThrow(() -> new RuntimeException("Parent not found"));
         Parent sender = parentRepository.findById(request.getParentId()).orElseThrow(() -> new RuntimeException("Sender not found"));
 
-        Notice requested = NoticeRepository.findByReceiverandSendertoJoinFamily(parent, sender);
-        NoticeRepository.delete(requested);
+        Notice requested = noticeRepository.findByReceiverandSendertoJoinFamily(parent, sender);
+        noticeRepository.delete(requested);
     }
 
     public void readAll(Parent parent) {
-        List<Notice> notices = NoticeRepository.findAllByParent(parent);
-        NoticeRepository.deleteAll(notices);
+        List<Notice> notices = noticeRepository.findAllByParent(parent);
+        noticeRepository.deleteAll(notices);
     }
 }
