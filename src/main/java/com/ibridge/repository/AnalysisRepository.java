@@ -2,6 +2,7 @@ package com.ibridge.repository;
 
 import com.ibridge.domain.dto.response.QuestionAnalysisDTO;
 import com.ibridge.domain.entity.Analysis;
+import io.micrometer.observation.ObservationFilter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,4 +16,6 @@ public interface AnalysisRepository extends JpaRepository<Analysis, Long> {
 
     @Query("SELECT a FROM Analysis a WHERE a.question.id = :questionId")
     Optional<Analysis> findByQuestionId(@Param("questionId") Long questionId);
+
+    Optional<Analysis> findBySubjectId(Long id);
 }

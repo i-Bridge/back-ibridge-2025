@@ -8,8 +8,10 @@ import com.ibridge.domain.entity.*;
 import com.ibridge.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cglib.core.Local;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,14 +47,58 @@ public class ParentService {
     private final ChildStatRepository childStatRepository;
     private final ChildPositiveBoardRepository childPositiveBoardRepository;
 
-    public ParentHomeResponseDTO getParentHome(Long childId, LocalDate date, String email) {
+    public ParentHomeResponseDTO getParentHome(Long childId, Pageable pageable, String email) {
         Child child = childRepository.findById(childId)
                 .orElseThrow(() -> new RuntimeException("해당 자녀를 찾을 수 없습니다: " + childId));
 
-        List<SubjectDTO> subjects = subjectRepository.findByChildIdAndDate(childId, date).stream()
-                .map(subject -> new SubjectDTO(subject.getId(), subject.getTitle(), subject.isAnswer()))
-                .collect(Collectors.toList());
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "date")
+        );
 
+        Page<SubjectDTO> subjects = subjectRepository.findByChildId(childId, sortedPageable)
+                .map(subject -> {
+                    String image = analysisRepository.findBySubjectId(subject.getId())
+                            .map(Analysis::getImage)
+                            .orElse(null);
+
+                    return new SubjectDTO(
+                            subject.getId(),
+                            subject.getTitle(),
+                            subject.isAnswer(),
+                            subject.getDate(),
+                            image
+                    );
+                });
+        return ParentHomeResponseDTO.builder()
+                .subjects(subjects)
+                .build();
+    }
+
+
+    public readSubjectsResponseDTO readSubjects(Parent parent, Long childId, Long year, Long month) {
+        boolean[] arr = new boolean[32];
+        Child child = childRepository.findById(childId).orElse(null);
+        List<Notice> notices = noticeRepository.findAllByReceiverAndChild(parent, year, month, child);
+        for(Notice notice : notices) {
+            Timestamp sendAt = notice.getSend_at();
+            LocalDateTime localDateTime = sendAt.toLocalDateTime();
+            int day = localDateTime.getDayOfMonth();
+            arr[day] = true;
+        }
+        List<Boolean> result = new ArrayList<>();
+        for(int i = 1;i<32;i++) {
+            result.add(arr[i]);
+        }
+
+        return readSubjectsResponseDTO.builder()
+                .month(result)
+                .build();
+    }
+
+    public BannerDTO getBanner(Long childId) {
+        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("해당하는 자녀를 찾을 수 없습니다." + childId));
         LocalDate startDate = LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue(), 1);
         LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
         List<ChildStat> stats = childStatRepository.findByChildAndPeriodBetween(child, startDate, endDate);
@@ -98,39 +144,17 @@ public class ParentService {
         if (cs != null && csToday != null) {
             grape = cs.getAnswerCount() / 6 - (cs.getAnswerCount() - csToday.getAnswerCount()) / 6;
         }
-
-        return ParentHomeResponseDTO.builder()
-                .newGrape((int) grape)
-                .name(child.getName())
-                .cumulativeAnswerCount(cs != null ? cs.getAnswerCount().intValue() : 0)
-                .mostTalkedCategory(cpb != null && cpb.getKeyword() != null ? cpb.getKeyword() : "없음")
-                .positiveCategory(highestPositiveCategory != null ? highestPositiveCategory : "없음")
-                .negativeCategory(highestNegativeCategory != null ? highestNegativeCategory : "없음")
+        return BannerDTO.builder()
+                .cumulativeAnswerCount(cs.getAnswerCount())
                 .emotion(mostSelectedEmotion)
-                .subjects(subjects)
+                .mostTalkedCategory(cpb.getKeyword())
+                .positiveCategory(highestPositiveCategory)
+                .negativeCategory(highestNegativeCategory)
+                .newGrape(Integer.parseInt(grape+""))
+                .name(child.getName())
                 .build();
     }
 
-
-    public readSubjectsResponseDTO readSubjects(Parent parent, Long childId, Long year, Long month) {
-        boolean[] arr = new boolean[32];
-        Child child = childRepository.findById(childId).orElse(null);
-        List<Notice> notices = noticeRepository.findAllByReceiverAndChild(parent, year, month, child);
-        for(Notice notice : notices) {
-            Timestamp sendAt = notice.getSend_at();
-            LocalDateTime localDateTime = sendAt.toLocalDateTime();
-            int day = localDateTime.getDayOfMonth();
-            arr[day] = true;
-        }
-        List<Boolean> result = new ArrayList<>();
-        for(int i = 1;i<32;i++) {
-            result.add(arr[i]);
-        }
-
-        return readSubjectsResponseDTO.builder()
-                .month(result)
-                .build();
-    }
     public void openNotice(NoticeRequestDTO noticeRequestDTO) {
         noticeRepository.deleteById(noticeRequestDTO.getNoticeId());
     }

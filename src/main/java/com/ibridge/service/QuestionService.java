@@ -19,6 +19,7 @@ import java.text.DateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -52,7 +53,7 @@ public class QuestionService {
         }
 
         return QuestionAnalysisDTO.builder()
-                .subjects(new SubjectDTO(subject.getId(), subject.getTitle(), subject.isAnswer()))
+                .subjects(new SubjectDTO(subject.getId(), subject.getTitle(), subject.isAnswer(), subject.getDate()))
                 .questions(questionDTOs)
                 .build();
     }
@@ -108,5 +109,15 @@ public class QuestionService {
         question.setText(randomQuestion);
         questionRepository.save(question);
         return new SubjectResponseDTO((long)id, randomQuestion);
+    }
+
+    public ScheduledDTO getScheduled(Long childId) {
+        List<SubjectDTO> subjects = subjectRepository.findSubjectsByChildIdAndDate(childId, LocalDate.now()).stream()
+                .map(subject -> new SubjectDTO(subject.getSubjectId(), subject.getSubjectTitle(), subject.isAnswer() ,subject.getDate()))
+                .collect(Collectors.toList());
+
+        return ScheduledDTO.builder()
+                .subjects(subjects)
+                .build();
     }
 }
