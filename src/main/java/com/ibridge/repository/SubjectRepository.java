@@ -45,4 +45,6 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
 
     @Query("SELECT s FROM Subject s WHERE s.child.id = :childId AND s.isCompleted = true ORDER BY s.id ASC")
     List<Subject> findCompletedSubjectsByChildId(@Param("childId") Long childId);
+    @Query("SELECT s FROM Subject s WHERE s.id = :subjectId")
+    Subject findBySubjectId(Long subjectId);
 }

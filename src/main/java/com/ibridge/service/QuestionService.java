@@ -71,13 +71,12 @@ public class QuestionService {
                 .build();
     }
 
-    public void editQuestion(Long childId, EditQuestionRequestDTO request, LocalDate date) {
-        List<Subject> subjects = subjectRepository.findByChildIdAndDate(childId, date);
-        Subject subject = subjects.get(0);
+    public void editQuestion(Long childId, EditQuestionRequestDTO request, Long subjectId) {
+        Subject subject = subjectRepository.findBySubjectId(subjectId);
         subject.setTitle(request.getTitle());
-        subject.setDate(date);
+        subject.setDate(LocalDate.now());
         subjectRepository.save(subject);
-        Question question = questionRepository.findBySubjectId(subjects.get(0).getId());
+        Question question = questionRepository.findBySubjectId(subjectId);
         question.setText(request.getTitle());
         questionRepository.save(question);
     }
