@@ -60,8 +60,12 @@ public class ParentService {
 
         Page<SubjectDTO> subjects = subjectRepository.findByChildId(childId, sortedPageable)
                 .map(subject -> {
-                    String image = analysisRepository.findBySubjectId(subject.getId())
+                    String image = subject.getQuestions().stream()
+                            .map(Question::getAnalysis)
+                            .filter(Objects::nonNull)          // Analysis가 있는 것만
                             .map(Analysis::getImage)
+                            .filter(Objects::nonNull)          // image가 null 아닌 것만
+                            .findFirst()                       // 하나만 가져오기
                             .orElse(null);
 
                     return new SubjectDTO(
