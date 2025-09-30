@@ -37,7 +37,7 @@ public class TokenValidationInterceptor implements HandlerInterceptor {
             response.setHeader("Access-Control-Allow-Headers", "Authorization,Content-Type,Provider");
             response.setHeader("Access-Control-Allow-Credentials", "true");
             response.setStatus(HttpServletResponse.SC_OK);
-            return false; // preflight는 처리 완료 후 실제 요청 진행 안함
+            return true; // preflight는 처리 완료 후 실제 요청 진행 안함
         }
         String authHeader = request.getHeader("Authorization");
         System.out.println("Interceptor called: " + request.getRequestURL());
