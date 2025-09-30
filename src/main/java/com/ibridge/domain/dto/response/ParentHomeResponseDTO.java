@@ -11,4 +11,5 @@ import java.util.List;
 @Builder
 public class ParentHomeResponseDTO {
     private Page<SubjectDTO> subjects;
+    private Boolean hasNext;
 }

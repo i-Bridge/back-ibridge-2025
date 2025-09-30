@@ -73,6 +73,7 @@ public class ParentService {
                 });
         return ParentHomeResponseDTO.builder()
                 .subjects(subjects)
+                .hasNext(subjects.hasNext())
                 .build();
     }
 
