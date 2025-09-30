@@ -137,10 +137,10 @@ public class ParentController {
     public ApiResponse<Void> editQuestion(
             @PathVariable Long childId,
             @RequestBody EditQuestionRequestDTO request,
-            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+            @RequestParam("subjectId") Long subjectId) {
 
         try {
-            questionService.editQuestion(childId, request, date);
+            questionService.editQuestion(childId, request, subjectId);
             return ApiResponse.onSuccess(null);
         }
         catch (Exception e) {
