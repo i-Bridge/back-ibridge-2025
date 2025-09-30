@@ -30,6 +30,11 @@ public class TokenValidationInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
+        // ✅ CORS preflight 요청(OPTIONS)은 그냥 통과시킴
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            return true;
+        }
+
         String authHeader = request.getHeader("Authorization");
         System.out.println("Interceptor called: " + request.getRequestURL());
 
