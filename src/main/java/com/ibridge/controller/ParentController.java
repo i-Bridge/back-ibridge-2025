@@ -30,10 +30,10 @@ public class ParentController {
     private final LoginService loginService;
 
     //지웅
-    @PostMapping("/openNotice")
-    public ApiResponse<?> openNotice(@RequestBody NoticeRequestDTO noticeRequestDTO){
+    @PostMapping("/{childId}/pressNoice")
+    public ApiResponse<?> openNotice(@PathVariable Long childId, @RequestParam(value = "subjectId") Long subjectId, @RequestParam(value = "noticeId") Long noticeId){
         try{
-            parentService.openNotice(noticeRequestDTO);
+            parentService.openNotice(childId, subjectId, noticeId);
             return ApiResponse.onSuccess(null);
         }
         catch (Exception e){

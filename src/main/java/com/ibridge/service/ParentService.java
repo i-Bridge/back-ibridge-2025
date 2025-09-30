@@ -1,6 +1,5 @@
 package com.ibridge.service;
 
-import com.ibridge.domain.dto.request.NoticeRequestDTO;
 import com.ibridge.domain.dto.request.ParentRequestDTO;
 import com.ibridge.domain.dto.response.*;
 import com.ibridge.domain.dto.SubjectDTO;
@@ -8,10 +7,7 @@ import com.ibridge.domain.entity.*;
 import com.ibridge.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cglib.core.Local;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -159,8 +155,40 @@ public class ParentService {
                 .build();
     }
 
-    public void openNotice(NoticeRequestDTO noticeRequestDTO) {
-        noticeRepository.deleteById(noticeRequestDTO.getNoticeId());
+    public ParentHomeResponseDTO openNotice(Long childId, Long subjectId, Long noticeId) {
+        noticeRepository.deleteById(noticeId);
+        List<Subject> subjects = subjectRepository.findCompletedSubjectsByChildId(childId);
+        int idx = -1;
+        for(int i = 0;i<subjects.size();i++){
+            if(subjects.get(i).getId().equals(subjectId)){
+                idx = i;
+                break;
+            }
+        }
+        if (idx == -1) {
+            throw new IllegalArgumentException("해당 subjectId를 찾을 수 없습니다. (isComplete=true 조건 확인)");
+        }
+        int fromIndex = Math.max(0, idx-5);
+        int toIndex = Math.min(subjects.size(),idx+6);
+
+        List<SubjectDTO> subjectDTOList = subjects.subList(fromIndex, toIndex).stream()
+                .map(subject -> new SubjectDTO(
+                        subject.getId(),
+                        subject.getTitle(),
+                        subject.isAnswer(),
+                        subject.getDate()
+                ))
+                .collect(Collectors.toList());
+
+        // 6. PageImpl 로 감싸기
+        Page<SubjectDTO> subjectDTOs = new PageImpl<>(
+                subjectDTOList,
+                Pageable.unpaged(),
+                subjectDTOList.size()
+        );
+        return ParentHomeResponseDTO.builder()
+                .subjects(subjectDTOs)
+                .build();
     }
 
     public AnalysisResponseDTO getDefaultAnalysis(Long childId) {
