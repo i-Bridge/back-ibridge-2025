@@ -1,6 +1,5 @@
 package com.ibridge.service;
 
-import com.ibridge.domain.dto.request.NoticeRequestDTO;
 import com.ibridge.domain.dto.request.ParentRequestDTO;
 import com.ibridge.domain.dto.response.*;
 import com.ibridge.domain.dto.SubjectDTO;
