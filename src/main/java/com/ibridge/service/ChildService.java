@@ -44,7 +44,7 @@ public class ChildService {
     }
 
     public void setEmotion(Long childId, ChildRequestDTO.setEmotionDTO request) {
-        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child not found"));
+        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + "not found"));
 
         ChildStat dailyStat = childStatRepository.findDateStatByChildandToday(child, LocalDate.now());
         dailyStat.setEmotion(request.getEmotion());
@@ -52,19 +52,26 @@ public class ChildService {
     }
 
     public ChildResponseDTO.getPredesignedQuestionDTO getPredesignedQuestion(Long childId) {
-        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child not found"));
+        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + "not found"));
 
         Subject baseSubject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now()).get(0);
         List<Question> questions = questionRepository.findAllBySubject(baseSubject);
-        Question lastQuestion = questions.get(questions.size() - 1);
+        List<ChildResponseDTO.ConversationDTO> conv = new ArrayList<>();
+        for(int i = 0; i < questions.size(); i++) {
+            ChildResponseDTO.ConversationDTO temp = ChildResponseDTO.ConversationDTO.builder()
+                    .ai(questions.get(i).getText())
+                    .user(i == questions.size() - 1 ? null : analysisRepository.findByQuestionId(questions.get(i).getId()).get().getAnswer())
+                    .build();
+            conv.add(temp);
+        }
 
         return ChildResponseDTO.getPredesignedQuestionDTO.builder()
                 .subjectId(baseSubject.getId())
-                .question(lastQuestion.getText()).build();
+                .questions(conv).build();
     }
 
     public ChildResponseDTO.getNewQuestionDTO getNewSubject(Long childId) {
-        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child not found"));
+        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + "not found"));
 
         Subject newSubject = Subject.builder()
                 .child(child)

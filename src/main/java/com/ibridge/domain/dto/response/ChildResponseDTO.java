@@ -59,7 +59,16 @@ public class ChildResponseDTO {
     @AllArgsConstructor
     public static class getPredesignedQuestionDTO {
         Long subjectId;
-        String question;
+        List<ConversationDTO> questions;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ConversationDTO {
+        String ai;
+        String user;
     }
 
     @Data
