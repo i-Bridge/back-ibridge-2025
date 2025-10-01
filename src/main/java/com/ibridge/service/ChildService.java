@@ -33,7 +33,7 @@ public class ChildService {
 
     //질문 화면 관련
     public ChildResponseDTO.getQuestionDTO getHome(Long childId) {
-        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child not found"));
+        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + "not found"));
         List<Subject> todaySubject = subjectRepository.findByChildIdAndDate(childId, LocalDate.now());
         ChildStat dailyStat = childStatRepository.findDateStatByChildandToday(child, LocalDate.now());
 
@@ -91,8 +91,8 @@ public class ChildService {
     }
 
     public ChildResponseDTO.getAI getNextQuestion(Long childId, ChildRequestDTO.AnswerDTO request) {
-        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child not found"));
-        Subject subject = subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject not found"));
+        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + "not found"));
+        Subject subject = subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject " + request.getSubjectId() + "not found"));
 
         List<Question> questions = questionRepository.findAllBySubject(subject);
         Analysis answer = Analysis.builder()
@@ -111,7 +111,13 @@ public class ChildService {
         String ai = "";
 
 
-        if(questions.size() == 5) ai = gptService.closingGPT(conv);
+        if(questions.size() == 5)  {
+            subject.setAnswer(true);
+            subject.setCompleted(true);
+            subjectRepository.save(subject);
+
+            ai = gptService.closingGPT(conv);
+        }
         else  {
             ai = gptService.askGpt(conv);
             Question question = Question.builder()
@@ -138,7 +144,7 @@ public class ChildService {
     }
 
     public void uploaded(ChildRequestDTO.UploadedDTO request) {
-        Subject subject = subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject not found"));
+        Subject subject = subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject " + request.getSubjectId() + "not found"));
 
         List<Question> questions = questionRepository.findAllBySubject(subject);
         List<String> parts = Arrays.asList(request.getFile().split("\\."));
@@ -175,8 +181,8 @@ public class ChildService {
     }
 
     public ChildResponseDTO.finishedDTO answerFinished(Long childId, ChildRequestDTO.FinishedDTO request) {
-        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child not found"));
-        Subject subject = subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject not found"));
+        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + "not found"));
+        Subject subject = subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new RuntimeException("Subject " + request.getSubjectId() + "not found"));
         Subject predesigned = subjectRepository.findByChildIdAndDate(childId, LocalDate.now()).get(0);
         List<Question> questions = questionRepository.findAllBySubject(subject);
 
