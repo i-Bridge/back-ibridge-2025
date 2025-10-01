@@ -104,7 +104,7 @@ public class QuestionService {
         Question question=questionRepository.findBySubjectId(subject.getId());
         question.setText(randomQuestion);
         questionRepository.save(question);
-        return new SubjectResponseDTO((long)id, randomQuestion);
+        return new SubjectResponseDTO(subjectId, randomQuestion);
     }
 
     public ScheduledDTO getScheduled(Long childId) {
