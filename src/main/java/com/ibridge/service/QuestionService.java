@@ -81,7 +81,7 @@ public class QuestionService {
         questionRepository.save(question);
     }
 
-    public SubjectResponseDTO rerollQuestion(Long childId, LocalDate date) {
+    public SubjectResponseDTO rerollQuestion(Long childId, Long subjectId) {
         List<String> subjects = new ArrayList<>();
         try (InputStream inputStream = QuestionService.class.getClassLoader().getResourceAsStream("SubjectList.txt")) {
             if (inputStream == null) {
@@ -99,15 +99,12 @@ public class QuestionService {
         int id = random.nextInt(subjects.size());
         // 랜덤으로 하나 선택
         String randomQuestion = subjects.get(id);
-        List<Subject> subject = subjectRepository.findByChildIdAndDate(childId, date);
-        if(!subject.isEmpty()){
-            subject.get(0).setTitle(randomQuestion);
-            subjectRepository.save(subject.get(0));
-        }
-        Question question=questionRepository.findBySubjectId(subject.get(0).getId());
+        Subject subject = subjectRepository.findById(subjectId).orElseThrow(() -> new EntityNotFoundException("Subject not found: " + subjectId));
+        subjectRepository.save(subject);
+        Question question=questionRepository.findBySubjectId(subject.getId());
         question.setText(randomQuestion);
         questionRepository.save(question);
-        return new SubjectResponseDTO((long)id, randomQuestion);
+        return new SubjectResponseDTO(subjectId, randomQuestion);
     }
 
     public ScheduledDTO getScheduled(Long childId) {

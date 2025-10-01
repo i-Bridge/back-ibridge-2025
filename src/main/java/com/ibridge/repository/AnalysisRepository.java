@@ -16,6 +16,4 @@ public interface AnalysisRepository extends JpaRepository<Analysis, Long> {
 
     @Query("SELECT a FROM Analysis a WHERE a.question.id = :questionId")
     Optional<Analysis> findByQuestionId(@Param("questionId") Long questionId);
-
-    Optional<Analysis> findBySubjectId(Long id);
 }
