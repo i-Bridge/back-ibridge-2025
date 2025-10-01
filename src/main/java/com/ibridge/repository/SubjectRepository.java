@@ -5,6 +5,7 @@ import com.ibridge.domain.entity.Child;
 import com.ibridge.domain.entity.Subject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,8 +16,9 @@ import java.util.Optional;
 
 public interface SubjectRepository extends JpaRepository<Subject, Long> {
     @Query("SELECT s FROM Subject s where s.child.id = :childId and s.isCompleted = true")
-    Page<Subject> findByChildId(Long childId, Pageable pageable);
+    Page<Subject> findCompletedByChildId(Long childId, Pageable pageable);
 
+    List<Subject> findByChildIdAndIsCompleted(Long childId, boolean isCompleted, Sort sort);
     Optional<Subject> findById(Long subjectId);
 
     @Query("SELECT s FROM Subject s WHERE s.child = :child")

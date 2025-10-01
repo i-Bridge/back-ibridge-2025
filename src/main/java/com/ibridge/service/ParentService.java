@@ -53,14 +53,35 @@ public class ParentService {
                 Sort.by(Sort.Direction.DESC, "date")
         );
 
-        Page<SubjectDTO> subjects = subjectRepository.findByChildId(childId, sortedPageable)
+        // 요청한 페이지 사이즈보다 하나 더 가져와서 hasNext 계산
+        int pageSize = sortedPageable.getPageSize();
+        int pageNumber = sortedPageable.getPageNumber();
+
+        List<Subject> subjectEntities = subjectRepository.findByChildIdAndIsCompleted(
+                childId,
+                true,
+                sortedPageable.getSort()
+        );
+
+        // offset, limit 흉내 (메모리에서 처리)
+        int fromIndex = pageNumber * pageSize;
+        int toIndex = Math.min(fromIndex + pageSize + 1, subjectEntities.size());
+
+        List<Subject> pagedSubjects = subjectEntities.subList(fromIndex, toIndex);
+
+        // hasNext 계산 → pageSize+1개를 가져왔다면 다음 페이지 있음
+        boolean hasNext = pagedSubjects.size() > pageSize;
+
+        // DTO 변환 (pageSize까지만 잘라서 반환)
+        List<SubjectDTO> subjects = pagedSubjects.stream()
+                .limit(pageSize)
                 .map(subject -> {
                     String image = subject.getQuestions().stream()
                             .map(Question::getAnalysis)
-                            .filter(Objects::nonNull)          // Analysis가 있는 것만
+                            .filter(Objects::nonNull)
                             .map(Analysis::getImage)
-                            .filter(Objects::nonNull)          // image가 null 아닌 것만
-                            .findFirst()                       // 하나만 가져오기
+                            .filter(Objects::nonNull)
+                            .findFirst()
                             .orElse(null);
 
                     return new SubjectDTO(
@@ -70,10 +91,12 @@ public class ParentService {
                             subject.getDate(),
                             image
                     );
-                });
+                })
+                .toList();
+
         return ParentHomeResponseDTO.builder()
-                .subjects(subjects)
-                .hasNext(subjects.hasNext())
+                .subjects(subjects) // List<SubjectDTO>
+                .hasNext(hasNext)   // 다음 페이지 여부
                 .build();
     }
 
@@ -172,7 +195,7 @@ public class ParentService {
         int fromIndex = Math.max(0, idx-5);
         int toIndex = Math.min(subjects.size(),idx+6);
 
-        List<SubjectDTO> subjectDTOList = subjects.subList(fromIndex, toIndex).stream()
+        List<SubjectDTO> subjectDTOs = subjects.subList(fromIndex, toIndex).stream()
                 .map(subject -> new SubjectDTO(
                         subject.getId(),
                         subject.getTitle(),
@@ -181,12 +204,6 @@ public class ParentService {
                 ))
                 .collect(Collectors.toList());
 
-        // 6. PageImpl 로 감싸기
-        Page<SubjectDTO> subjectDTOs = new PageImpl<>(
-                subjectDTOList,
-                Pageable.unpaged(),
-                subjectDTOList.size()
-        );
         return ParentHomeResponseDTO.builder()
                 .subjects(subjectDTOs)
                 .build();

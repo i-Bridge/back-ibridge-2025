@@ -1,15 +1,16 @@
 package com.ibridge.domain.dto.response;
 
 import com.ibridge.domain.dto.SubjectDTO;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
-@Getter
+@Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ParentHomeResponseDTO {
-    private Page<SubjectDTO> subjects;
+    private List<SubjectDTO> subjects;
     private Boolean hasNext;
 }

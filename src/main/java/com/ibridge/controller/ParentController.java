@@ -73,7 +73,6 @@ public class ParentController {
     @GetMapping("/{childId}/scheduled")
     public ApiResponse<ScheduledDTO> getAnalysis(HttpServletRequest r,
                                                         @PathVariable Long childId) {
-
         try {
             String email = (String) r.getAttribute("email");
             ScheduledDTO response = questionService.getScheduled(childId);
