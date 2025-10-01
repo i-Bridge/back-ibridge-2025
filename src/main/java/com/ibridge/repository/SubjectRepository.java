@@ -42,8 +42,10 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
     @Query("SELECT s FROM Subject s WHERE s.child.id = :childId and s.date = :date")
     List<Subject> findByChildIdAndDate(Long childId, LocalDate date);
 
-    @Query("SELECT s FROM Subject s WHERE s.child.id = :childId AND s.date >= :date and s.isCompleted = false")
+    @Query("SELECT new com.ibridge.domain.dto.SubjectDTO(s.id, s.title, s.isAnswer, s.date) " +
+            "FROM Subject s WHERE s.child.id = :childId AND s.date >= :date and s.isCompleted = false")
     List<SubjectDTO> findSubjectsByChildIdAndDate(Long childId, LocalDate date);
+
 
     @Query("SELECT s FROM Subject s WHERE s.child.id = :childId AND s.isCompleted = true ORDER BY s.id ASC")
     List<Subject> findCompletedSubjectsByChildId(@Param("childId") Long childId);
