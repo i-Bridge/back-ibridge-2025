@@ -150,9 +150,9 @@ public class ParentController {
     }
 
     @GetMapping("/{childId}/questions/reroll")
-    public ApiResponse<SubjectResponseDTO> rerollQuestion(@PathVariable Long childId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+    public ApiResponse<SubjectResponseDTO> rerollQuestion(@PathVariable Long childId, @RequestParam("subjectId") Long subjectId) {
         try {
-            SubjectResponseDTO response = questionService.rerollQuestion(childId, date);
+            SubjectResponseDTO response = questionService.rerollQuestion(childId, subjectId);
             return ApiResponse.onSuccess(response);
         }
         catch (Exception e) {
