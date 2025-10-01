@@ -111,7 +111,13 @@ public class ChildService {
         String ai = "";
 
 
-        if(questions.size() == 5) ai = gptService.closingGPT(conv);
+        if(questions.size() == 5)  {
+            subject.setAnswer(true);
+            subject.setCompleted(true);
+            subjectRepository.save(subject);
+
+            ai = gptService.closingGPT(conv);
+        }
         else  {
             ai = gptService.askGpt(conv);
             Question question = Question.builder()
