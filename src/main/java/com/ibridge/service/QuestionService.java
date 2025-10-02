@@ -100,6 +100,7 @@ public class QuestionService {
         // 랜덤으로 하나 선택
         String randomQuestion = subjects.get(id);
         Subject subject = subjectRepository.findById(subjectId).orElseThrow(() -> new EntityNotFoundException("Subject not found: " + subjectId));
+        subject.setTitle(randomQuestion);
         subjectRepository.save(subject);
         Question question=questionRepository.findBySubjectId(subject.getId());
         question.setText(randomQuestion);
