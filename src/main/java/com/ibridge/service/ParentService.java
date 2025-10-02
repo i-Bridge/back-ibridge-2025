@@ -185,8 +185,8 @@ public class ParentService {
         noticeRepository.deleteById(noticeId);
         List<Subject> subjects = subjectRepository.findCompletedSubjectsByChildId(childId);
         int idx = -1;
-        for(int i = 0;i<subjects.size();i++){
-            if(subjects.get(i).getId().equals(subjectId)){
+        for (int i = 0; i < subjects.size(); i++) {
+            if (subjects.get(i).getId().equals(subjectId)) {
                 idx = i;
                 break;
             }
@@ -194,8 +194,10 @@ public class ParentService {
         if (idx == -1) {
             throw new IllegalArgumentException("해당 subjectId를 찾을 수 없습니다. (isComplete=true 조건 확인)");
         }
-        int fromIndex = Math.max(0, idx-5);
-        int toIndex = Math.min(subjects.size(),idx+6);
+
+        // 앞 4개, 뒤 5개 (총 10개)
+        int fromIndex = Math.max(0, idx - 4);
+        int toIndex = Math.min(subjects.size(), idx + 6);
 
         List<SubjectDTO> subjectDTOs = subjects.subList(fromIndex, toIndex).stream()
                 .map(subject -> new SubjectDTO(
@@ -206,8 +208,15 @@ public class ParentService {
                 ))
                 .collect(Collectors.toList());
 
+        int pageSize = 10;
+        int page = idx / pageSize + 1;
+
+        boolean hasNext = toIndex < subjects.size();
+
         return ParentHomeResponseDTO.builder()
                 .subjects(subjectDTOs)
+                .page(page)
+                .hasNext(hasNext)
                 .build();
     }
 
