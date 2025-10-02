@@ -16,6 +16,8 @@ import software.amazon.awssdk.services.s3.endpoints.internal.Not;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -321,8 +323,15 @@ public class ParentService {
 
     public CategorySubjectDTO getSubjects(Long childId, String keyword) {
         Optional<Child> child = childRepository.findById(childId);
-        Pageable top60 = PageRequest.of(0,60);
-        List<SubjectDTO> subjects = subjectRepository.findRecentSubjectDTOs(child.get(), keyword, top60);
+        Pageable top60 = PageRequest.of(0, 60);
+
+        // keyword 디코딩
+        String decodedKeyword = null;
+        if (keyword != null && !keyword.isEmpty()) {
+            decodedKeyword = URLDecoder.decode(keyword, StandardCharsets.UTF_8);
+        }
+
+        List<SubjectDTO> subjects = subjectRepository.findRecentSubjectDTOs(child.get(), decodedKeyword, top60);
 
         return CategorySubjectDTO.builder()
                 .subjects(subjects)
