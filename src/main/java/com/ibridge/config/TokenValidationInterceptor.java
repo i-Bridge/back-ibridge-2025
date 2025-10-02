@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Component
@@ -40,7 +41,7 @@ public class TokenValidationInterceptor implements HandlerInterceptor {
             return true; // preflight는 처리 완료 후 실제 요청 진행 안함
         }
         String authHeader = request.getHeader("Authorization");
-        System.out.println("Interceptor called: " + request.getRequestURL());
+        System.out.println("[" + LocalDateTime.now() + "]: " + request.getRequestURL());
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
