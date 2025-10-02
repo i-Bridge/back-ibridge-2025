@@ -5,6 +5,7 @@ import com.ibridge.domain.dto.response.ChildResponseDTO;
 import com.ibridge.domain.entity.*;
 import com.ibridge.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +15,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +33,7 @@ public class ChildService {
     private final NoticeRepository noticeRepository;
     private final ChildPositiveBoardRepository childPositiveBoardRepository;
     private final StoreRepository storeRepository;
+    private final ClusteringService clusteringService;
 
     //질문 화면 관련
     public ChildResponseDTO.getQuestionDTO getHome(Long childId) {
@@ -248,11 +252,15 @@ public class ChildService {
                     .append(analysisRepository.findByQuestionId(q.getId()).get().getAnswer()).append('\n');
         }
         String conv = sb.toString();
-        String summary = gptService.summarizeGPT(conv);
-        subject.setTitle(summary);
 
-        int positiveRate = gptService.positiveGPT(conv).get("긍정");
-        subject.setPositive(positiveRate);
+        CompletableFuture<String> sumF = CompletableFuture.supplyAsync(() -> gptService.summarizeGPT(conv))
+                .orTimeout(12, TimeUnit.SECONDS)
+                .exceptionally(e -> subject.getTitle());
+        CompletableFuture<Integer> posF = CompletableFuture.supplyAsync(() -> gptService.positiveGPT(conv).get("긍정"))
+                .orTimeout(12, TimeUnit.SECONDS)
+                .exceptionally(e -> 50);
+        subject.setTitle(sumF.join());
+        subject.setPositive(posF.join());
 
         subjectRepository.save(subject);
 
@@ -274,17 +282,14 @@ public class ChildService {
         monthlyStat.setAnswerCount(monthlyStat.getAnswerCount() + 1);
         totalStat.setAnswerCount(totalStat.getAnswerCount() + 1);
 
-        childStatRepository.save(dailyStat);
-        childStatRepository.save(weeklyStat);
-        childStatRepository.save(monthlyStat);
-        childStatRepository.save(totalStat);
+        childStatRepository.saveAll(List.of(dailyStat, weeklyStat, monthlyStat, totalStat));
 
         makeNotice(subject);
 
         //군집화 진행 여부 확인 및 진행
         int subjectCount = subjectRepository.countByChild(child);
         if(subjectCount % 15 == 0) {
-            clustering(child, subjectRepository.findClusteringSubjectbyChild(child, Math.min(subjectCount, 60)));
+            clusteringService.clustering(child, subjectRepository.findClusteringSubjectbyChild(child, Math.min(subjectCount, 60)));
         }
     }
 
@@ -314,53 +319,6 @@ public class ChildService {
                         .type(3).build();
                 noticeRepository.save(grapeNotice);        
             }
-        }
-    }
-
-    private void clustering(Child child, List<Subject> subjectList) {
-        //군집화 진행
-        Map<String, List<Long>> categorized = gptService.categorizeSubjects(subjectList);
-        for (Map.Entry<String, List<Long>> entry : categorized.entrySet()) {
-            String keyword = entry.getKey();
-            List<Long> subjectIds = entry.getValue();
-
-            // SubjectRepository 이용해서 batch 조회
-            List<Subject> subjects = subjectRepository.findAllById(subjectIds);
-
-            for (Subject subject : subjects) {
-                subject.setKeyword(keyword);
-
-                Optional<ChildPositiveBoard> childPositiveBoard = childPositiveBoardRepository.findByChildAndKeyword(child, keyword, LocalDate.now());
-                if(childPositiveBoard.isPresent()) {
-                    Long newPositive = childPositiveBoard.get().getPositive() * childPositiveBoard.get().getKeywordCount() + subject.getPositive();
-                    childPositiveBoard.get().setPositive(newPositive / (childPositiveBoard.get().getKeywordCount() + 1));
-
-                    childPositiveBoard.get().setKeywordCount(childPositiveBoard.get().getKeywordCount() + 1);
-
-                    childPositiveBoardRepository.save(childPositiveBoard.get());
-                }
-                else {
-                    ChildPositiveBoard newKeyword = ChildPositiveBoard.builder()
-                            .keyword(keyword)
-                            .child(child)
-                            .keywordCount(1L)
-                            .period(LocalDate.now())
-                            .positive(Long.valueOf(subject.getPositive()))
-                            .build();
-                    childPositiveBoardRepository.save(newKeyword);
-                }
-            }
-        }
-
-        //알람 전송
-        List<Parent> parents = parentRepository.findAllByFamily(child.getFamily());
-        for(Parent parent : parents) {
-            Notice notice = Notice.builder()
-                    .child(child)
-                    .send_at(Timestamp.valueOf(LocalDateTime.now()))
-                    .type(3)
-                    .receiver(parent).build();
-            noticeRepository.save(notice);
         }
     }
 
