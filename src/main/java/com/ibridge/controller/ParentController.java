@@ -30,7 +30,7 @@ public class ParentController {
     private final LoginService loginService;
 
     //지웅
-    @PostMapping("/{childId}/pressNoice")
+    @PostMapping("/{childId}/pressNotice")
     public ApiResponse<?> openNotice(@PathVariable Long childId, @RequestParam(value = "subjectId") Long subjectId, @RequestParam(value = "noticeId") Long noticeId){
         try{
             parentService.openNotice(childId, subjectId, noticeId);
