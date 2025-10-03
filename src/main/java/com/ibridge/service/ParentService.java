@@ -170,13 +170,15 @@ public class ParentService {
         if (cs != null && csToday != null) {
             grape = cs.getAnswerCount() / 6 - (cs.getAnswerCount() - csToday.getAnswerCount()) / 6;
         }
+        String mostTalkedCategory = (cpb != null ? cpb.getKeyword() : null);
+
         return BannerDTO.builder()
-                .cumulativeAnswerCount(cs.getAnswerCount())
+                .cumulativeAnswerCount(cs != null ? cs.getAnswerCount() : 0)
                 .emotion(mostSelectedEmotion)
-                .mostTalkedCategory(cpb.getKeyword())
+                .mostTalkedCategory(mostTalkedCategory)
                 .positiveCategory(highestPositiveCategory)
                 .negativeCategory(highestNegativeCategory)
-                .newGrape(Integer.parseInt(grape+""))
+                .newGrape((int) grape)
                 .name(child.getName())
                 .build();
     }
