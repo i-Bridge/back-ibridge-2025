@@ -24,13 +24,37 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
     @Query("SELECT s FROM Subject s WHERE s.child = :child")
     List<Subject> findAllByChild(Child child);
 
-    @Query("SELECT new com.ibridge.domain.dto.SubjectDTO(s.id, s.title, true, s.date) " +
-            "FROM Subject s " +
-            "WHERE s.child = :child AND s.keyword = :keyword " +
-            "ORDER BY s.date DESC, s.id DESC")
-    List<SubjectDTO> findRecentSubjectDTOs(@Param("child") Child child,
-                                           @Param("keyword") String keyword,
-                                           Pageable pageable);
+    @Query("""
+    SELECT new com.ibridge.domain.dto.SubjectDTO(
+        s.id, s.title, true, s.date
+    )
+    FROM Subject s
+    WHERE s.child = :child
+      AND s.keyword = :keyword
+      AND s.date = (
+          SELECT MAX(s2.date)
+          FROM Subject s2
+          WHERE s2.child = s.child
+            AND s2.keyword = s.keyword
+            AND s2.date IN (
+                SELECT cpb.period
+                FROM ChildPositiveBoard cpb
+                WHERE cpb.child = s.child
+                  AND cpb.keyword = s.keyword
+                  AND cpb.period = (
+                      SELECT MAX(cpb2.period)
+                      FROM ChildPositiveBoard cpb2
+                      WHERE cpb2.child = s.child
+                        AND cpb2.keyword = s.keyword
+                  )
+            )
+      )
+    ORDER BY s.date DESC, s.id DESC
+    """)
+    List<SubjectDTO> findRecentSubjectDTOs(
+            @Param("child") Child child,
+            @Param("keyword") String keyword,
+            Pageable pageable);
 
 
     @Query("SELECT count(s) FROM Subject s WHERE s.child = :child and s.isCompleted = true")
