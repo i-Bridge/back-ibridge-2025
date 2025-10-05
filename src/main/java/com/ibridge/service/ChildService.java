@@ -259,7 +259,7 @@ public class ChildService {
         CompletableFuture<Integer> posF = CompletableFuture.supplyAsync(() -> gptService.positiveGPT(conv).get("긍정"))
                 .orTimeout(12, TimeUnit.SECONDS)
                 .exceptionally(e -> 50);
-        subject.setTitle(sumF.join());
+        subject.setTitle(sumF.join().replaceAll("^-\\s*", "").replaceAll("\\.$", ""));
         subject.setPositive(posF.join());
 
         subjectRepository.save(subject);
