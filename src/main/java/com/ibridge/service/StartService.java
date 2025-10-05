@@ -106,6 +106,7 @@ public class StartService {
                             .gender(childRequest.getGender() == 0 ? Gender.MALE : Gender.FEMALE)
                             .birth(LocalDate.parse(childRequest.getBirth()))
                             .family(family)
+                            .grape(0L)
                             .build();
 
                     List<Subject> subjectList = new ArrayList<>();
