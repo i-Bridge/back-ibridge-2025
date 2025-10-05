@@ -196,8 +196,8 @@ public class ParentController {
         }
     }
 
-    @GetMapping("{childId}/stat/{keyword}")
-    public ApiResponse<CategorySubjectDTO> getSubjects(@PathVariable Long childId, @PathVariable String keyword){
+    @GetMapping("{childId}/stat/subject")
+    public ApiResponse<CategorySubjectDTO> getSubjects(@PathVariable Long childId, @RequestParam String keyword){
         try{
             CategorySubjectDTO categorySubjectDTO  = parentService.getSubjects(childId, keyword);
             return ApiResponse.onSuccess(categorySubjectDTO);
