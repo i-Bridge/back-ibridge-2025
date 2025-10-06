@@ -40,8 +40,13 @@ public interface ChildPositiveBoardRepository extends JpaRepository<ChildPositiv
 
     @Query("SELECT new com.ibridge.domain.dto.response.KeywordDTO(c.keyword, c.keywordCount, c.positive) " +
             "FROM ChildPositiveBoard c " +
-            "WHERE c.child.id = :childId")
-    List<KeywordDTO> findkeywordsByChild(Long childId);
+            "WHERE c.child.id = :childId " +
+            "AND c.period = (" +
+            "   SELECT MAX(c2.period) " +
+            "   FROM ChildPositiveBoard c2 " +
+            "   WHERE c2.child.id = :childId" +
+            ")")
+    List<KeywordDTO> findKeywordsByChildId(@Param("childId") Long childId);
 
     @Query("SELECT cp FROM ChildPositiveBoard cp WHERE cp.child = :child")
     List<ChildPositiveBoard> findAllByChild(Child child);
