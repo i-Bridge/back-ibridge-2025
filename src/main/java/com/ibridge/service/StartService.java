@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -134,13 +135,36 @@ public class StartService {
                     }
                     child.setSubjects(subjectList);
 
-                    ChildStat childStat = ChildStat.builder()
+                    ChildStat dailyStat = ChildStat.builder()
                             .child(child)
-                            .type(PeriodType.CUMULATIVE)
                             .period(LocalDate.now())
-                            .emotion(null)
                             .answerCount(0L)
-                            .build();
+                            .type(PeriodType.DAY)
+                            .emotion(null).build();
+                    ChildStat weeklyStat = ChildStat.builder()
+                            .child(child)
+                            .period(LocalDate.now().with(DayOfWeek.MONDAY))
+                            .answerCount(0L)
+                            .type(PeriodType.WEEK)
+                            .emotion(null).build();
+                    ChildStat monthlyStat = ChildStat.builder()
+                            .child(child)
+                            .period(LocalDate.now().withDayOfMonth(1))
+                            .answerCount(0L)
+                            .type(PeriodType.MONTH)
+                            .emotion(null).build();
+                    ChildStat totalStat = ChildStat.builder()
+                            .child(child)
+                            .answerCount(0L)
+                            .period(LocalDate.now())
+                            .type(PeriodType.CUMULATIVE)
+                            .emotion(null).build();
+
+                    childStatRepository.save(dailyStat);
+                    childStatRepository.save(weeklyStat);
+                    childStatRepository.save(monthlyStat);
+                    childStatRepository.save(totalStat);
+
                     return child;
                 })
                 .collect(Collectors.toList());
