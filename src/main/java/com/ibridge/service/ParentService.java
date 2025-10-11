@@ -426,6 +426,11 @@ public class ParentService {
                 .children(childInfoDTOList).build();
     }
 
+    public void editName(Parent parent, ParentRequestDTO.editNameDTO request) {
+        parent.setName(request.getName());
+        parentRepository.save(parent);
+    }
+
     public void editFamilyName(Long parentId, ParentRequestDTO.editFamilyNameDTO request) {
         Parent parent = parentRepository.findById(parentId).get();
         Family family = parent.getFamily();
