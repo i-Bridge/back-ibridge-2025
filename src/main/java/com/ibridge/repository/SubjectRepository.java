@@ -65,15 +65,23 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
 
 
     @Query("""
-        SELECT DISTINCT s
+        SELECT DISTINCT new com.ibridge.domain.dto.SubjectDTO(
+            s.id,
+            s.title,
+            s.isAnswer,
+            s.date,
+            a.image
+        )
         FROM Subject s
-        LEFT JOIN FETCH s.questions q
-        LEFT JOIN FETCH q.analysis a
+        LEFT JOIN s.questions q
+        LEFT JOIN q.analysis a
         WHERE s.child.id = :childId
-        AND s.isCompleted = true
-        ORDER BY s.date DESC
+          AND s.isCompleted = true
+        ORDER BY s.id ASC
     """)
-    List<Subject> findCompletedSubjectsByChildId(@Param("childId") Long childId);
+    List<SubjectDTO> findSubjectDTOsByChildId(@Param("childId") Long childId);
+
+
     @Query("SELECT s FROM Subject s WHERE s.id = :subjectId")
     Subject findBySubjectId(Long subjectId);
 }
