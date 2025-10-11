@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
-    @Query("SELECT p FROM Notice p WHERE p.receiver = :parent ORDER BY p.id desc")
+    @Query("SELECT p FROM Notice p WHERE p.receiver = :parent ORDER BY p.send_at desc")
     List<Notice> findAllByParent(@Param("parent") Parent parent);
 
     @Query("SELECT p FROM Notice p WHERE p.receiver = :receiver and p.sender = :sender and p.type = 2")
