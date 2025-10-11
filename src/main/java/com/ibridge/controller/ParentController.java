@@ -56,7 +56,7 @@ public class ParentController {
     @GetMapping("/{childId}/home")
     public ApiResponse<ParentHomeResponseDTO> getParentHome(
             @PathVariable Long childId,
-            @PageableDefault(page = 0, size = 7) Pageable pageable,
+            @PageableDefault(page = 0, size = 10) Pageable pageable,
             HttpServletRequest r) {
 
         try {
