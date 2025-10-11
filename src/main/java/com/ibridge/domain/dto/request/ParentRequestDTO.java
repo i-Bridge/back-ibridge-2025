@@ -68,4 +68,12 @@ public class ParentRequestDTO {
     public static class editFamilyNameDTO {
         String familyName;
     }
+
+    @Builder
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class editNameDTO {
+        String name;
+    }
 }

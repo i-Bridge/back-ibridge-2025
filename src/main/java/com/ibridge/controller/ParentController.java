@@ -242,6 +242,20 @@ public class ParentController {
         }
     }
 
+    @PatchMapping("/mypage/edit/name")
+    public ApiResponse editName(HttpServletRequest r, @RequestBody ParentRequestDTO.editNameDTO request) {
+        try {
+            Parent parent = loginService.getParentFromHeader((String) r.getAttribute("email"));
+
+            parentService.editName(parent, request);
+            return ApiResponse.onSuccess(null);
+        }
+        catch(Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
+    }
+
     @PatchMapping("/mypage/edit/familyName")
     public ApiResponse editFamilyName(HttpServletRequest r, @RequestBody ParentRequestDTO.editFamilyNameDTO request) {
         try {
