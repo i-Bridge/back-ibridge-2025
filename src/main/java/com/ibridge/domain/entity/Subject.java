@@ -39,7 +39,7 @@ public class Subject {
     @JoinColumn(name = "child")
     private Child child;
 
-    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL)
     private List<Question> questions;
 
     @Column
