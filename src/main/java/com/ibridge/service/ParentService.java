@@ -49,25 +49,58 @@ public class ParentService {
         Child child = childRepository.findById(childId)
                 .orElseThrow(() -> new RuntimeException("해당 자녀를 찾을 수 없습니다: " + childId));
 
-        // 요청 페이지 정보 그대로 사용, 정렬만 DESC date로
         Pageable sortedPageable = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
                 Sort.by(Sort.Direction.DESC, "date")
         );
 
-        // DB에서 DTO 직접 조회 + 페이징
-        Page<SubjectDTO> subjectPage = subjectRepository.findCompletedSubjectDTOsByChildId(childId, sortedPageable);
-        List<SubjectDTO> subjects = subjectPage.getContent();
+        // 요청한 페이지 사이즈보다 하나 더 가져와서 hasNext 계산
+        int pageSize = sortedPageable.getPageSize();
+        int pageNumber = sortedPageable.getPageNumber();
 
-        boolean hasNext = subjectPage.hasNext();
+        List<Subject> subjectEntities = subjectRepository.findByChildIdAndIsCompleted(
+                childId,
+                true,
+                sortedPageable.getSort()
+        );
+
+        // offset, limit 흉내 (메모리에서 처리)
+        int fromIndex = pageNumber * pageSize;
+        int toIndex = Math.min(fromIndex + pageSize + 1, subjectEntities.size());
+
+        List<Subject> pagedSubjects = subjectEntities.subList(fromIndex, toIndex);
+
+        // hasNext 계산 → pageSize+1개를 가져왔다면 다음 페이지 있음
+        boolean hasNext = pagedSubjects.size() > pageSize;
+
+        // DTO 변환 (pageSize까지만 잘라서 반환)
+        List<SubjectDTO> subjects = pagedSubjects.stream()
+                .limit(pageSize)
+                .map(subject -> {
+                    String image = subject.getQuestions().stream()
+                            .map(Question::getAnalysis)
+                            .filter(Objects::nonNull)
+                            .map(Analysis::getImage)
+                            .filter(Objects::nonNull)
+                            .findFirst()
+                            .orElse(null);
+
+                    return new SubjectDTO(
+                            subject.getId(),
+                            subject.getTitle(),
+                            subject.isAnswer(),
+                            subject.getDate(),
+                            image
+                    );
+                })
+                .toList();
 
         return ParentHomeResponseDTO.builder()
-                .subjects(subjects)
-                .hasNext(hasNext)
+                .subjects(subjects) // List<SubjectDTO>
+                .hasNext(hasNext)   // 다음 페이지 여부
                 .build();
     }
-
 
 
     public readSubjectsResponseDTO readSubjects(Parent parent, Long childId, Long year, Long month) {
@@ -151,15 +184,11 @@ public class ParentService {
     }
 
     public ParentHomeResponseDTO openNotice(Long childId, Long subjectId, Long noticeId) {
-        // 공지 삭제
         noticeRepository.deleteById(noticeId);
 
-        // DB에서 DTO 직접 조회 + 페이징
-        Pageable pageable = PageRequest.of(0, 60, Sort.by(Sort.Direction.DESC, "date"));
-        Page<SubjectDTO> subjectPage = subjectRepository.findCompletedSubjectDTOsByChildId(childId, pageable);
-        List<SubjectDTO> subjects = subjectPage.getContent();
+        // DTO 직접 조회
+        List<SubjectDTO> subjects = subjectRepository.findSubjectDTOsByChildId(childId);
 
-        // subjectId 인덱스 찾기
         int idx = -1;
         for (int i = 0; i < subjects.size(); i++) {
             if (subjects.get(i).getSubjectId().equals(subjectId)) {
@@ -169,17 +198,18 @@ public class ParentService {
         }
 
         if (idx == -1) {
-            throw new IllegalArgumentException("해당 subjectId를 찾을 수 없습니다. (isCompleted=true 확인)");
+            throw new IllegalArgumentException("해당 subjectId를 찾을 수 없습니다. (isComplete=true 조건 확인)");
         }
 
         // 앞 4개, 뒤 5개 (총 10개)
         int fromIndex = Math.max(0, idx - 4);
         int toIndex = Math.min(subjects.size(), idx + 6);
+
         List<SubjectDTO> subjectDTOs = subjects.subList(fromIndex, toIndex);
 
-        // page, hasNext 계산
         int pageSize = 10;
         int page = idx / pageSize + 1;
+
         boolean hasNext = toIndex < subjects.size();
 
         return ParentHomeResponseDTO.builder()
@@ -188,7 +218,6 @@ public class ParentService {
                 .hasNext(hasNext)
                 .build();
     }
-
 
 
     public AnalysisResponseDTO getDefaultAnalysis(Long childId) {
