@@ -13,9 +13,11 @@ public class ChildResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class getQuestionDTO {
-        Long grape;
-        boolean emotion;
-        boolean isCompleted;
+        String childName;
+        Long grapes;
+        Integer emotion;
+        boolean emotionDone;
+        boolean specifiedDone;
     }
 
     @Data

@@ -42,9 +42,11 @@ public class ChildService {
         ChildStat dailyStat = childStatRepository.findDateStatByChildandToday(child, LocalDate.now());
 
         return ChildResponseDTO.getQuestionDTO.builder()
-                .grape(child.getGrape())
-                .emotion(dailyStat.getEmotion() != null)
-                .isCompleted(todaySubject.get(0).isCompleted()).build();
+                .childName(child.getName())
+                .grapes(child.getGrape())
+                .emotion(dailyStat.getEmotion())
+                .emotionDone(dailyStat.getEmotion() != null)
+                .specifiedDone(todaySubject.get(0).isCompleted()).build();
     }
 
     public void setEmotion(Long childId, ChildRequestDTO.setEmotionDTO request) {
