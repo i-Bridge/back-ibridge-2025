@@ -14,10 +14,22 @@ public class ChildResponseDTO {
     @AllArgsConstructor
     public static class getQuestionDTO {
         String childName;
-        Long grapes;
+        Long grapeBunches;
+        Long grapePieces;
+        boolean rewardAvailable;
         Integer emotion;
         boolean emotionDone;
         boolean specifiedDone;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class bunchAvailableDTO {
+        Long grapeBunches;
+        Long grapePieces;
+        boolean available;
     }
 
     @Data

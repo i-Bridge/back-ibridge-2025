@@ -43,10 +43,27 @@ public class ChildService {
 
         return ChildResponseDTO.getQuestionDTO.builder()
                 .childName(child.getName())
-                .grapes(child.getGrape())
+                .grapeBunches(child.getBunch())
+                .grapePieces(child.getGrape())
+                .rewardAvailable(child.getGrape() >= 6)
                 .emotion(dailyStat.getEmotion())
                 .emotionDone(dailyStat.getEmotion() != null)
                 .specifiedDone(todaySubject.get(0).isCompleted()).build();
+    }
+
+    public ChildResponseDTO.bunchAvailableDTO getBunch(Long childId) {
+        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + "not found"));
+        Long grapePieces = child.getGrape() + 1;
+        Long grapeBunches = child.getBunch() - 6;
+
+        child.setBunch(grapeBunches);
+        child.setBunch(grapePieces);
+        childRepository.save(child);
+
+        return ChildResponseDTO.bunchAvailableDTO.builder()
+                .grapeBunches(grapeBunches)
+                .grapePieces(grapePieces)
+                .available(grapePieces >= 6).build();
     }
 
     public void setEmotion(Long childId, ChildRequestDTO.setEmotionDTO request) {
