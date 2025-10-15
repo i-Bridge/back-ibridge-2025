@@ -53,8 +53,8 @@ public class ChildService {
 
     public ChildResponseDTO.bunchAvailableDTO getBunch(Long childId) {
         Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("Child " + childId + "not found"));
-        Long grapePieces = child.getGrape() + 1;
-        Long grapeBunches = child.getBunch() - 6;
+        Long grapePieces = child.getGrape() - 6;
+        Long grapeBunches = child.getBunch() + 1;
 
         child.setBunch(grapeBunches);
         child.setBunch(grapePieces);
