@@ -57,7 +57,7 @@ public class ChildService {
         Long grapeBunches = child.getBunch() + 1;
 
         child.setBunch(grapeBunches);
-        child.setBunch(grapePieces);
+        child.setGrape(grapePieces);
         childRepository.save(child);
 
         return ChildResponseDTO.bunchAvailableDTO.builder()
