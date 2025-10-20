@@ -585,6 +585,7 @@ public class ParentService {
         List<ParentResponseDTO.NoticeDTO> noticeDTOList = new ArrayList<>();
         List<Notice> noticesForParent = noticeRepository.findAllByParent(parent);
 
+        int count = 0;
         for(Notice notice : noticesForParent) {
             notice.setRead(true);
             noticeRepository.save(notice);
@@ -596,11 +597,16 @@ public class ParentService {
                     .time(notice.getSend_at().toString())
                     .subject(notice.getSubject() == null? null : notice.getSubject().getId())
                     .isAccept(notice.isAccept())
-                    .senderName(notice.getChild() == null? notice.getSender().getName() : notice.getChild().getName()).build()
+                    .senderName(notice.getChild() == null? notice.getSender().getName() : notice.getChild().getName())
+                    .isRead(notice.isRead()).build()
             );
+            if(!notice.isRead()) count++;
         }
 
-        return ParentResponseDTO.NoticeCheckDTO.builder().notices(noticeDTOList).build();
+        return ParentResponseDTO.NoticeCheckDTO.builder()
+                .notices(noticeDTOList)
+                .newCount(count)
+                .build();
     }
 
     public void addParentintoFamily(Long parentId, ParentRequestDTO.getParentintoFamilyDTO request) {
