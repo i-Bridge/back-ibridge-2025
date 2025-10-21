@@ -127,7 +127,6 @@ public class ParentService {
         Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("해당하는 자녀를 찾을 수 없습니다." + childId));
         LocalDate startDate = LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue(), 1);
         LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
-        List<ChildStat> stats = childStatRepository.findByChildAndPeriodBetween(child, startDate, endDate);
         // 누적 ChildStat
         ChildStat cs = childStatRepository.findByType(child).orElse(null);
 
@@ -156,29 +155,15 @@ public class ParentService {
             highestNegativeCategory = maxNegativeBoard != null ? maxNegativeBoard.getKeyword() : null;
         }
 
-        // 가장 많이 선택한 감정
-        Integer mostSelectedEmotion = stats.stream()
-                .filter(s -> s.getEmotion() != null)
-                .collect(Collectors.groupingBy(ChildStat::getEmotion, Collectors.counting()))
-                .entrySet().stream()
-                .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
-                .orElse(null);
-
         // 포도송이 계산 시 cs, csToday null 체크
-        long grape = 0;
-        if (cs != null && csToday != null) {
-            grape = cs.getAnswerCount() / 6 - (cs.getAnswerCount() - csToday.getAnswerCount()) / 6;
-        }
+
         String mostTalkedCategory = (cpb != null ? cpb.getKeyword() : null);
 
         return BannerDTO.builder()
                 .cumulativeAnswerCount(cs != null ? cs.getAnswerCount() : 0)
-                .emotion(mostSelectedEmotion)
                 .mostTalkedCategory(mostTalkedCategory)
                 .positiveCategory(highestPositiveCategory)
                 .negativeCategory(highestNegativeCategory)
-                .newGrape((int) grape)
                 .name(child.getName())
                 .build();
     }

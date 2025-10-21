@@ -14,7 +14,5 @@ public class BannerDTO {
     private String mostTalkedCategory;
     private String positiveCategory;
     private String negativeCategory;
-    private Integer emotion;
     private String name;
-    private Integer newGrape;
 }
