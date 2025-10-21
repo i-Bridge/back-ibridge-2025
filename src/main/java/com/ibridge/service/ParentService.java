@@ -310,7 +310,7 @@ public class ParentService {
         YearMonth yearMonth = YearMonth.from(LocalDate.now());
         LocalDate start = yearMonth.atDay(1);
         List<Long> cumulatives = new ArrayList<>();
-
+        Optional<ChildStat> cs = childStatRepository.findByType(child);
         switch (periodType) {
             case "day":
                 for (int i = 6; i >= 0; i--) {
@@ -337,6 +337,7 @@ public class ParentService {
                 break;
         }
         return AnalysisResponseDTO.builder()
+                .cumulative(cs.get().getAnswerCount())
                 .cumList(cumulatives)
                 .build();
     }
