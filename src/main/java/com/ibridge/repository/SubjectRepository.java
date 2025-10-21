@@ -84,4 +84,11 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
 
     @Query("SELECT s FROM Subject s WHERE s.id = :subjectId")
     Subject findBySubjectId(Long subjectId);
+
+    @Query("SELECT DISTINCT s FROM Subject s " +
+            "LEFT JOIN FETCH s.questions q " +
+            "LEFT JOIN FETCH q.analysis a " +
+            "WHERE s.child.id = :childId " +
+            "AND s.date = :date")
+    List<Subject> findAllByChildIdAndDateWithQuestions(Long childId, LocalDate date);
 }

@@ -208,6 +208,18 @@ public class ParentController {
         }
     }
 
+    @GetMapping("/{childId}/subjects")
+    public SubjectListResponseDTO getSubjectByDate(@PathVariable Long childId, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date)
+    {
+        try{
+            SubjectListResponseDTO subjectListResponseDTO  = parentService.getSubjectsByDate(childId, date);
+            return ApiResponse.onSuccess(subjectListResponseDTO);
+        }
+        catch(Exception e){
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
+    }
 
 
 

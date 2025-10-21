@@ -238,12 +238,8 @@ public class ParentService {
         }
         List<KeywordDTO> keywordDTOs = childPositiveBoardRepository.findKeywordsByChildId(childId);
         return AnalysisResponseDTO.builder()
-                .name(child.getName())
-                .signupDate(cs.getPeriod())
-                .cumulative(cs.getAnswerCount())
                 .keywords(keywordDTOs)
-                .emotions(Arrays.asList(emotions))
-                .cumList(cumList) .build();
+                .build();
     }
 
     public EmotionAnalysisResponseDTO getEmotions(Long childId, LocalDate today) {
@@ -356,6 +352,35 @@ public class ParentService {
 
         return CategorySubjectDTO.builder()
                 .subjects(subjects)
+                .build();
+    }
+
+    public SubjectListResponseDTO getSubjectsByDate(Long childId, LocalDate date) {
+        if (date == null) date = LocalDate.now();
+
+        List<Subject> subjects = subjectRepository.findAllByChildIdAndDateWithQuestions(childId, date);
+
+        List<SubjectListResponseDTO.SubjectResponseDTO> subjectDTOs = subjects.stream()
+                .map(subject -> SubjectListResponseDTO.SubjectResponseDTO.builder()
+                        .subjectId(subject.getId())
+                        .title(subject.getTitle())
+                        .questions(subject.getQuestions().stream()
+                                .map(q -> {
+                                    Analysis a = q.getAnalysis();
+                                    return SubjectListResponseDTO.QuestionResponseDTO.builder()
+                                            .text(q.getText())
+                                            .answer(a != null ? a.getAnswer() : null)
+                                            .image(a != null ? a.getImage() : null)
+                                            .video(a != null ? a.getVideo() : null)
+                                            .build();
+                                })
+                                .collect(Collectors.toList()))
+                        .build())
+                .collect(Collectors.toList());
+
+        return SubjectListResponseDTO.builder()
+                .subjectCount(subjectDTOs.size())
+                .subjects(subjectDTOs)
                 .build();
     }
 

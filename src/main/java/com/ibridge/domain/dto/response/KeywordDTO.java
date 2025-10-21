@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class KeywordDTO{
-    private String keyword;
+    private String category;
     private Long count;
     private Long positiveScore;
 }
