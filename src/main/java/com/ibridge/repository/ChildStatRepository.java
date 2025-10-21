@@ -63,4 +63,10 @@ public interface ChildStatRepository extends JpaRepository<ChildStat, Long> {
 
     @Query("select cs from ChildStat cs where cs.child = :child AND cs.period = :period AND cs.type = com.ibridge.domain.entity.PeriodType.DAY")
     ChildStat findByChildAndPeriod(@Param("child") Child child, @Param("period") LocalDate period);
+
+    @Query("SELECT cs FROM ChildStat cs " +
+            "WHERE cs.child = :child " +
+            "ORDER BY cs.period ASC " +
+            "LIMIT 1")
+    Optional<ChildStat> findFirstByChildOrderByPeriodAsc(Child child);
 }

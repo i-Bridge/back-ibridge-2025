@@ -41,7 +41,7 @@ public class ParentController {
             return ApiResponse.onFailure("404", e.getMessage());
         }
     }
-    @GetMapping("{childId}/readSubjects")
+    /*@GetMapping("{childId}/readSubjects")
     public ApiResponse<readSubjectsResponseDTO> readSubjects(HttpServletRequest r, @PathVariable Long childId, @RequestParam(value = "year") Long year, @RequestParam(value = "month") Long month) {
         try {
             String email = (String)r.getAttribute("email");
@@ -52,7 +52,7 @@ public class ParentController {
             System.out.println("failure return: " + e.getMessage());
             return ApiResponse.onFailure("404", e.getMessage());
         }
-    }
+    }*/
     @GetMapping("/{childId}/home")
     public ApiResponse<ParentHomeResponseDTO> getParentHome(
             @PathVariable Long childId,
@@ -115,7 +115,7 @@ public class ParentController {
         }
     }
 
-    @GetMapping("/{childId}/{subjectId}/{questionId}")
+    /*@GetMapping("/{childId}/{subjectId}/{questionId}")
     public ApiResponse<QuestionDetailResponseDTO> getQuestionDetail(
             @PathVariable Long childId,
             @PathVariable Long subjectId,
@@ -130,7 +130,7 @@ public class ParentController {
             System.out.println("failure return: " + e.getMessage());
             return ApiResponse.onFailure("404", e.getMessage());
         }
-    }
+    }*/
 
     @PatchMapping("/{childId}/questions/edit")
     public ApiResponse<Void> editQuestion(
@@ -160,7 +160,7 @@ public class ParentController {
         }
     }
 
-    @GetMapping("/{childId}/stat")
+    @GetMapping("/{childId}/keywords")
     public ApiResponse<AnalysisResponseDTO> getAnalysis(@PathVariable Long childId){
         try{
             AnalysisResponseDTO analysisResponseDTO = parentService.getDefaultAnalysis(childId);
@@ -173,10 +173,10 @@ public class ParentController {
     }
 
     @GetMapping("{childId}/stat/emotion")
-    public ApiResponse<AnalysisResponseDTO> getEmotions(@PathVariable Long childId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date){
+    public ApiResponse<EmotionAnalysisResponseDTO> getEmotions(@PathVariable Long childId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date){
         try{
-            AnalysisResponseDTO analysisResponseDTO = parentService.getEmotions(childId, date);
-            return ApiResponse.onSuccess(analysisResponseDTO);
+            EmotionAnalysisResponseDTO emotionAnalysisResponseDTO = parentService.getEmotions(childId, date);
+            return ApiResponse.onSuccess(emotionAnalysisResponseDTO);
         }
         catch(Exception e){
             System.out.println("failure return: " + e.getMessage());

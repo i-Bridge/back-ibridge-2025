@@ -59,7 +59,7 @@ public class QuestionService {
     }
 
 
-    public QuestionDetailResponseDTO getQuestionDetail(Long childId, Long subjectId, Long questionId, LocalDate date) {
+    /*public QuestionDetailResponseDTO getQuestionDetail(Long childId, Long subjectId, Long questionId, LocalDate date) {
         Analysis analysis = analysisRepository.findByQuestionId(questionId)
                 .orElse(null); // 분석이 없을 수도 있음
         AnalysisDTO analysisDTO = analysis != null
@@ -69,7 +69,7 @@ public class QuestionService {
         return QuestionDetailResponseDTO.builder()
                 .analysis(analysisDTO)
                 .build();
-    }
+    }*/
 
     public void editQuestion(Long childId, EditQuestionRequestDTO request, Long subjectId) {
         Subject subject = subjectRepository.findBySubjectId(subjectId);

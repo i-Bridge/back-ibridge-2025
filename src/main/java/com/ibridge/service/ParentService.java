@@ -103,7 +103,7 @@ public class ParentService {
     }
 
 
-    public readSubjectsResponseDTO readSubjects(Parent parent, Long childId, Long year, Long month) {
+    /*public readSubjectsResponseDTO readSubjects(Parent parent, Long childId, Long year, Long month) {
         boolean[] arr = new boolean[32];
         Child child = childRepository.findById(childId).orElse(null);
         List<Notice> notices = noticeRepository.findAllByReceiverAndChild(parent, year, month, child);
@@ -121,7 +121,7 @@ public class ParentService {
         return readSubjectsResponseDTO.builder()
                 .month(result)
                 .build();
-    }
+    }*/
 
     public BannerDTO getBanner(Long childId) {
         Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("해당하는 자녀를 찾을 수 없습니다." + childId));
@@ -209,14 +209,12 @@ public class ParentService {
         Child child = childRepository.findById(childId) .orElseThrow(() -> new RuntimeException("Child not found"));
         YearMonth yearMonth = YearMonth.from(LocalDate.now());
         LocalDate start = yearMonth.atDay(1);
-        LocalDate end = yearMonth.atEndOfMonth();
-        //누적 응담 수
+        LocalDate end = yearMonth.atEndOfMonth(); //누적 응담 수
         ChildStat cs = childStatRepository.findByType(child).orElseThrow(() -> new RuntimeException("ChildStat not found"));
         // 감정 목록 조회, null이면 0으로 채움 (달의 일 수만큼)
         List<ChildStat> emotionsFromDb = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
         int daysInMonth = yearMonth.lengthOfMonth();
-        Integer[] emotions = new Integer[daysInMonth+1];
-        Arrays.fill(emotions, 0);
+        Integer[] emotions = new Integer[daysInMonth+1]; Arrays.fill(emotions, 0);
         for(ChildStat childStat : emotionsFromDb) {
             if(childStat.getEmotion() != null){
                 emotions[childStat.getPeriod().getDayOfMonth()] = childStat.getEmotion();
@@ -227,50 +225,78 @@ public class ParentService {
         for (int i = 6; i >= 0; i--) {
             periodList.add(LocalDate.now().minusDays(i));
         }
-
         // cumList 조회, null이면 0으로 채움
         List<Long> cumFromDb = childStatRepository.findAnswerCountsByChildAndPeriodList(child, periodList);
         List<Long> cumList = new ArrayList<>(7);
         for (int i = 0; i < 7; i++) {
             if (cumFromDb != null && i < cumFromDb.size() && cumFromDb.get(i) != null) {
-                cumList.add(cumFromDb.get(i)); }
+                cumList.add(cumFromDb.get(i));
+            }
             else {
                 cumList.add(0L);
             }
         }
         List<KeywordDTO> keywordDTOs = childPositiveBoardRepository.findKeywordsByChildId(childId);
-
         return AnalysisResponseDTO.builder()
                 .name(child.getName())
                 .signupDate(cs.getPeriod())
                 .cumulative(cs.getAnswerCount())
                 .keywords(keywordDTOs)
                 .emotions(Arrays.asList(emotions))
-                .cumList(cumList)
-                .build();
+                .cumList(cumList) .build();
     }
 
-    public AnalysisResponseDTO getEmotions(Long childId, LocalDate today) {
+    public EmotionAnalysisResponseDTO getEmotions(Long childId, LocalDate today) {
         Child child = childRepository.findById(childId)
                 .orElseThrow(() -> new RuntimeException("Child not found"));
 
+        // 2) 요청일 기준 YearMonth 범위
         YearMonth yearMonth = YearMonth.from(today);
         LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();
-
-        List<ChildStat> emotionsFromDb = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
         int daysInMonth = yearMonth.lengthOfMonth();
-        Integer[] emotions = new Integer[daysInMonth+1];
-        Arrays.fill(emotions, 0);
-        for(ChildStat childStat : emotionsFromDb) {
-            if(childStat.getEmotion() != null){
-                emotions[childStat.getPeriod().getDayOfMonth()] = childStat.getEmotion();
+
+        // 3) 이번 달의 ChildStat(감정) 조회 (period 오름차순)
+        List<ChildStat> stats = childStatRepository.findEmotionsByChildAndMonth(child, start, end);
+
+        // 4) 날짜별 감정 배열 초기화
+        // 배열 길이를 daysInMonth+1로 하여 dayOfMonth 인덱스를 그대로 사용(0 인덱스는 unused)
+        Integer[] emotions = new Integer[daysInMonth + 1];
+        Arrays.fill(emotions, 0); // 기본값 0
+
+        for (ChildStat cs : stats) {
+            if (cs.getEmotion() != null && cs.getPeriod() != null) {
+                int day = cs.getPeriod().getDayOfMonth();
+                if (day >= 1 && day <= daysInMonth) {
+                    emotions[day] = cs.getEmotion();
+                }
             }
         }
 
-        return AnalysisResponseDTO.builder()
-                .emotions(Arrays.asList(emotions))
+        // 5) 이번 달 최빈 감정 계산 (0은 무시)
+        Map<Integer, Long> freq = Arrays.stream(emotions)
+                .filter(Objects::nonNull)
+                .filter(v -> v != 0)
+                .collect(Collectors.groupingBy(v -> v, Collectors.counting()));
+
+        int mostFrequentEmotion = freq.entrySet().stream()
+                .max(Map.Entry.<Integer, Long>comparingByValue()
+                        .thenComparing(Map.Entry.comparingByKey())) // 동률이면 작은 값 선택(임의)
+                .map(Map.Entry::getKey)
+                .orElse(0);
+
+        // 6) signupDate 결정: 가능한 경우 가장 오래된 ChildStat.period 사용
+        Optional<ChildStat> firstStatOpt = childStatRepository.findFirstByChildOrderByPeriodAsc(child);
+        LocalDate signupDate = firstStatOpt.map(ChildStat::getPeriod).orElse(null);
+
+        // 7) AnalysisResponseDTO 구성
+        EmotionAnalysisResponseDTO dto = EmotionAnalysisResponseDTO.builder()
+                .signupDate(signupDate)
+                .emotion(mostFrequentEmotion)
+                .emotions(Arrays.asList(emotions)) // 인덱스 0은 unused(0)
                 .build();
+
+        return dto;
     }
 
 
