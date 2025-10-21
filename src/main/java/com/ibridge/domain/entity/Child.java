@@ -38,5 +38,9 @@ public class Child {
 
     @Column(nullable = false)
     @ColumnDefault("0")
+    private Long bunch;
+
+    @Column(nullable = false)
+    @ColumnDefault("0")
     private Long grape;
 }

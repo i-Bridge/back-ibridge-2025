@@ -79,6 +79,7 @@ public class ParentResponseDTO {
     @NoArgsConstructor
     public static class NoticeCheckDTO {
         List<NoticeDTO> notices;
+        Integer newCount;
     }
 
     @Builder
@@ -93,6 +94,7 @@ public class ParentResponseDTO {
         String time;
         boolean isAccept;
         Long subject;
+        boolean isRead;
     }
 
 

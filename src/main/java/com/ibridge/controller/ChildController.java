@@ -44,6 +44,18 @@ public class ChildController {
         }
     }
 
+    @PostMapping("/{childId}/getBunch")
+    public ApiResponse<ChildResponseDTO.bunchAvailableDTO> getBunch(@PathVariable Long childId) {
+        try {
+            ChildResponseDTO.bunchAvailableDTO data = childService.getBunch(childId);
+            return ApiResponse.onSuccess(data);
+        }
+        catch (Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
+    }
+
     @GetMapping("/{childId}/grape")
     public ApiResponse<ChildResponseDTO.getRewardDTO> reward(@PathVariable Long childId) {
         try {
