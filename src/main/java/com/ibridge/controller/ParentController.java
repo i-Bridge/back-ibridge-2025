@@ -209,7 +209,7 @@ public class ParentController {
     }
 
     @GetMapping("/{childId}/subjects")
-    public SubjectListResponseDTO getSubjectByDate(@PathVariable Long childId, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date)
+    public ApiResponse<SubjectListResponseDTO> getSubjectByDate(@PathVariable Long childId, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date)
     {
         try{
             SubjectListResponseDTO subjectListResponseDTO  = parentService.getSubjectsByDate(childId, date);
