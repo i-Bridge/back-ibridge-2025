@@ -11,4 +11,5 @@ import java.util.List;
 @AllArgsConstructor
 public class StartResponseDTO {
     private boolean isFirst;
+    private boolean requiredPIIConsent;
 }

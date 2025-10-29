@@ -35,6 +35,11 @@ public class StartService {
 
     public StartResponseDTO signIn(String email, String name) {
         boolean isFirst = !parentRepository.existsByEmail(email);
+        boolean PIIConsent = false;
+        Parent p = parentRepository.findParentByEmail(email);
+        if(p != null && p.isRequiredPIIConsent()){
+            PIIConsent = true;
+        }
         //isFirst가 true -> db에 저장
         if(isFirst) {
             Parent parent = Parent.builder()//gender 추가 해야 함
@@ -42,9 +47,9 @@ public class StartService {
                     .email(email)
                     .build();
             parentRepository.save(parent);
-            return new StartResponseDTO(isFirst);
+            return new StartResponseDTO(isFirst, PIIConsent);
         }
-        return new StartResponseDTO(isFirst);
+        return new StartResponseDTO(isFirst, PIIConsent);
     }
 
     public FamilyExistDTO checkFamilyExistence(StartRequestDTO request, Parent parent) {

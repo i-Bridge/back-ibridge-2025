@@ -27,6 +27,12 @@ public class Parent {
     @JoinColumn(name = "family")
     private Family family;
 
+    @Column
+    private boolean requiredPIIConsent;
+
+    @Column
+    private boolean optionalPIIConsent;
+
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notice> parentNotices;
 }
