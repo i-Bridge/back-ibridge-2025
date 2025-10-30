@@ -3,6 +3,7 @@ package com.ibridge.service;
 import com.ibridge.domain.dto.request.StartRequestDTO;
 import com.ibridge.domain.dto.request.StartSignupNewRequestDTO;
 import com.ibridge.domain.dto.response.FamilyExistDTO;
+import com.ibridge.domain.dto.response.PIIResponseDTO;
 import com.ibridge.domain.dto.response.StartUserSelectionResponseDTO;
 import com.ibridge.domain.entity.*;
 import com.ibridge.repository.*;
@@ -32,6 +33,7 @@ public class StartService {
     private final SubjectRepository subjectRepository;
     private final QuestionRepository questionRepository;
     private final ChildStatRepository childStatRepository;
+    private final PIIRepository piiRepository;
 
     public StartResponseDTO signIn(String email, String name) {
         boolean isFirst = !parentRepository.existsByEmail(email);
@@ -50,6 +52,11 @@ public class StartService {
             return new StartResponseDTO(isFirst, PIIConsent);
         }
         return new StartResponseDTO(isFirst, PIIConsent);
+    }
+
+    public PIIResponseDTO signUpConsent() {
+        List<PII> pii = piiRepository.findAllByOrderByIdAsc();
+        return new PIIResponseDTO(pii.get(0).getContent(), pii.get(1).getContent(), pii.get(2).getContent());
     }
 
     public FamilyExistDTO checkFamilyExistence(StartRequestDTO request, Parent parent) {
@@ -234,6 +241,4 @@ public class StartService {
 
         NoticeRepository.deleteAll(Notices);
     }
-
-
 }

@@ -37,6 +37,7 @@ public class StartController {
     public ApiResponse<PIIResponseDTO> signUpConsent() {
         try{
             PIIResponseDTO response = startService.signUpConsent();
+            return ApiResponse.onSuccess(response);
         }
         catch(Exception e) {
             System.out.println("failure return: " + e.getMessage());
