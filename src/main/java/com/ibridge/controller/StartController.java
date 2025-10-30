@@ -109,6 +109,17 @@ public class StartController {
             return ApiResponse.onFailure("404", e.getMessage());
         }
     }
+    @GetMapping("/signup/status")
+    public ApiResponse<?> changeStatus(HttpServletRequest r){
+        try {
+            String email = (String) r.getAttribute("email");
+            startService.changeStatus(email);
+        }
+        catch(Exception e){
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
+    }
 
     @GetMapping("/login")
     public ApiResponse<StartUserSelectionResponseDTO> getUserSelection(HttpServletRequest r) {

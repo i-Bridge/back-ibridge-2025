@@ -85,6 +85,8 @@ public class StartService {
 
                 NoticeRepository.save(notice);
             }
+            parent.setStatus(Status.PEDING);
+            parentRepository.save(parent);
 
             return new FamilyExistDTO(true);
         }
@@ -191,6 +193,11 @@ public class StartService {
         childRepository.saveAll(children);
     }
 
+    public void changeStatus(String email) {
+        Parent parent = parentRepository.findParentByEmail(email);
+        parent.setStatus(Status.ACTIVE);
+    }
+
     public StartUserSelectionResponseDTO getUserSelection(Parent parent) {
         // 가족 정보 조회
         Family family = parent.getFamily();
@@ -218,6 +225,7 @@ public class StartService {
                     .isAccepted(isAccept)
                     .familyName(family.getName())
                     .isSend(true) //임시로 false
+                    .status(parent.getStatus())
                     .children(childDTOs)
                     .build();
         }

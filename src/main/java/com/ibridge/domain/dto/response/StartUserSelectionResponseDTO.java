@@ -1,6 +1,7 @@
 package com.ibridge.domain.dto.response;
 
 import com.ibridge.domain.entity.Gender;
+import com.ibridge.domain.entity.Status;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,6 +15,7 @@ public class StartUserSelectionResponseDTO {
     private boolean isAccepted;
     private boolean isSend;
     private String familyName;
+    private Status status;
     private List<ChildDTO> children;
 
     @Getter
