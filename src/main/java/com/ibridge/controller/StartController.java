@@ -114,6 +114,7 @@ public class StartController {
         try {
             String email = (String) r.getAttribute("email");
             startService.changeStatus(email);
+            return ApiResponse.onSuccess(null);
         }
         catch(Exception e){
             System.out.println("failure return: " + e.getMessage());
