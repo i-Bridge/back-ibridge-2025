@@ -16,8 +16,15 @@ public class StartUserSelectionResponseDTO {
     private boolean isSend;
     private String familyName;
     private Status status;
+    private List<ParentDTO> parents;
     private List<ChildDTO> children;
 
+    @Getter
+    @Builder
+    public static class ParentDTO {
+        private Long id;
+        private String name;
+    }
     @Getter
     @Builder
     public static class ChildDTO {

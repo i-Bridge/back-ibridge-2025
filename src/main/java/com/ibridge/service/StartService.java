@@ -210,7 +210,16 @@ public class StartService {
                     .isSend(!Notice.isEmpty())
                     .build();
         }
-        else {        // 자녀 리스트 생성
+        else {
+            //부모 리스트 생성
+            List<StartUserSelectionResponseDTO.ParentDTO> parentDTOS = family.getParents().stream()
+                    .sorted(Comparator.comparing(Parent::getId))
+                    .map(p -> StartUserSelectionResponseDTO.ParentDTO.builder()
+                            .id(p.getId())
+                            .name(p.getName())
+                            .build())
+                    .toList();
+            // 자녀 리스트 생성
             List<StartUserSelectionResponseDTO.ChildDTO> childDTOs = family.getChildren().stream()
                     .sorted(Comparator.comparing(Child::getBirth)) //  birth 기준 오름차순 정렬
                     .map(c -> StartUserSelectionResponseDTO.ChildDTO.builder()
@@ -226,6 +235,7 @@ public class StartService {
                     .familyName(family.getName())
                     .isSend(true) //임시로 false
                     .status(parent.getStatus())
+                    .parents(parentDTOS)
                     .children(childDTOs)
                     .build();
         }
