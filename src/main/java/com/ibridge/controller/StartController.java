@@ -4,6 +4,7 @@ import com.ibridge.domain.dto.request.StartRequestDTO;
 import com.ibridge.domain.dto.request.StartSigninRequestDTO;
 import com.ibridge.domain.dto.request.StartSignupNewRequestDTO;
 import com.ibridge.domain.dto.response.FamilyExistDTO;
+import com.ibridge.domain.dto.response.PIIResponseDTO;
 import com.ibridge.domain.dto.response.StartUserSelectionResponseDTO;
 import com.ibridge.domain.dto.response.StartResponseDTO;
 import com.ibridge.service.LoginService;
@@ -27,6 +28,17 @@ public class StartController {
             return ApiResponse.onSuccess(response);
         }
         catch (Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
+    }
+
+    @GetMapping("/signup/consent")
+    public ApiResponse<PIIResponseDTO> signUpConsent() {
+        try{
+            PIIResponseDTO response = startService.signUpConsent();
+        }
+        catch(Exception e) {
             System.out.println("failure return: " + e.getMessage());
             return ApiResponse.onFailure("404", e.getMessage());
         }
