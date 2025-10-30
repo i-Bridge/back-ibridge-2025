@@ -34,4 +34,10 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
 
     @Query("SELECT n FROM Notice n WHERE n.child = :child")
     List<Notice> findAllByChild(Child child);
+
+    @Query("SELECT CASE WHEN COUNT(n) > 0 THEN TRUE ELSE FALSE END " +
+            "FROM Notice n " +
+            "WHERE n.sender = :sender AND n.type = :type")
+    boolean existsNoticeBySenderAndType(@Param("sender") Parent sender,
+                                        @Param("type") Integer type);
 }

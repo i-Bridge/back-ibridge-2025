@@ -40,7 +40,8 @@ public class StartService {
         boolean isFirst = !parentRepository.existsByEmail(email);
         boolean PIIConsent = false;
         Parent p = parentRepository.findParentByEmail(email);
-        notice
+        boolean isSend = noticeRepository.existsNoticeBySenderAndType(p, 2);
+        boolean hasFamily = familyRepository.existsFamilyByParentsContaining(p);
         if(p != null && p.isRequiredPIIConsent()){
             PIIConsent = true;
         }
@@ -51,9 +52,9 @@ public class StartService {
                     .email(email)
                     .build();
             parentRepository.save(parent);
-            return new StartResponseDTO(isFirst, PIIConsent);
+            return new StartResponseDTO(isFirst, PIIConsent, isSend, hasFamily);
         }
-        return new StartResponseDTO(isFirst, PIIConsent);
+        return new StartResponseDTO(isFirst, PIIConsent, isSend, hasFamily);
     }
 
     public PIIResponseDTO signUpConsent() {
