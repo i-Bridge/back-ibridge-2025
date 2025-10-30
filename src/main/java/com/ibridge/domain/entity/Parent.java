@@ -33,6 +33,9 @@ public class Parent {
     @Column
     private boolean optionalPIIConsent;
 
+    @Column
+    private Status status;
+
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notice> parentNotices;
 }
