@@ -1,5 +1,6 @@
 package com.ibridge.controller;
 
+import com.ibridge.domain.dto.request.ConsentRequestDTO;
 import com.ibridge.domain.dto.request.StartRequestDTO;
 import com.ibridge.domain.dto.request.StartSigninRequestDTO;
 import com.ibridge.domain.dto.request.StartSignupNewRequestDTO;
@@ -38,6 +39,19 @@ public class StartController {
         try{
             PIIResponseDTO response = startService.signUpConsent();
             return ApiResponse.onSuccess(response);
+        }
+        catch(Exception e) {
+            System.out.println("failure return: " + e.getMessage());
+            return ApiResponse.onFailure("404", e.getMessage());
+        }
+    }
+
+    @PostMapping("signup/isConsent")
+    public ApiResponse<?> signUpIsConsent(HttpServletRequest r, @RequestBody ConsentRequestDTO request){
+        try{
+            String email = (String) r.getAttribute("email");
+            startService.signUpIsConsent(email, request);
+            return ApiResponse.onSuccess(null);
         }
         catch(Exception e) {
             System.out.println("failure return: " + e.getMessage());

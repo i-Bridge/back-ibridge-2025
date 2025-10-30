@@ -1,5 +1,6 @@
 package com.ibridge.service;
 
+import com.ibridge.domain.dto.request.ConsentRequestDTO;
 import com.ibridge.domain.dto.request.StartRequestDTO;
 import com.ibridge.domain.dto.request.StartSignupNewRequestDTO;
 import com.ibridge.domain.dto.response.FamilyExistDTO;
@@ -57,6 +58,13 @@ public class StartService {
     public PIIResponseDTO signUpConsent() {
         List<PII> pii = piiRepository.findAllByOrderByIdAsc();
         return new PIIResponseDTO(pii.get(0).getContent(), pii.get(1).getContent(), pii.get(2).getContent());
+    }
+
+    public void signUpIsConsent(String email, ConsentRequestDTO request) {
+        Parent parent = parentRepository.findParentByEmail(email);
+        parent.setRequiredPIIConsent(request.isRequiredPII());
+        parent.setOptionalPIIConsent(request.isOptionalPII());
+        parentRepository.save(parent);
     }
 
     public FamilyExistDTO checkFamilyExistence(StartRequestDTO request, Parent parent) {
