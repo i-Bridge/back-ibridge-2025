@@ -33,6 +33,7 @@ public class Parent {
     @Column
     private boolean optionalPIIConsent;
 
+    @Enumerated(EnumType.STRING)
     @Column
     private Status status;
 

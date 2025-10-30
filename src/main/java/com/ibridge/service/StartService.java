@@ -30,7 +30,7 @@ public class StartService {
     private final ParentRepository parentRepository;
     private final FamilyRepository familyRepository;
     private final ChildRepository childRepository;
-    private final NoticeRepository NoticeRepository;
+    private final NoticeRepository noticeRepository;
     private final SubjectRepository subjectRepository;
     private final QuestionRepository questionRepository;
     private final ChildStatRepository childStatRepository;
@@ -40,6 +40,7 @@ public class StartService {
         boolean isFirst = !parentRepository.existsByEmail(email);
         boolean PIIConsent = false;
         Parent p = parentRepository.findParentByEmail(email);
+        notice
         if(p != null && p.isRequiredPIIConsent()){
             PIIConsent = true;
         }
@@ -83,7 +84,7 @@ public class StartService {
                         .type(2)
                         .build();
 
-                NoticeRepository.save(notice);
+                noticeRepository.save(notice);
             }
             parent.setStatus(Status.PEDING);
             parentRepository.save(parent);
@@ -203,11 +204,7 @@ public class StartService {
         Family family = parent.getFamily();
         boolean isAccept = true;
         if (family == null) {
-            isAccept = false;
-            List<Notice> Notice = NoticeRepository.findBySenderAndType(parent);
             return StartUserSelectionResponseDTO.builder()
-                    .isAccepted(isAccept)
-                    .isSend(!Notice.isEmpty())
                     .build();
         }
         else {
@@ -231,9 +228,7 @@ public class StartService {
                     .toList();
 
             return StartUserSelectionResponseDTO.builder()
-                    .isAccepted(isAccept)
                     .familyName(family.getName())
-                    .isSend(true) //임시로 false
                     .status(parent.getStatus())
                     .parents(parentDTOS)
                     .children(childDTOs)
@@ -263,8 +258,8 @@ public class StartService {
     public void undoRequest(String email) {
         Parent parent = parentRepository.findParentByEmail(email);
 
-        List<Notice> Notices = NoticeRepository.findAllBySender(parent);
+        List<Notice> Notices = noticeRepository.findAllBySender(parent);
 
-        NoticeRepository.deleteAll(Notices);
+        noticeRepository.deleteAll(Notices);
     }
 }

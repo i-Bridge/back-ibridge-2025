@@ -12,8 +12,6 @@ import java.util.List;
 @Getter
 @Builder
 public class StartUserSelectionResponseDTO {
-    private boolean isAccepted;
-    private boolean isSend;
     private String familyName;
     private Status status;
     private List<ParentDTO> parents;

@@ -12,4 +12,6 @@ import java.util.List;
 public class StartResponseDTO {
     private boolean isFirst;
     private boolean requiredPIIConsent;
+    private boolean send;
+    private boolean hasFamily;
 }
