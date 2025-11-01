@@ -87,7 +87,7 @@ public class StartService {
 
                 noticeRepository.save(notice);
             }
-            parent.setStatus(Status.PEDING);
+            parent.setStatus(Status.PENDING);
             parentRepository.save(parent);
 
             return new FamilyExistDTO(true);
