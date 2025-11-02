@@ -662,6 +662,7 @@ public class ParentService {
             noticeRepository.delete(otherRequest);
         }
 
+        requester.setStatus(Status.FIRST_LOGIN);
         requester.setFamily(family);
         parentRepository.save(requester);
     }
