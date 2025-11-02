@@ -592,8 +592,12 @@ public class ParentService {
 
     public void deleteChild(ParentRequestDTO.DeleteChildDTO request) {
         Child child = childRepository.findById(request.getChildId()).orElseThrow(() -> new RuntimeException("Child not found"));
+        Family family = child.getFamily();
         List<Notice> noticeList = noticeRepository.findAllByChild(child);
         noticeRepository.deleteAll(noticeList);
+
+        List<Child> childCount = childRepository.findAllByFamily(family);
+        if(childCount.isEmpty()) throw new RuntimeException("자식 수가 1개라 삭제가 불가능합니다.");
 
         List<Subject> subjectList = subjectRepository.findAllByChild(child);
         for(Subject subject : subjectList) {
@@ -609,8 +613,6 @@ public class ParentService {
         List<ChildStat> childStatList = childStatRepository.findAllByChild(child);
         childStatRepository.deleteAll(childStatList);
         childRepository.delete(child);
-
-
     }
 
 
