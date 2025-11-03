@@ -206,6 +206,7 @@ public class StartService {
         boolean isAccept = true;
         if (family == null) {
             return StartUserSelectionResponseDTO.builder()
+                    .status(parent.getStatus())
                     .build();
         }
         else {

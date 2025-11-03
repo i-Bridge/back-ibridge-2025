@@ -35,7 +35,7 @@ public class Parent {
 
     @Enumerated(EnumType.STRING)
     @Column
-    private Status status;
+    private Status status = Status.PENDING;
 
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notice> parentNotices;
