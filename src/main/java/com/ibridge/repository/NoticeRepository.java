@@ -40,4 +40,7 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
             "WHERE n.sender = :sender AND n.type = :type")
     boolean existsNoticeBySenderAndType(@Param("sender") Parent sender,
                                         @Param("type") Integer type);
+
+    @Query("SELECT n.receiver FROM Notice n WHERE n.sender.id = :senderId AND n.type = :type")
+    List<Parent> findAllReceiverBySenderAndType(@Param("senderId") Long senderId, @Param("type") Integer type);
 }
