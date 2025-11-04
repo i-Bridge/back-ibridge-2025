@@ -206,6 +206,7 @@ public class StartService {
         boolean isAccept = true;
         if (family == null) {
             List<Parent> parents = noticeRepository.findAllReceiverBySenderAndType(parent.getId(), 2);
+            Family receiverFamily = familyRepository.findFamilyByParents(parents);
             List<StartUserSelectionResponseDTO.ParentDTO> parentDTOs = parents.stream()
                     .map(p -> StartUserSelectionResponseDTO.ParentDTO.builder()
                             .id(p.getId())
@@ -213,6 +214,7 @@ public class StartService {
                             .build())
                     .toList();
             return StartUserSelectionResponseDTO.builder()
+                    .familyName(receiverFamily != null ? receiverFamily.getName() : null)
                     .parents(parentDTOs)
                     .status(parent.getStatus())
                     .build();

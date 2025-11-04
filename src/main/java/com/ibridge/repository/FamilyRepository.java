@@ -2,6 +2,7 @@ package com.ibridge.repository;
 
 import com.ibridge.domain.entity.Family;
 import com.ibridge.domain.entity.Parent;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -17,4 +18,7 @@ public interface FamilyRepository extends JpaRepository<Family, Long> {
             "JOIN f.parents p " +
             "WHERE p = :parent")
     boolean existsFamilyByParentsContaining(@Param("parent") Parent parent);
+
+    @Query("SELECT f FROM Family f JOIN f.parents p WHERE p IN :parents")
+    Family findFamilyByParents(@Param("parents") List<Parent> parents);
 }
