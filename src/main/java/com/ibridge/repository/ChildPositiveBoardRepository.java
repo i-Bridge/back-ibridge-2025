@@ -66,4 +66,7 @@ public interface ChildPositiveBoardRepository extends JpaRepository<ChildPositiv
 
     @Query("SELECT cp FROM ChildPositiveBoard cp WHERE cp.child = :child and cp.keyword = :keyword and cp.period = :today")
     Optional<ChildPositiveBoard> findByChildAndKeyword(Child child, String keyword, LocalDate today);
+
+    @Query("SELECT c FROM ChildPositiveBoard c WHERE c.child = :child ORDER BY c.period DESC LIMIT 1")
+    ChildPositiveBoard findTopByChildOrderByPeriodDesc(@Param("child") Child child);
 }

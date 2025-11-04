@@ -132,6 +132,7 @@ public class ParentService {
 
         // 오늘 ChildStat
         ChildStat csToday = childStatRepository.findByChildAndPeriod(child, LocalDate.now());
+        ChildPositiveBoard latestBoard = childPositiveBoardRepository.findTopByChildOrderByPeriodDesc(child);
 
         // ChildPositiveBoard
         ChildPositiveBoard cpb = childPositiveBoardRepository.findTopByChild(child);
@@ -160,6 +161,7 @@ public class ParentService {
         String mostTalkedCategory = (cpb != null ? cpb.getKeyword() : null);
 
         return BannerDTO.builder()
+                .date(latestBoard.getPeriod())
                 .cumulativeAnswerCount(cs != null ? cs.getAnswerCount() : 0)
                 .mostTalkedCategory(mostTalkedCategory)
                 .positiveCategory(highestPositiveCategory)

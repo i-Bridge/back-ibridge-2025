@@ -1,5 +1,6 @@
 package com.ibridge.domain.dto.response;
 
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BannerDTO {
+    private LocalDate date;
     private Long cumulativeAnswerCount;
     private String mostTalkedCategory;
     private String positiveCategory;
