@@ -680,7 +680,7 @@ public class ParentService {
     }
 
     public void readAll(Parent parent) {
-        List<Notice> notices = noticeRepository.findAllByParent(parent);
+        List<Notice> notices = noticeRepository.findAllByParentAndType(parent, 1);
         noticeRepository.deleteAll(notices);
     }
 }
