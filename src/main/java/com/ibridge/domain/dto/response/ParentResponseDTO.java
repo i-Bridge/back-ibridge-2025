@@ -40,10 +40,10 @@ public class ParentResponseDTO {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ChildInfoDTO {
-        Long childId;
-        String childName;
-        String childBirth;
-        int childGender;
+        Long id;
+        String name;
+        String birth;
+        int gender;
     }
 
     @Builder
@@ -59,8 +59,10 @@ public class ParentResponseDTO {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ParentInfoDTO {
-        Long parentId;
-        String parentName;
+        Long id;
+        String email;
+        String name;
+        boolean own;
     }
 
     @Builder
@@ -71,6 +73,8 @@ public class ParentResponseDTO {
         String familyName;
         List<ParentInfoDTO> parents;
         List<ChildInfoDTO> children;
+        Integer parentCount;
+        Integer childCount;
     }
 
     @Builder

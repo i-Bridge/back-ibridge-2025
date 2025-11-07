@@ -444,23 +444,26 @@ public class ParentService {
         List<ParentResponseDTO.ParentInfoDTO> parentInfoDTOList = new ArrayList<>();
         for(Parent otherParent : parentRepository.findAllByFamily(family)) {
             parentInfoDTOList.add(ParentResponseDTO.ParentInfoDTO.builder()
-                    .parentId(otherParent.getId())
-                    .parentName(otherParent.getName()).build());
+                    .id(otherParent.getId())
+                    .name(otherParent.getName())
+                    .own(otherParent.equals(parent)).build());
         }
 
         List<ParentResponseDTO.ChildInfoDTO> childInfoDTOList = new ArrayList<>();
         for(Child child : childRepository.findAllByFamily(family)) {
             childInfoDTOList.add(ParentResponseDTO.ChildInfoDTO.builder()
-                    .childId(child.getId())
-                    .childName(child.getName())
-                    .childBirth(child.getBirth().toString())
-                    .childGender(child.getGender().ordinal()).build());
+                    .id(child.getId())
+                    .name(child.getName())
+                    .birth(child.getBirth().toString())
+                    .gender(child.getGender().ordinal()).build());
         }
 
         return ParentResponseDTO.GetFamilyInfoDTO.builder()
                 .familyName(family.getName())
                 .parents(parentInfoDTOList)
-                .children(childInfoDTOList).build();
+                .children(childInfoDTOList)
+                .parentCount(parentInfoDTOList.size())
+                .childCount(childInfoDTOList.size()).build();
     }
 
     public void editName(Parent parent, ParentRequestDTO.editNameDTO request) {
