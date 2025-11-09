@@ -45,7 +45,8 @@ public interface ChildPositiveBoardRepository extends JpaRepository<ChildPositiv
             "   SELECT MAX(c2.period) " +
             "   FROM ChildPositiveBoard c2 " +
             "   WHERE c2.child.id = :childId" +
-            ")")
+            ")" +
+            "ORDER BY c.keywordCount DESC")
     List<KeywordDTO> findKeywordsByChildId(@Param("childId") Long childId);
 
     @Query("SELECT cp FROM ChildPositiveBoard cp WHERE cp.child = :child")
