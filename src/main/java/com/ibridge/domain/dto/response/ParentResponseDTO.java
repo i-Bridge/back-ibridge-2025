@@ -43,7 +43,7 @@ public class ParentResponseDTO {
         Long id;
         String name;
         String birth;
-        int gender;
+        String gender;
     }
 
     @Builder

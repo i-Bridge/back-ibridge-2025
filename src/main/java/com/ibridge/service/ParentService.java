@@ -445,6 +445,7 @@ public class ParentService {
         for(Parent otherParent : parentRepository.findAllByFamily(family)) {
             parentInfoDTOList.add(ParentResponseDTO.ParentInfoDTO.builder()
                     .id(otherParent.getId())
+                    .email(otherParent.getEmail())
                     .name(otherParent.getName())
                     .own(otherParent.equals(parent)).build());
         }
@@ -455,7 +456,7 @@ public class ParentService {
                     .id(child.getId())
                     .name(child.getName())
                     .birth(child.getBirth().toString())
-                    .gender(child.getGender().ordinal()).build());
+                    .gender(child.getGender().toString()).build());
         }
 
         return ParentResponseDTO.GetFamilyInfoDTO.builder()
