@@ -160,7 +160,7 @@ public class ParentController {
         }
     }
 
-    @GetMapping("/{childId}/keywords")
+    @GetMapping("/{childId}/categories")
     public ApiResponse<AnalysisResponseDTO> getAnalysis(@PathVariable Long childId){
         try{
             AnalysisResponseDTO analysisResponseDTO = parentService.getDefaultAnalysis(childId);

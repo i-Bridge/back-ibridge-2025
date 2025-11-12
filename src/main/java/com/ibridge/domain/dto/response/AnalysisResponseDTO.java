@@ -18,5 +18,5 @@ public class AnalysisResponseDTO {
     private Long cumulative;
     private List<Integer> emotions;
     private List<Long> cumList;
-    private List<KeywordDTO> keywords;
+    private List<KeywordDTO> categories;
 }
