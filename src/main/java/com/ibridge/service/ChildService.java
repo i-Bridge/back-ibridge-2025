@@ -127,8 +127,8 @@ public class ChildService {
         //지금까지의 대화
         StringBuilder sb = new StringBuilder(2048);
         for (Question question : questions) {
-            sb.append(question.getText()).append('\n')
-                    .append(analysisRepository.findByQuestionId(question.getId()).get().getAnswer()).append('\n');
+            sb.append("AI: " + question.getText()).append('\n')
+                    .append("아이: " + analysisRepository.findByQuestionId(question.getId()).get().getAnswer()).append('\n');
         }
         String conv = sb.toString();
         String ai = "";
