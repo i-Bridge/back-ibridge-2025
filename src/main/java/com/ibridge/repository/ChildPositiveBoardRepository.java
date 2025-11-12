@@ -70,4 +70,7 @@ public interface ChildPositiveBoardRepository extends JpaRepository<ChildPositiv
 
     @Query("SELECT c FROM ChildPositiveBoard c WHERE c.child = :child ORDER BY c.period DESC LIMIT 1")
     ChildPositiveBoard findTopByChildOrderByPeriodDesc(@Param("child") Child child);
+
+    @Query("SELECT c FROM ChildPositiveBoard c WHERE c.child = :child ORDER BY c.period ASC")
+    List<ChildPositiveBoard> findByChild(Child child);
 }

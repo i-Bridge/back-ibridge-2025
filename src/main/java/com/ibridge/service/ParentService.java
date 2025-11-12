@@ -124,44 +124,52 @@ public class ParentService {
     }*/
 
     public BannerDTO getBanner(Long childId) {
-        Child child = childRepository.findById(childId).orElseThrow(() -> new RuntimeException("해당하는 자녀를 찾을 수 없습니다." + childId));
-        LocalDate startDate = LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue(), 1);
-        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+        Child child = childRepository.findById(childId)
+                .orElseThrow(() -> new RuntimeException("해당하는 자녀를 찾을 수 없습니다. " + childId));
+
         // 누적 ChildStat
         ChildStat cs = childStatRepository.findByType(child).orElse(null);
-
         // 오늘 ChildStat
         ChildStat csToday = childStatRepository.findByChildAndPeriod(child, LocalDate.now());
+        // 최신 ChildPositiveBoard
         ChildPositiveBoard latestBoard = childPositiveBoardRepository.findTopByChildOrderByPeriodDesc(child);
 
-        // ChildPositiveBoard
-        ChildPositiveBoard cpb = childPositiveBoardRepository.findTopByChild(child);
-
-        List<ChildPositiveBoard> boards = childPositiveBoardRepository.findByChildAndPeriodBetween(child, startDate, endDate);
+        // 자녀의 전체 ChildPositiveBoard 데이터 조회
+        List<ChildPositiveBoard> boards = childPositiveBoardRepository.findByChild(child);
 
         String highestPositiveCategory = null;
         String highestNegativeCategory = null;
 
         if (!boards.isEmpty()) {
+            // 긍정 비율 가장 높은 카테고리
             ChildPositiveBoard maxPositiveBoard = boards.stream()
-                    .filter(b -> b.getKeyword() != null && b.getKeywordCount() != 0)
-                    .max(Comparator.comparingDouble(b -> (double) b.getPositive() / b.getKeywordCount()))
+                    .filter(b -> b.getKeyword() != null && b.getKeywordCount() > 0)
+                    .max(Comparator.comparingDouble(b ->
+                            (double) b.getPositive() / b.getKeywordCount()))
                     .orElse(null);
-            highestPositiveCategory = maxPositiveBoard != null ? maxPositiveBoard.getKeyword() : null;
 
+            highestPositiveCategory = (maxPositiveBoard != null)
+                    ? maxPositiveBoard.getKeyword()
+                    : null;
+
+            // 부정 비율 가장 높은 카테고리
             ChildPositiveBoard maxNegativeBoard = boards.stream()
-                    .filter(b -> b.getKeyword() != null && b.getKeywordCount() != 0)
-                    .max(Comparator.comparingDouble(b -> 1.0 - (double) b.getPositive() / b.getKeywordCount()))
+                    .filter(b -> b.getKeyword() != null && b.getKeywordCount() > 0)
+                    .max(Comparator.comparingDouble(b ->
+                            1.0 - (double) b.getPositive() / b.getKeywordCount()))
                     .orElse(null);
-            highestNegativeCategory = maxNegativeBoard != null ? maxNegativeBoard.getKeyword() : null;
+
+            highestNegativeCategory = (maxNegativeBoard != null)
+                    ? maxNegativeBoard.getKeyword()
+                    : null;
         }
 
-        // 포도송이 계산 시 cs, csToday null 체크
-
+        // 가장 최근에 대화한 카테고리 (optional)
+        ChildPositiveBoard cpb = childPositiveBoardRepository.findTopByChild(child);
         String mostTalkedCategory = (cpb != null ? cpb.getKeyword() : null);
 
         return BannerDTO.builder()
-                .date(latestBoard.getPeriod())
+                .date(latestBoard != null ? latestBoard.getPeriod() : null)
                 .cumulativeAnswerCount(cs != null ? cs.getAnswerCount() : 0)
                 .mostTalkedCategory(mostTalkedCategory)
                 .positiveCategory(highestPositiveCategory)
@@ -169,6 +177,7 @@ public class ParentService {
                 .name(child.getName())
                 .build();
     }
+
 
     public ParentHomeResponseDTO openNotice(Long childId, Long subjectId, Long noticeId) {
         noticeRepository.deleteById(noticeId);
