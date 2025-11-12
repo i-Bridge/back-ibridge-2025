@@ -160,7 +160,7 @@ public class ParentController {
         }
     }
 
-    @GetMapping("/{childId}/keywords")
+    @GetMapping("/{childId}/categories")
     public ApiResponse<AnalysisResponseDTO> getAnalysis(@PathVariable Long childId){
         try{
             AnalysisResponseDTO analysisResponseDTO = parentService.getDefaultAnalysis(childId);
@@ -173,8 +173,11 @@ public class ParentController {
     }
 
     @GetMapping("{childId}/stat/emotion")
-    public ApiResponse<EmotionAnalysisResponseDTO> getEmotions(@PathVariable Long childId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date){
+    public ApiResponse<EmotionAnalysisResponseDTO> getEmotions(@PathVariable Long childId, @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date){
         try{
+            if(date == null) {
+                date = LocalDate.now();
+            }
             EmotionAnalysisResponseDTO emotionAnalysisResponseDTO = parentService.getEmotions(childId, date);
             return ApiResponse.onSuccess(emotionAnalysisResponseDTO);
         }
