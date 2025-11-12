@@ -240,7 +240,7 @@ public class ParentService {
         }
         List<KeywordDTO> keywordDTOs = childPositiveBoardRepository.findKeywordsByChildId(childId);
         return AnalysisResponseDTO.builder()
-                .keywords(keywordDTOs)
+                .categories(keywordDTOs)
                 .build();
     }
 
