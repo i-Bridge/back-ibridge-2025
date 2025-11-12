@@ -244,12 +244,12 @@ public class ParentService {
                 .build();
     }
 
-    public EmotionAnalysisResponseDTO getEmotions(Long childId, LocalDate today) {
+    public EmotionAnalysisResponseDTO getEmotions(Long childId, LocalDate date) {
         Child child = childRepository.findById(childId)
                 .orElseThrow(() -> new RuntimeException("Child not found"));
 
         // 2) 요청일 기준 YearMonth 범위
-        YearMonth yearMonth = YearMonth.from(today);
+        YearMonth yearMonth = YearMonth.from(date);
         LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();
         int daysInMonth = yearMonth.lengthOfMonth();
@@ -272,16 +272,17 @@ public class ParentService {
         }
 
         // 5) 이번 달 최빈 감정 계산 (0은 무시)
-        Map<Integer, Long> freq = Arrays.stream(emotions)
-                .filter(Objects::nonNull)
-                .filter(v -> v != 0)
-                .collect(Collectors.groupingBy(v -> v, Collectors.counting()));
-
-        int mostFrequentEmotion = freq.entrySet().stream()
-                .max(Map.Entry.<Integer, Long>comparingByValue()
-                        .thenComparing(Map.Entry.comparingByKey())) // 동률이면 작은 값 선택(임의)
-                .map(Map.Entry::getKey)
-                .orElse(0);
+        int mostFrequentEmotion =
+                java.util.stream.IntStream.rangeClosed(1, daysInMonth)
+                        .map(i -> emotions[i] == null ? 0 : emotions[i])
+                        .filter(v -> v != 0)
+                        .boxed()
+                        .collect(Collectors.groupingBy(v -> v, Collectors.counting()))
+                        .entrySet().stream()
+                        .max(Map.Entry.<Integer, Long>comparingByValue()
+                                .thenComparing(Map.Entry.comparingByKey()))
+                        .map(Map.Entry::getKey)
+                        .orElse(0);
 
         // 6) signupDate 결정: 가능한 경우 가장 오래된 ChildStat.period 사용
         Optional<ChildStat> firstStatOpt = childStatRepository.findFirstByChildOrderByPeriodAsc(child);
