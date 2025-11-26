@@ -682,10 +682,16 @@ public class ParentService {
 
         Notice requested = noticeRepository.findByReceiverandSendertoJoinFamily(parent, sender);
         noticeRepository.delete(requested);
+
+        if(noticeRepository.findAllBySender(parent).isEmpty()) parent.setStatus(Status.REJECT);
+        parentRepository.save(parent);
     }
 
     public void readAll(Parent parent) {
         List<Notice> notices = noticeRepository.findAllByParentAndType(parent, 1);
         noticeRepository.deleteAll(notices);
+
+        List<Notice> notice_grape = noticeRepository.findAllByParentAndType(parent, 3);
+        noticeRepository.deleteAll(notice_grape);
     }
 }
